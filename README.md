@@ -1,76 +1,164 @@
-About the Project
+# Gastroacoustic Spectral-Energy Analysis
 
-MOM Device v2 is a research project I am working on to develop a low-cost ESP32-based system that can detect gastrointestinal sounds using acoustic signal processing.
+This repository is the reproducibility companion for the manuscript:
 
-The project combines hardware and software. The goal is to use an ESP32 and microphone to collect or analyze audio and determine whether gastrointestinal acoustic events can be detected reliably.
+**Annotated bowel-sound events showed higher relative 120-480 Hz spectral energy in a public acoustic dataset**
 
-What the Code Does
+It contains the analysis code for the manuscript's secondary analysis of the public **Bowel sounds signal** dataset by Zahra Mansour (Figshare version 1; DOI `10.6084/m9.figshare.28595741.v1`).
 
-The Python code processes audio recordings to look for possible gastrointestinal acoustic events.
+## What this repository analyzes
 
-The current process:
+The manuscript tests the a priori hypothesis that annotated bowel-sound event windows contain a greater fraction of 20-2,000 Hz spectral power within 120-480 Hz than eligible annotation-free windows.
 
-Reads an audio file.
-Applies a bandpass filter to focus on a specific frequency range.
-Calculates the amplitude envelope of the filtered audio.
-Converts the signal to dBFS.
-Uses a threshold to determine whether an acoustic event was detected.
+This repository does **not** test the ESP32/MAX4466 hardware, diagnostic accuracy, gastrointestinal motility, or a threshold-based bowel-sound detector.
 
-The frequency range and other settings may change as I test the system and compare the results with research and published literature.
+## Analysis implemented in `process_gut_audio.py`
 
-Requirements
+The script reproduces the manuscript pipeline:
 
-The code uses Python 3 and the following libraries:
+1. Uses the seven WAV recordings and seven matching TXT annotation files in Figshare version 1.
+2. Converts audio to floating point and mean-centers each recording.
+3. Resamples the 48 kHz recordings to 8 kHz with polyphase resampling.
+4. Splits each recording into non-overlapping 500 ms (4,000-sample) windows.
+5. Parses the annotation files and treats `SB`, `MB`, `CRS`, and `HS` as confirmed bowel-sound events.
+6. Gives confirmed-event overlap priority when a window overlaps a confirmed event.
+7. Excludes windows that overlap other/unrecognized annotations or whose start is within 500 ms of an annotation boundary.
+8. Treats the remaining eligible windows as non-events.
+9. Mean-centers each retained window, applies a Hann taper, and computes a real FFT.
+10. Computes the primary feature:
 
-NumPy
-SciPy
+   `band-energy ratio = power(120-480 Hz) / power(20-2,000 Hz)`
 
-To install them, run:
+11. Reports pooled window-level distributions descriptively only.
+12. Groups recordings by their four filename date prefixes for the higher-level paired analysis.
+13. Computes event-minus-non-event median differences for each date group.
+14. Performs an exact two-sided sign-flip test over all 16 sign assignments.
+15. Computes a conventional t-based 95% confidence interval for the mean paired difference.
+16. Computes the Mann-Whitney probability-of-superiority effect size within each date group.
+17. Saves the manuscript tables, figures, window-level results, and a JSON summary.
 
-pip install numpy scipy
-How to Run
-Install Python 3.
-Install the required libraries:
-pip install numpy scipy
-Download or clone this repository.
-Place a WAV audio file in the project folder.
-Run the processing code using the audio file.
+The code deliberately does **not** run a pooled window-level significance test because windows from the same recording are correlated and are not independent biological replicates.
 
-For example:
+## Dataset
 
-from process_gut_audio import process_gut_audio
+Source:
 
-result = process_gut_audio("example_audio.wav")
+- Zahra Mansour, **Bowel sounds signal**, Figshare, version 1
+- DOI: `10.6084/m9.figshare.28595741.v1`
+- License: CC BY 4.0
 
-print("Gastrointestinal acoustic event detected:", result)
-Dataset
+The Figshare release contains seven mono WAV recordings and seven matching TXT annotation files used here.
 
-I plan to use publicly available recordings and a controlled acoustic validation dataset to test the signal-processing methods.
+The source metadata states that the recordings come from four subjects, but the public release does not provide a verified recording-to-subject mapping for these seven files. Therefore, the manuscript uses the four filename date prefixes only as **unverified higher-level analysis units**, not as confirmed participant IDs.
 
-Dataset: https://ir.lib.uwo.ca/clinicalskills_abdominalexam/
+The raw audio is not copied into this repository. The analysis script can download the immutable Figshare version-1 files directly.
 
-I will update this section once the final dataset has been selected. The repository will also include information about the number of unique recordings and how the recordings were processed.
+## Installation
 
-Research Question
+Python 3.10 or later is recommended.
 
-My research question is:
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
 
-How accurately can a low-cost embedded acoustic system detect gastrointestinal acoustic events from controlled audio datasets?
+## One-command reproduction
 
-This code is part of the analysis used to answer that question. It processes audio recordings and attempts to identify potential gastrointestinal acoustic events.
+From the repository root:
 
-I am also testing the hypothesis that frequency-based filtering will improve gastrointestinal acoustic event detection compared with using amplitude thresholds alone.
+```bash
+python process_gut_audio.py --download --verify
+```
 
-Project Status
+This command:
 
-Status: In Development
+- downloads the exact Figshare v1 files into `data/` if they are not already present,
+- analyzes all seven recordings,
+- writes regenerated results to `outputs/`,
+- compares the regenerated values with the manuscript values at the reported precision,
+- exits with an error if the values do not match.
 
-I am currently working on the hardware feasibility testing and developing the audio-processing pipeline. The code and processing methods may change as I collect results and improve the system.
+If the data have already been downloaded, run:
 
-About This Repository
+```bash
+python process_gut_audio.py --verify
+```
 
-This repository contains the Python code used for the MOM Device v2 project. I am making the code publicly available so that the methods used in the project can be viewed and, where possible, reproduced by others.
+## Expected manuscript results
 
-Author
+The `--verify` check compares independently recomputed outputs against these reported values:
+
+| Quantity | Manuscript value |
+|---|---:|
+| Complete 500 ms windows | 10,922 |
+| Confirmed-event windows | 3,881 |
+| Eligible non-event windows | 5,878 |
+| Excluded windows | 1,163 |
+| Event mean band-energy ratio | 0.469 |
+| Event median band-energy ratio | 0.426 |
+| Non-event mean band-energy ratio | 0.148 |
+| Non-event median band-energy ratio | 0.089 |
+| Date-group median differences | 0.077, 0.103, 0.308, 0.383 |
+| Mean paired difference | 0.218 |
+| Median paired difference | 0.206 |
+| 95% CI for mean paired difference | -0.023 to 0.459 |
+| Exact two-sided sign-flip p-value | 0.125 |
+| Mean P(event > non-event) | 0.728 |
+
+These values are stored only as **verification targets**. They are not inserted into the calculations. The analysis is recomputed from the source WAV and annotation files.
+
+## Generated outputs
+
+A successful run creates:
+
+```text
+outputs/
+├── analysis_summary.json
+├── window_level_results.csv
+├── table1_pooled_summary.csv
+├── table2_date_group_summary.csv
+├── table3_recording_summary.csv
+├── figure1_window_distributions.png
+└── figure2_group_medians.png
+```
+
+## Reproducibility gate
+
+A repository should only be described as reproducing the manuscript after a clean run of:
+
+```bash
+python process_gut_audio.py --download --verify
+```
+
+prints:
+
+```text
+REPRODUCIBILITY CHECK PASSED
+```
+
+If the check fails, the script prints each discrepancy and exits with a non-zero status. Any discrepancy should be resolved before the repository is cited as verified reproduction of the manuscript.
+
+## Statistical interpretation
+
+The thousands of 500 ms windows are useful for describing acoustic distributions, but they are not thousands of independent participants. The primary higher-level analysis therefore uses four filename-date groups and should be interpreted cautiously because those groups are not verified participant identifiers.
+
+The repository reproduces the analysis as reported; it does not convert the four date groups into verified biological replicates.
+
+## Repository structure
+
+```text
+.
+├── README.md
+├── process_gut_audio.py
+├── requirements.txt
+└── .gitignore
+```
+
+## Citation
+
+If you reuse the source audio or annotations, cite the original Figshare dataset and comply with its CC BY 4.0 license.
+
+## Author
 
 Neelesh Kotte
