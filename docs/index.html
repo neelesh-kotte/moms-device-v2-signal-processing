@@ -16,42 +16,41 @@
 
   <main>
     <section class="hero"><div class="wrap">
-      <span class="eyebrow">Independent Biomedical Engineering Project</span>
-      <h1>Low-cost gastroacoustic sensing, built to be inspected.</h1>
-      <p>The MOM Device project explores whether accessible sensing hardware and transparent signal processing can support physiological acoustic analysis outside traditional clinical instrumentation. This page separates the prototype engineering work from the independently reproducible public spectral-analysis archive.</p>
+      <span class="eyebrow">Independent Biomedical Engineering Research</span>
+      <h1>Low-cost gastroacoustic sensing, tested across datasets.</h1>
+      <p>The MOM Device project combines accessible sensing hardware with transparent physiological-acoustic analysis. The research track tests a fixed bowel-sound spectral ratio in seven derivation recordings and a separate 19-subject corpus while keeping the failed primary endpoint distinct from an exploratory rank pattern.</p>
       <div class="cta">
         <a class="btn primary" href="https://github.com/neelesh-kotte/moms-device-v2-signal-processing">Open public GitHub repository</a>
-        <a class="btn" href="https://doi.org/10.6084/m9.figshare.28595741.v1">Open source dataset</a>
+        <a class="btn" href="https://doi.org/10.6084/m9.figshare.28595741.v1">Figshare corpus</a>
+        <a class="btn" href="https://doi.org/10.34740/KAGGLE/DSV/2825527">External corpus</a>
       </div>
     </div></section>
 
     <section class="section" id="evidence"><div class="wrap">
       <h2>Evidence, not just claims.</h2>
-      <p class="lede">Each item is labeled by what can actually be checked online. “Verified public” means a reviewer can follow the link and inspect it now. “Documented prototype” means the project component is described here but its full source artifact is not currently included in the public reproducibility repository.</p>
+      <p class="lede">“Verified public” means a reviewer can inspect the linked resource now. “Documented analysis” means the result is reported in the updated manuscripts and repository documentation, while the full external-corpus V8 executable package is not yet present on the public branch.</p>
       <div class="grid">
-        <article class="card span4"><span class="tag verified">Verified public</span><h3>GitHub repository</h3><p>Public analysis code, dependencies, README, reproducibility instructions, and versioned history.</p><p style="margin-top:14px"><a href="https://github.com/neelesh-kotte/moms-device-v2-signal-processing">View repository →</a></p></article>
-        <article class="card span4"><span class="tag verified">Verified public</span><h3>Dataset</h3><p>Seven WAV recordings and matching annotations are drawn from the immutable Figshare v1 release and can be downloaded by the analysis script.</p><p style="margin-top:14px"><a href="https://doi.org/10.6084/m9.figshare.28595741.v1">View Figshare dataset →</a></p></article>
-        <article class="card span4"><span class="tag verified">Verified public</span><h3>Testing methodology</h3><p>The repository defines the windowing, annotation rules, FFT procedure, energy ratio, higher-level grouping, statistical test, and verification gate.</p><p style="margin-top:14px"><a href="https://github.com/neelesh-kotte/moms-device-v2-signal-processing/blob/main/README.md">Read methodology →</a></p></article>
-        <article class="card span4"><span class="tag documented">Documented prototype</span><h3>Hardware schematic</h3><p>Final prototype architecture uses an ESP32-WROOM-32, MAX4466 microphone amplifier, and stethoscope-based acoustic coupling. The electrical signal path is documented below.</p></article>
-        <article class="card span4"><span class="tag documented">Documented prototype</span><h3>Technical report</h3><p>This page records the engineering rationale, system architecture, analysis pipeline, validation logic, limitations, and public evidence trail.</p></article>
-        <article class="card span4"><span class="tag gap">Not yet public</span><h3>Flask / AI prototype source</h3><p>A Flask-based research interface was developed during the broader prototype effort, but that application source is not part of the current spectral-analysis reproducibility repository. This page does not present it as independently verified public code.</p></article>
+        <article class="card span4"><span class="tag verified">Verified public</span><h3>GitHub repository</h3><p>Public derivation code, dependencies, updated study documentation, reproducibility instructions, and versioned history.</p><p style="margin-top:14px"><a href="https://github.com/neelesh-kotte/moms-device-v2-signal-processing">View repository →</a></p></article>
+        <article class="card span4"><span class="tag verified">Verified public</span><h3>Two source datasets</h3><p>Seven annotated Figshare recordings form the derivation corpus. A separate Kaggle release contains 1,606 clips from 19 anonymized subjects.</p><p style="margin-top:14px"><a href="https://doi.org/10.6084/m9.figshare.28595741.v1">Figshare →</a> &nbsp; <a href="https://doi.org/10.34740/KAGGLE/DSV/2825527">Kaggle →</a></p></article>
+        <article class="card span4"><span class="tag verified">Verified public</span><h3>Updated methodology</h3><p>The repository documents the fixed estimator, participant-weighted transport test, exploratory rank analysis, power decomposition, sensitivity checks, and interpretation limits.</p><p style="margin-top:14px"><a href="https://github.com/neelesh-kotte/moms-device-v2-signal-processing/blob/main/README.md">Read methodology →</a></p></article>
+        <article class="card span4"><span class="tag documented">Documented prototype</span><h3>Hardware schematic</h3><p>The prototype uses an ESP32-WROOM-32, MAX4466 microphone amplifier, and stethoscope-based acoustic coupling. Hardware validation is separate from the public-data analysis.</p></article>
+        <article class="card span4"><span class="tag documented">Documented analysis</span><h3>Cross-corpus transport study</h3><p>The fixed ratio was tested without retuning in an independent corpus. The primary median shift failed to transfer; a secondary post-hoc rank pattern remained exploratory.</p></article>
+        <article class="card span4"><span class="tag gap">Not yet public</span><h3>Expanded V8 package</h3><p>The external-corpus scripts, machine-readable transport outputs, and expanded verification suite described in the manuscripts are not yet included on the public branch. No claim here treats them as presently downloadable.</p></article>
       </div>
     </div></section>
 
     <section class="section" id="system"><div class="wrap">
       <h2>System architecture</h2>
-      <p class="lede">The engineering prototype and the public data-analysis archive answer related but different questions. The hardware track explores low-cost acquisition. The reproducibility track tests a specific spectral-energy hypothesis on a public annotated dataset.</p>
-      <div class="card span12">
-        <div class="arch">
-          <div class="node">Abdominal acoustic signal</div><div class="arrow">→</div>
-          <div class="node">Stethoscope coupling</div><div class="arrow">→</div>
-          <div class="node">MAX4466 amplifier</div><div class="arrow">→</div>
-          <div class="node">ESP32 GPIO32 ADC</div><div class="arrow">→</div>
-          <div class="node">Python DSP / FFT</div>
-        </div>
-      </div>
+      <p class="lede">The hardware and research tracks answer different questions. The prototype explores low-cost acquisition; the cross-corpus study tests whether a fixed spectral estimator transports across acquisition domains.</p>
+      <div class="card span12"><div class="arch">
+        <div class="node">Abdominal acoustic signal</div><div class="arrow">→</div>
+        <div class="node">Stethoscope coupling</div><div class="arrow">→</div>
+        <div class="node">MAX4466 amplifier</div><div class="arrow">→</div>
+        <div class="node">ESP32 GPIO32 ADC</div><div class="arrow">→</div>
+        <div class="node">Python DSP / FFT</div>
+      </div></div>
       <div class="grid" style="margin-top:16px">
-        <article class="card span6"><h3>Prototype electrical schematic</h3><p class="small">This is a prototype wiring schematic, not evidence of a fabricated custom PCB.</p><pre class="schematic">MAX4466                     ESP32-WROOM-32
+        <article class="card span6"><h3>Prototype electrical schematic</h3><p class="small">Prototype wiring only; no fabricated custom PCB is claimed.</p><pre class="schematic">MAX4466                     ESP32-WROOM-32
 ────────                    ──────────────
 VCC   ───────────────────→  3V3
 GND   ───────────────────→  GND
@@ -62,64 +61,74 @@ Stethoscope diaphragm
 MAX4466 microphone + adjustable gain
         ↓ analog signal
 ESP32 ADC acquisition</pre></article>
-        <article class="card span6"><h3>Why frequency-domain analysis?</h3><p>Amplitude can rise because of target acoustic activity, motion, contact changes, or environmental noise. The analysis therefore examines spectral composition rather than assuming that every large-amplitude event is biologically meaningful.</p><p style="margin-top:14px">The public analysis computes the fraction of 20–2,000 Hz spectral power that lies inside 120–480 Hz after mean-centering, Hann tapering, and an FFT.</p></article>
+        <article class="card span6"><h3>Fixed spectral estimator</h3><p>Audio is mean-centered, resampled to 8 kHz, divided into non-overlapping 500 ms windows, tapered with <code>numpy.hanning(4000)</code>, and transformed with a real FFT.</p><p style="margin-top:14px">The feature is <code>power(120–480 Hz) / power(20–2,000 Hz)</code>, using inclusive frequency boundaries. It was not retuned for the external corpus.</p></article>
       </div>
     </div></section>
 
     <section class="section" id="methods"><div class="wrap">
-      <h2>Reproducible analysis methodology</h2>
-      <p class="lede">The public repository is structured so a reviewer can recompute the reported analysis rather than trust a screenshot or manually entered table.</p>
+      <h2>Cross-corpus analysis methodology</h2>
+      <p class="lede">The design separates descriptive acoustic windows from independent biological units and preserves the difference between the frozen primary endpoint and post-hoc analyses.</p>
       <div class="steps">
-        <div class="step"><b>Acquire the immutable source files</b><span>The script downloads the seven Figshare v1 WAV files and seven matching annotation files.</span></div>
-        <div class="step"><b>Standardize audio</b><span>Audio is converted to floating point, mean-centered, and 48 kHz recordings are resampled to 8 kHz.</span></div>
-        <div class="step"><b>Create fixed analysis windows</b><span>Each recording is divided into non-overlapping 500 ms windows, corresponding to 4,000 samples at 8 kHz.</span></div>
-        <div class="step"><b>Apply annotation rules</b><span>SB, MB, CRS, and HS annotations define confirmed bowel-sound events. Ambiguous or boundary-adjacent windows are excluded by explicit rules.</span></div>
-        <div class="step"><b>Calculate the primary spectral feature</b><span>After a Hann taper and real FFT, the script computes power(120–480 Hz) / power(20–2,000 Hz).</span></div>
-        <div class="step"><b>Respect the data hierarchy</b><span>Window-level distributions are descriptive. Higher-level comparisons use four filename-date groups as unverified grouping units, not verified participant IDs.</span></div>
-        <div class="step"><b>Run the verification gate</b><span><code>python process_gut_audio.py --download --verify</code> independently recomputes the outputs and checks them against reported values.</span></div>
+        <div class="step"><b>Analyze the derivation corpus</b><span>Seven public 48 kHz recordings produced 10,922 complete windows. Because participant and sensor mappings are unresolved, inference remains recording-level and conditional.</span></div>
+        <div class="step"><b>Reconstruct the external corpus</b><span>1,606 two-second, 44.1 kHz clips and 6,413 source annotations were organized into 19 anonymized subject records; duplicate boundary-spanning annotations were removed.</span></div>
+        <div class="step"><b>Apply one fixed estimator</b><span>Both corpora use the same 8 kHz resampling, 500 ms windows, boundary guard, Hann taper, FFT, and 120–480/20–2,000 Hz ratio.</span></div>
+        <div class="step"><b>Respect independent units</b><span>Pooled windows are descriptive. The external primary analysis gives each eligible subject one median difference and equal weight.</span></div>
+        <div class="step"><b>Test the frozen primary endpoint</b><span>The subject-level event-minus-non-event median difference receives a t-based interval and exact two-sided sign-flip test.</span></div>
+        <div class="step"><b>Label exploratory work explicitly</b><span>After heterogeneity was observed, within-subject Mann–Whitney probability of superiority was added post hoc. It does not replace the primary endpoint.</span></div>
+        <div class="step"><b>Stress-test the result</b><span>Checks include participant bootstrapping, leave-one-subject-out analysis, minimum class counts, alternative labels, Holm correction, power decomposition, and estimator verification.</span></div>
       </div>
-      <div class="cta"><a class="btn" href="https://github.com/neelesh-kotte/moms-device-v2-signal-processing/blob/main/process_gut_audio.py">Inspect process_gut_audio.py</a></div>
+      <div class="cta"><a class="btn" href="https://github.com/neelesh-kotte/moms-device-v2-signal-processing/blob/main/README.md">Inspect updated research documentation</a></div>
     </div></section>
 
     <section class="section" id="results"><div class="wrap">
-      <h2>Publicly reproducible results</h2>
-      <p class="lede">These are the verification targets documented in the repository. They are recomputed from the source recordings and annotations rather than inserted as inputs to the analysis.</p>
+      <h2>Results across two corpora</h2>
+      <p class="lede">The main result is not a single positive finding. The stable median-shift claim failed in the external corpus, while a different post-hoc rank estimand showed exploratory ordering.</p>
       <div class="grid">
-        <div class="card span4"><div class="metric">10,922</div><div class="metriclabel">complete 500 ms windows</div></div>
-        <div class="card span4"><div class="metric">3,881</div><div class="metriclabel">confirmed-event windows</div></div>
-        <div class="card span4"><div class="metric">5,878</div><div class="metriclabel">eligible non-event windows</div></div>
-        <div class="card span4"><div class="metric">0.426</div><div class="metriclabel">event median band-energy ratio</div></div>
-        <div class="card span4"><div class="metric">0.089</div><div class="metriclabel">non-event median band-energy ratio</div></div>
-        <div class="card span4"><div class="metric">0.728</div><div class="metriclabel">mean P(event &gt; non-event)</div></div>
+        <div class="card span4"><div class="metric">17,346</div><div class="metriclabel">complete 500 ms windows across both corpora</div></div>
+        <div class="card span4"><div class="metric">19</div><div class="metriclabel">external subjects; 16 had both guarded classes</div></div>
+        <div class="card span4"><div class="metric">0.0089</div><div class="metriclabel">external primary mean median difference</div></div>
+        <div class="card span4"><div class="metric">p = 0.455</div><div class="metriclabel">failed external primary sign-flip test</div></div>
+        <div class="card span4"><div class="metric">0.598</div><div class="metriclabel">exploratory external probability of superiority</div></div>
+        <div class="card span4"><div class="metric">14 / 16</div><div class="metriclabel">external subjects with rank probability above 0.5</div></div>
       </div>
-      <div class="tablewrap" style="margin-top:16px"><table><thead><tr><th>Higher-level result</th><th>Reported value</th></tr></thead><tbody>
-        <tr><td>Date-group median differences</td><td>0.077, 0.103, 0.308, 0.383</td></tr>
-        <tr><td>Mean paired difference</td><td>0.218</td></tr>
-        <tr><td>95% CI for mean paired difference</td><td>−0.023 to 0.459</td></tr>
-        <tr><td>Exact two-sided sign-flip p-value</td><td>0.125</td></tr>
+      <div class="tablewrap" style="margin-top:16px"><table><thead><tr><th>Outcome</th><th>Derivation corpus</th><th>Independent corpus</th></tr></thead><tbody>
+        <tr><td>Complete windows</td><td>10,922</td><td>6,424</td></tr>
+        <tr><td>Event / non-event / excluded</td><td>3,881 / 5,878 / 1,163</td><td>3,050 / 2,340 / 1,034</td></tr>
+        <tr><td>Pooled event / non-event medians</td><td>0.426 / 0.089</td><td>0.056 / 0.059</td></tr>
+        <tr><td>Primary independent-unit effect</td><td>Conditional four-group mean 0.218</td><td>Mean subject effect 0.0089</td></tr>
+        <tr><td>95% interval</td><td>−0.023 to 0.459</td><td>−0.0151 to 0.0329</td></tr>
+        <tr><td>Median-shift sign-flip p</td><td>0.125, conditional</td><td>0.455</td></tr>
+        <tr><td>Rank probability mean</td><td>0.718, conditional</td><td>0.598, exploratory</td></tr>
+        <tr><td>Rank 95% interval</td><td>0.570–0.865</td><td>0.540–0.655</td></tr>
+        <tr><td>Rank sign-flip p</td><td>0.031, conditional</td><td>0.0032, exploratory</td></tr>
       </tbody></table></div>
+      <div class="grid" style="margin-top:16px">
+        <article class="card span6"><h3>Absolute-power transport failed</h3><p>External target, outside-target, and total power factors were 1.46, 0.99, and 1.08. Every corresponding interval included zero, so the derivation power-amplification pattern did not transfer.</p></article>
+        <article class="card span6"><h3>Why the endpoints differ</h3><p>Medians test one point in each distribution. Probability of superiority summarizes all event–non-event pair orderings. Similar medians can coexist with distributed rank separation, but the post-hoc rank result remains hypothesis-generating.</p></article>
+      </div>
     </div></section>
 
     <section class="section"><div class="wrap">
-      <h2>Technical artifact checklist</h2>
+      <h2>Verification and robustness</h2>
       <div class="grid">
-        <article class="card span6"><span class="tag verified">Available</span><h3>GitHub repository</h3><p>Source code, README, dependencies, commit history, and one-command verification.</p></article>
-        <article class="card span6"><span class="tag verified">Available</span><h3>Technical report</h3><p>This public portfolio page functions as a concise technical report and evidence map.</p></article>
-        <article class="card span6"><span class="tag documented">Prototype schematic</span><h3>Electrical schematic</h3><p>ESP32/MAX4466 wiring and signal path are documented. A fabricated custom PCB is not claimed.</p></article>
-        <article class="card span6"><span class="tag verified">Available</span><h3>Testing methodology + dataset</h3><p>Methodology is encoded in the repository and the raw source dataset is permanently identified through Figshare v1.</p></article>
+        <article class="card span6"><span class="tag verified">Current public script</span><h3>Derivation reproduction</h3><p><code>python process_gut_audio.py --download --verify</code> retrieves Figshare v1, recomputes the seven-recording analysis, and checks reported verification targets.</p></article>
+        <article class="card span6"><span class="tag documented">Expanded study</span><h3>Transport checks</h3><p>The manuscripts report exact sign-flip tests, participant bootstrap intervals, leave-one-subject-out means, minimum class-count checks, alternative label definitions, and Holm correction.</p></article>
+        <article class="card span6"><span class="tag documented">Estimator validation</span><h3>Numerical verification</h3><p>The expanded analysis reports 28 deterministic tests, 991 end-to-end resampling checks with maximum discrepancy 1.79 × 10⁻¹¹, and 100 independent periodogram comparisons with maximum difference 2.22 × 10⁻¹⁶.</p></article>
+        <article class="card span6"><span class="tag documented">Publication record</span><h3>Research manuscripts</h3><p>The original work was published through the Journal of Emerging Investigators and extended into a cross-corpus transport paper and Columbia Junior Science Journal research brief.</p></article>
       </div>
     </div></section>
 
     <section class="section" id="limits"><div class="wrap">
       <h2>Limitations and scope</h2>
-      <div class="note"><strong>Research prototype, not a medical device.</strong> This work does not establish diagnostic accuracy, gastrointestinal motility measurement, or clinical safety/effectiveness. The public repository reproduces a secondary spectral analysis of an existing acoustic dataset and explicitly does not validate the ESP32/MAX4466 hardware.</div>
+      <div class="note"><strong>Research result, not a medical device.</strong> This work does not establish diagnostic accuracy, gastrointestinal motility measurement, a biological mechanism, a clinical threshold, or hardware safety and effectiveness.</div>
       <div class="grid" style="margin-top:16px">
-        <article class="card span6"><h3>Independent-unit limitation</h3><p>The public release does not provide a verified mapping from the seven recordings to participant identities. Four filename-date prefixes are therefore treated only as unverified higher-level grouping units.</p></article>
-        <article class="card span6"><h3>Prototype limitation</h3><p>Consumer-grade microphones and mechanical coupling are sensitive to placement, motion, contact pressure, gain, and room noise. Hardware performance should be validated separately from the public spectral-analysis result.</p></article>
+        <article class="card span4"><h3>Metadata limitation</h3><p>Corpus 1 lacks verified participant and sensor mappings. The corpora also differ in formats, sensors, protocols, gains, and annotation systems.</p></article>
+        <article class="card span4"><h3>Interpretation limitation</h3><p>The external primary median shift and absolute-power mechanism did not transfer. The rank result was selected after the primary outcome and must remain exploratory.</p></article>
+        <article class="card span4"><h3>Prototype limitation</h3><p>Consumer-grade microphones and mechanical coupling remain sensitive to placement, motion, pressure, gain, and room noise. Hardware validation is separate from the public-data result.</p></article>
       </div>
     </div></section>
   </main>
 
-  <footer class="footer"><div class="wrap"><strong>MOM Device Technical Portfolio</strong><br />Independent biomedical engineering project by Neelesh Kotte. Public evidence links point to the project repository and immutable source dataset. Last assembled August 2026.</div></footer>
+  <footer class="footer"><div class="wrap"><strong>MOM Device Technical Portfolio</strong><br />Independent biomedical engineering research by Neelesh Kotte. Evidence links identify the public repository and both source datasets. Updated August 2026.</div></footer>
 </body>
 </html>
