@@ -1,149 +1,126 @@
-# Gastroacoustic Spectral-Energy Analysis
+# Cross-Corpus Bowel-Sound Spectral Analysis
 
-This repository is the reproducibility companion for the manuscript:
+This repository supports research on whether annotated bowel-sound events differ from eligible non-event periods in a fixed spectral feature:
 
-**Annotated bowel-sound events showed higher relative 120-480 Hz spectral energy in a public acoustic dataset**
+`power(120–480 Hz) / power(20–2,000 Hz)`
 
-It contains the analysis code for the manuscript's secondary analysis of the public **Bowel sounds signal** dataset by Zahra Mansour (Figshare version 1; DOI `10.6084/m9.figshare.28595741.v1`).
+The project began as a seven-recording derivation analysis and was extended into an independent cross-corpus transport study. The updated manuscripts distinguish a failed primary median-shift test from an exploratory within-subject rank pattern.
 
-## What this repository analyzes
+## Manuscripts
 
-The manuscript tests the a priori hypothesis that annotated bowel-sound event windows contain a greater fraction of 20-2,000 Hz spectral power within 120-480 Hz than eligible annotation-free windows.
+- **Journal of Emerging Investigators manuscript:** *A fixed bowel-sound spectral ratio shows rank separation but an unstable median shift across datasets*
+- **Columbia Junior Science Journal research brief:** *Cross-corpus transport of a fixed bowel-sound spectral ratio: failed median transfer and an exploratory rank pattern*
 
-This repository does **not** test the ESP32/MAX4466 hardware, diagnostic accuracy, gastrointestinal motility, or a threshold-based bowel-sound detector.
+## Study design
 
-## Analysis implemented in `process_gut_audio.py`
+No new human-participant data were collected. The work reanalyzes two public, de-identified acoustic datasets.
 
-The script reproduces the manuscript pipeline:
+| | Derivation corpus | Independent transport corpus |
+|---|---:|---:|
+| Source | Figshare, `10.6084/m9.figshare.28595741.v1` | Kaggle, `10.34740/KAGGLE/DSV/2825527` |
+| Analysis units | 7 recordings; participant IDs unresolved | 19 anonymized subjects; 16 with both guarded classes |
+| Complete 500 ms windows | 10,922 | 6,424 |
+| Event windows | 3,881 | 3,050 |
+| Eligible non-event windows | 5,878 | 2,340 |
+| Excluded windows | 1,163 | 1,034 |
 
-1. Uses the seven WAV recordings and seven matching TXT annotation files in Figshare version 1.
-2. Converts audio to floating point and mean-centers each recording.
-3. Resamples the 48 kHz recordings to 8 kHz with polyphase resampling.
-4. Splits each recording into non-overlapping 500 ms (4,000-sample) windows.
-5. Parses the annotation files and treats `SB`, `MB`, `CRS`, and `HS` as confirmed bowel-sound events.
-6. Gives confirmed-event overlap priority when a window overlaps a confirmed event.
-7. Excludes windows that overlap other/unrecognized annotations or whose start is within 500 ms of an annotation boundary.
-8. Treats the remaining eligible windows as non-events.
-9. Mean-centers each retained window, applies a Hann taper, and computes a real FFT.
-10. Computes the primary feature:
+The derivation release does not provide verified recording-to-participant or recording-to-sensor mappings. Its results are therefore recording-level and conditional, not verified participant-level replication.
 
-   `band-energy ratio = power(120-480 Hz) / power(20-2,000 Hz)`
+## Fixed signal-processing estimator
 
-11. Reports pooled window-level distributions descriptively only.
-12. Groups recordings by their four filename date prefixes for the higher-level paired analysis.
-13. Computes event-minus-non-event median differences for each date group.
-14. Performs an exact two-sided sign-flip test over all 16 sign assignments.
-15. Computes a conventional t-based 95% confidence interval for the mean paired difference.
-16. Computes the Mann-Whitney probability-of-superiority effect size within each date group.
-17. Saves the manuscript tables, figures, window-level results, and a JSON summary.
+For both corpora, the analysis:
 
-The code deliberately does **not** run a pooled window-level significance test because windows from the same recording are correlated and are not independent biological replicates.
+1. Converts audio to floating point and mean-centers each reconstructed recording.
+2. Resamples audio to 8 kHz using polyphase resampling.
+3. Divides audio into non-overlapping 500 ms windows.
+4. Labels a window as an event when it overlaps a confirmed annotation.
+5. Defines an eligible non-event window as annotation-free and beginning at least 500 ms from annotation boundaries.
+6. Mean-centers each window and applies the symmetric Hann taper from `numpy.hanning(4000)`.
+7. Computes a one-sided real FFT.
+8. Divides inclusive 120–480 Hz power by inclusive 20–2,000 Hz power.
 
-## Dataset
+Pooled windows are reported descriptively. Population-level inference does not treat correlated windows from the same recording or subject as independent biological replicates.
 
-Source:
+## Main findings
 
-- Zahra Mansour, **Bowel sounds signal**, Figshare, version 1
-- DOI: `10.6084/m9.figshare.28595741.v1`
-- License: CC BY 4.0
+### Derivation corpus
 
-The Figshare release contains seven mono WAV recordings and seven matching TXT annotation files used here.
+- Pooled event median: **0.426**
+- Pooled eligible non-event median: **0.089**
+- Six of seven recording-level median differences were positive.
+- Conditional four-group mean difference: **0.218** (95% CI **−0.023 to 0.459**; exact sign-flip **p = 0.125**).
+- Mean within-recording probability of superiority: **0.718** (95% CI **0.570–0.865**; six of seven recordings above 0.5).
+- Event-associated power changes were **6.63-fold** in the target band, **2.43-fold** outside the target band, and **4.19-fold** across 20–2,000 Hz.
 
-The source metadata states that the recordings come from four subjects, but the public release does not provide a verified recording-to-subject mapping for these seven files. Therefore, the manuscript uses the four filename date prefixes only as **unverified higher-level analysis units**, not as confirmed participant IDs.
+These results establish an internal recording-level association, not participant-level validation or a biological mechanism.
 
-The raw audio is not copied into this repository. The analysis script can download the immutable Figshare version-1 files directly.
+### Independent transport corpus
 
-## Installation
+The frozen primary endpoint was the equal-subject mean of each subject's event-minus-non-event median-ratio difference.
 
-Python 3.10 or later is recommended.
+- Primary mean median difference: **0.0089** (95% CI **−0.0151 to 0.0329**; exact sign-flip **p = 0.455**).
+- The primary median-shift endpoint was therefore inconclusive.
+- External target, outside-target, and total power factors were **1.46**, **0.99**, and **1.08**; all corresponding intervals included zero.
+- The derivation absolute-power pattern did not transfer.
+
+After the primary result was observed, a within-subject Mann–Whitney probability of superiority was added as an explicitly exploratory, post-hoc estimand.
+
+- Equal-subject rank mean: **0.598** (95% CI **0.540–0.655**; participant-bootstrap CI **0.545–0.647**).
+- Exact sign-flip **p = 0.0032**.
+- **14 of 16** subjects exceeded 0.5.
+- Leave-one-subject-out means ranged from **0.586 to 0.614**.
+- Minimum class-count checks of 5, 10, 20, and 50 windows retained means of **0.595, 0.594, 0.571, and 0.572**.
+
+The rank result does not replace the failed primary endpoint. It defines a prospective hypothesis and is not a biomarker, diagnostic threshold, mechanism, or clinical tool.
+
+## Why the median and rank results can differ
+
+The median difference tests separation at one point in each distribution. Probability of superiority measures ordering across all event–non-event pairs within a subject. Similar medians can coexist with systematic pairwise ordering when distribution shapes differ or when separation occurs away from the median.
+
+## Robustness and computational verification
+
+The updated analysis includes:
+
+- exact subject-level sign-flip tests;
+- participant bootstrap intervals;
+- leave-one-subject-out analysis;
+- minimum class-count checks;
+- alternative control and event-label definitions with Holm correction;
+- within-unit absolute-power decomposition;
+- 28 deterministic estimator tests;
+- 991 end-to-end resampling comparisons, with maximum ratio discrepancy `1.79 × 10⁻¹¹`;
+- 100 independently coded periodogram comparisons, with maximum difference `2.22 × 10⁻¹⁶`;
+- machine-readable CSV/JSON results and input manifests.
+
+## Current public code
+
+The current `process_gut_audio.py` script reproduces the original Figshare derivation analysis:
 
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-```
-
-## One-command reproduction
-
-From the repository root:
-
-```bash
 python process_gut_audio.py --download --verify
 ```
 
-This command:
-
-- downloads the exact Figshare v1 files into `data/` if they are not already present,
-- analyzes all seven recordings,
-- writes regenerated results to `outputs/`,
-- compares the regenerated values with the manuscript values at the reported precision,
-- exits with an error if the values do not match.
-
-If the data have already been downloaded, run:
-
-```bash
-python process_gut_audio.py --verify
-```
-
-## Expected manuscript results
-
-The `--verify` check compares independently recomputed outputs against these reported values:
-
-| Quantity | Manuscript value |
-|---|---:|
-| Complete 500 ms windows | 10,922 |
-| Confirmed-event windows | 3,881 |
-| Eligible non-event windows | 5,878 |
-| Excluded windows | 1,163 |
-| Event mean band-energy ratio | 0.469 |
-| Event median band-energy ratio | 0.426 |
-| Non-event mean band-energy ratio | 0.148 |
-| Non-event median band-energy ratio | 0.089 |
-| Date-group median differences | 0.077, 0.103, 0.308, 0.383 |
-| Mean paired difference | 0.218 |
-| Median paired difference | 0.206 |
-| 95% CI for mean paired difference | -0.023 to 0.459 |
-| Exact two-sided sign-flip p-value | 0.125 |
-| Mean P(event > non-event) | 0.728 |
-
-These values are stored only as **verification targets**. They are not inserted into the calculations. The analysis is recomputed from the source WAV and annotation files.
-
-## Generated outputs
-
-A successful run creates:
-
-```text
-outputs/
-├── analysis_summary.json
-├── window_level_results.csv
-├── table1_pooled_summary.csv
-├── table2_date_group_summary.csv
-├── table3_recording_summary.csv
-├── figure1_window_distributions.png
-└── figure2_group_medians.png
-```
-
-## Reproducibility gate
-
-A repository should only be described as reproducing the manuscript after a clean run of:
-
-```bash
-python process_gut_audio.py --download --verify
-```
-
-prints:
+A successful run prints:
 
 ```text
 REPRODUCIBILITY CHECK PASSED
 ```
 
-If the check fails, the script prints each discrepancy and exits with a non-zero status. Any discrepancy should be resolved before the repository is cited as verified reproduction of the manuscript.
+**Scope note:** the script presently on `main` covers the seven-recording derivation corpus. The independent 19-subject transport analysis and the expanded V8 verification package described in the updated manuscripts are not yet represented by the public files on this branch. This README separates manuscript-wide results from the narrower scope of the currently available executable script so that repository claims remain auditable.
 
-## Statistical interpretation
+## Data availability
 
-The thousands of 500 ms windows are useful for describing acoustic distributions, but they are not thousands of independent participants. The primary higher-level analysis therefore uses four filename-date groups and should be interpreted cautiously because those groups are not verified participant identifiers.
+- Zahra Mansour, *Bowel Sounds Signal*, Figshare version 1: https://doi.org/10.6084/m9.figshare.28595741.v1
+- Robert Nowak and collaborators, *Bowel Sounds*, Kaggle: https://doi.org/10.34740/KAGGLE/DSV/2825527
 
-The repository reproduces the analysis as reported; it does not convert the four date groups into verified biological replicates.
+Raw audio is not redistributed in this repository.
+
+## Interpretation limits
+
+The corpora differ in sensors, formats, event taxonomies, gains, and recording protocols. Corpus 1 lacks verified participant and sensor mappings, and the external release lacks clinical and acquisition metadata needed for biological attribution. The work tests portability of a fixed acoustic estimator under dataset shift; it does not test disease diagnosis, gastrointestinal motility, ESP32/MAX4466 hardware, or a deployed bowel-sound detector.
 
 ## Repository structure
 
@@ -155,10 +132,7 @@ The repository reproduces the analysis as reported; it does not convert the four
 └── .gitignore
 ```
 
-## Citation
-
-If you reuse the source audio or annotations, cite the original Figshare dataset and comply with its CC BY 4.0 license.
-
 ## Author
 
-Neelesh Kotte
+Neelesh Kotte  
+Los Osos High School, Rancho Cucamonga, California, USA
