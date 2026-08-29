@@ -1,0 +1,32 @@
+p><p><strong>Baseline:</strong> a simpler comparison model, such as meal timing only.</p></div></details></article></div></section>
+</div></section>
+</main>
+
+<div class="modal hidden" id="sessionModal" role="dialog" aria-modal="true" aria-labelledby="sessionTitle"><div class="modalCard"><button class="close" id="closeSession" aria-label="Close session detail">×</button><h2 id="sessionTitle">Session detail</h2><div id="sessionDetail"></div></div></div>
+<footer class="footer"><div class="wrap">MOM SenseLoop · Experimental research prototype · Not a medical device or diagnostic tool.</div></footer>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>const SUPABASE_URL='https://xzdxqnxsbagbycxmuqmx.supabase.co';
+const SUPABASE_KEY='sb_publishable_p4q_l6-cnv7BKBKQzWrutg_K_kPCAGE';
+const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+const $=q=>document.querySelector(q), $$=q=>[...document.querySelectorAll(q)];
+let user=null, profile=null, profiles=[], sessions=[], checkins=[], devices=[], prefs=null, recordStep=0, timerHandle=null, secondsLeft=60, selectedPrefs=new Set();
+const safe=s=>String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+const fmt=x=>new Date(x).toLocaleString([], {month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'});
+function showView(id){['publicView','authView','privateView'].forEach(x=>$('#'+x).classList.add('hidden'));$('#'+id).classList.remove('hidden');$('#publicNav').classList.toggle('hidden',id!=='publicView');$('#privateNav').classList.toggle('hidden',id!=='privateView');window.scrollTo(0,0)}
+function jumpTab(tab){$$('.tab').forEach(x=>x.classList.toggle('active',x.dataset.tab===tab));$$('.panel').forEach(x=>x.classList.toggle('active',x.id==='p-'+tab));window.scrollTo({top:0,behavior:'smooth'})}
+$$('.tab').forEach(b=>b.onclick=()=>jumpTab(b.dataset.tab));$$('[data-tab-jump]').forEach(b=>b.onclick=()=>jumpTab(b.dataset.tabJump));
+$('#brandBtn').onclick=$('#publicBtn').onclick=$('#backBtn').onclick=()=>showView('publicView');
+async function privateGo(){const {data:{session}}=await sb.auth.getSession();if(session){user=session.user;await openDash()}else showView('authView')}
+$$('.privateBtn').forEach(b=>b.onclick=privateGo);
+$('#logoutBtn').onclick=async()=>{await sb.auth.signOut();user=profile=null;showView('publicView')};
+$('#googleBtn').onclick=async()=>{const {error}=await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:location.origin+location.pathname}});if(error){$('#authMsg').textContent=error.message.includes('provider is not enabled')?'Google sign-in is not enabled yet in the MOM cloud project. The site is ready for Google OAuth, but the Google Client ID and Client Secret still need to be added in Supabase.':error.message}};
+sb.auth.onAuthStateChange(async(e,s)=>{if(s?.user&&(e==='SIGNED_IN'||e==='INITIAL_SESSION')){user=s.user;if(!$('#authView').classList.contains('hidden')||location.hash.includes('access_token')||location.search.includes('code='))await openDash()}});
+async function openDash(){showView('privateView');$('#welcome').textContent='Welcome, '+(user.user_metadata?.full_name?.split(' ')[0]||user.email?.split('@')[0]||'there')+'.';await loadProfiles()}
+async function loadProfiles(){const r=await sb.from('mom_profiles').select('*').order('created_at');if(r.error)return topNotice(r.error.message);profiles=r.data||[];$('#profile').innerHTML='<option value="">Choose a profile</option>'+profiles.map(p=>`<option value="${p.id}">${safe(p.display_name)}</option>`).join('');if(profile){$('#profile').value=profile.id}else if(profiles.length===1){profile=profiles[0];$('#profile').value=profile.id}await loadData()}
+$('#createProfile').onclick=async()=>{const n=$('#newProfile').value.trim();if(!n)return;const r=await sb.from('mom_profiles').insert({owner_id:user.id,display_name:n}).select().single();if(r.error)return topNotice(r.error.message);$('#newProfile').value='';profile=r.data;await loadProfiles();$('#profile').value=profile.id};
+$('#profile').onchange=async e=>{profile=profiles.find(p=>p.id===e.target.value)||null;await loadData()};
+async function loadData(){if(!profile){sessions=[];checkins=[];devices=[];prefs=null;return renderAll()}const [s,c,d,p]=await Promise.all([sb.from('mom_sessions').select('*').eq('profile_id',profile.id).order('started_at',{ascending:false}),sb.from('mom_checkins').select('*').eq('profile_id',profile.id).order('created_at',{ascending:false}),sb.from('mom_devices').select('*').eq('profile_id',profile.id).order('created_at',{ascending:false}),sb.from('mom_preferences').select('*').eq('profile_id',profile.id).maybeSingle()]);sessions=s.data||[];checkins=c.data||[];devices=d.data||[];prefs=p.data||null;selectedPrefs=new Set(prefs?.categories||[]);$('#constraints').value=prefs?.constraints?.notes||'';renderAll()}
+function isOnline(){return devices.some(d=>d.last_seen_at&&Date.now()-new Date(d.last_seen_at).getTime()<120000)}
+function usableCount(){return sessions.filter(x=>['good','fair'].includes(x.quality_label)&&x.learning_eligible!==false).length}
+function renderAll(){renderHome();renderSessions();renderInsights();renderPrefs();renderDevice();renderRecordReadiness()}
+function renderHome(){const ok=!!profile, online=isOnline(), usable=usableCount();$('#usable').textContent=usable;if(!ok){$('#homeTitle').textContent='Choose your profile.';$('#nextText').textContent='MOM uses the selected profile’s own history.';$('#homeAction').textContent='Choose profile';$('#homeAction').onclick=()=>$('#profile').focus();$('#homeNotice').innerHTML=''}else if(!online){$('#homeTitle').textContent='Your dashboard is ready. The device is offline.';$('#nextText').textContent='You can review your history now, or connect the physical MOM device to start a guided recording.';$('#homeAction').textContent='Open device settings';$('#homeAction').onclick=()=>jumpTab('device');$('#homeNotice').innerHTML='<div class="notice">The cloud dashboard is online. No paired device has checked in recently.</div>'}else{$('#homeTitle').textContent='Ready for a check-in?';$('#nextText').textContent='Current profile: '+profile.display_name+'. Keep the selected sensor position consistent and start when you are ready.';$('#homeAction').textContent='Start guided recording';$('#homeAction').onclick=()=>{setRecordStep(0);jumpTab('record')};$('#homeNotice').in
