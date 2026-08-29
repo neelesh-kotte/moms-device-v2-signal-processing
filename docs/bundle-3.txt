@@ -1,0 +1,40 @@
+s:flex-start;flex-direction:column}}@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="nav">
+  <div class="wrap navin">
+    <button class="brandBtn" id="brandBtn" aria-label="MOM SenseLoop public home"><span class="brand">MOM SenseLoop</span><span class="sub">research prototype</span></button>
+    <nav class="links" id="publicNav" aria-label="Public navigation">
+      <a href="#how">How it works</a><a href="#demo">Guest demo</a><a href="#limits">Safety & limits</a>
+      <button class="btn primary privateBtn">Private Dashboard</button>
+    </nav>
+    <nav class="links hidden" id="privateNav" aria-label="Private navigation">
+      <button class="btn ghost" id="publicBtn">Public Home</button><button class="btn" id="logoutBtn">Sign out</button>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+<section id="publicView">
+  <section class="hero"><div class="wrap heroGrid">
+    <div><span class="eyebrow">Public guest experience</span><h1>Listen to abdominal sounds. Learn carefully.</h1><p>MOM SenseLoop is an experimental device that records abdominal sounds through a stethoscope-style sensor. After each recording, you can add your own check-in. Over time, MOM compares new recordings with your previous examples and only shows a research summary when there is enough usable information.</p><div class="cta"><button class="btn primary privateBtn">Open Private Dashboard</button><a class="btn" href="#how">See how MOM works</a></div><p class="trust">Research and personal exploration only. Not a medical device or diagnostic tool.</p></div>
+    <div class="heroVisual" aria-label="Illustration of a sensor recording sound and turning it into a personal research history"><div class="sensorOrb">MOM</div><div class="signalLine"></div><div class="waveMini" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><div class="historyStack"><span>Recording</span><span>Quality review</span><span>Your check-in</span><span>Personal history</span></div></div>
+  </div></section>
+
+  <section class="section" id="how"><div class="wrap"><span class="kicker">How it works</span><h2>Four steps. No signal-processing knowledge required.</h2><div class="grid steps">
+    <article class="card s3"><div class="n">1</div><h3>Power MOM</h3><p>After one-time firmware setup, plug the ESP32 into a power bank. It starts automatically. Arduino is not needed during normal use.</p></article>
+    <article class="card s3"><div class="n">2</div><h3>Place the sensor</h3><p>Hold the stethoscope-style sensor at the same selected abdominal position and keep it comfortably steady.</p></article>
+    <article class="card s3"><div class="n">3</div><h3>Record for one minute</h3><p>MOM captures the sound and checks movement, background noise, clipping, contact consistency, and completion.</p></article>
+    <article class="card s3"><div class="n">4</div><h3>Add your check-in</h3><p>You can rate how hungry you feel and optionally add meal timing. Your own response stays the reference.</p></article>
+  </div><div class="flow" aria-label="MOM data flow"><span>Sensor</span><b>→</b><span>60-sec recording</span><b>→</b><span>Quality review</span><b>→</b><span>Your check-in</span><b>→</b><span>Personal history</span></div></div></section>
+
+  <section class="section"><div class="wrap"><span class="kicker">What MOM can do</span><h2>Useful features without pretending the sensor knows more than it does.</h2><div class="grid">
+    <article class="card s4"><h3>Guided recording</h3><p>Step-by-step preparation, quality review, recording, and save flow.</p></article><article class="card s4"><h3>Signal-quality review</h3><p>Plain-language guidance for movement, background noise, clipping, contact, and completion.</p></article><article class="card s4"><h3>Separate profiles</h3><p>Each signed-in user's profiles, recordings, check-ins, preferences, and research history stay separate.</p></article>
+    <article class="card s4"><h3>Careful research summaries</h3><p>When the evidence is limited or conflicting, MOM says “Not enough information.”</p></article><article class="card s4"><h3>History & insights</h3><p>Review sessions, usable recordings, optional check-ins, and evidence level over time.</p></article><article class="card s4"><h3>Optional food ideas</h3><p>Preference-based suggestions are separate from acoustic analysis and are not nutrition advice.</p></article>
+  </div></div></section>
+
+  <section class="section" id="demo"><div class="wrap"><span class="kicker">Guest demo</span><h2>Explore without opening anyone's private data.</h2><p class="lede">Everything below is demonstration content. No real profile, live device stream, check-in, or personalized output is used.</p><div class="demoGrid"><div class="waveCard"><span class="badge">Demo data</span><div class="wave" aria-label="Example abdominal-acoustic waveform"><svg viewBox="0 0 800 180" preserveAspectRatio="none"><path d="M0 92 C45 75 70 102 105 88 S165 80 205 95 S270 101 300 82 S345 68 380 97 S440 108 470 87 S520 70 555 94 S620 104 650 85 S710 78 800 92"/><path class="mutedPath" d="M0 92 C48 98 82 83 118 93 S190 105 230 86 S292 76 330 95 S390 107 428 88 S498 79 535 96 S605 108 645 91 S720 82 800 92"/></svg></div></div><div class="card"><span class="badge">Demo data</span><h3>Example quality review</h3><div class="qualityRows"><div><span>Contact consistency</span><strong>Good</strong></div><div><span>Background noise</span><strong>Low</strong></div><div><span>Motion stability</span><strong>Good</strong></div><div><span>Clipping</span><strong>None detected</strong></div></div><div class="divider"></div><h3>Experimental summary</h3><p><strong>Not enough information.</strong> MOM chooses not to force a result when the available support is weak.</p></div></div></div></section>
+
+  <section class="section" id="limits"><div class="wrap"><span class="kicker">Safety & limits</span><h2>Experimental pattern summary, not a medical conclusion.</h2><div class="grid"><article class="card s6"><h3>MOM can use</h3><ul class="clean"><li>Abdominal sound recordings</li><li>Recording-quality observations</li><li>Your optional self-reported check-ins</li><li>Optional meal timing and context</li><li>Your saved preferences</li></ul></article><article class="card s6"><h3>MOM does not determine</h3><ul class="clean"><li>A diagnosis or medical co
