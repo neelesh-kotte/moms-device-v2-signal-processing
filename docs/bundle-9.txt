@@ -1,0 +1,51 @@
+<script>
+(function(){
+  async function googleProviderReady(){
+    try{
+      const r=await fetch(SUPABASE_URL+'/auth/v1/settings',{
+        headers:{apikey:SUPABASE_KEY},
+        cache:'no-store'
+      });
+      if(!r.ok)return null;
+      const j=await r.json();
+      return !!(j&&j.external&&j.external.google===true);
+    }catch(_){return null;}
+  }
+
+  const btn=document.querySelector('#googleBtn');
+  const msg=document.querySelector('#authMsg');
+  if(!btn)return;
+
+  btn.onclick=async()=>{
+    const old=btn.textContent;
+    btn.disabled=true;
+    btn.textContent='Checking Google sign-in…';
+    if(msg)msg.textContent='';
+
+    const ready=await googleProviderReady();
+    if(ready===false){
+      if(msg)msg.textContent='Private Dashboard is temporarily unavailable while Google sign-in is being configured. No personal data has been exposed.';
+      btn.disabled=false;
+      btn.textContent=old;
+      return;
+    }
+    if(ready===null){
+      if(msg)msg.textContent='MOM could not verify the sign-in service. Check your internet connection and try again.';
+      btn.disabled=false;
+      btn.textContent=old;
+      return;
+    }
+
+    btn.textContent='Opening Google…';
+    const {error}=await sb.auth.signInWithOAuth({
+      provider:'google',
+      options:{redirectTo:location.origin+location.pathname}
+    });
+    if(error){
+      if(msg)msg.textContent='Google sign-in could not start. Please try again.';
+      btn.disabled=false;
+      btn.textContent=old;
+    }
+  };
+})();
+</script>
