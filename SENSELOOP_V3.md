@@ -82,9 +82,28 @@ This is **preference prediction from previous choices**, not thought reading. Do
 
 ## Guest Mode
 
-The device-hosted web application includes a public Guest Mode for visitors who want to understand the project without seeing a real user's private dashboard.
+The public Guest experience is hosted separately from private user data so visitors can understand the project without seeing a real user's dashboard.
 
-Guest Mode is intentionally read-only and contains no profile names, live sensor stream, session history, check-ins, personalized model outputs, or preference data. A sample card is explicitly labeled as illustrative data.
+Guest Mode is intentionally read-only and contains no profile names, live sensor stream, session history, check-ins, personalized model outputs, or preference data. Its interactive walkthrough is explicitly labeled as simulated/example data.
+
+## Power-bank autonomy
+
+The ESP32 stores its firmware in onboard flash memory. After the final firmware has been flashed once, **Arduino IDE and the programming computer are not required during normal use**.
+
+Normal operation is:
+
+1. connect the ESP32 development board's USB port to a stable USB power bank or USB power source;
+2. the ESP32 boots the MOM firmware automatically;
+3. the MAX4466 remains powered from ESP32 `3V3`, with `GND → GND` and `OUT → GPIO32`;
+4. the device tries its saved 2.4 GHz Wi-Fi networks or phone hotspot for data transfer.
+
+A power source and an internet connection are separate requirements. Power alone is enough to boot the firmware and sensor node, but remote transfer still requires a compatible Wi-Fi path. The Universal firmware includes a local fallback/status mode when no saved network is available so normal troubleshooting does not require reconnecting to Arduino.
+
+## Public website availability
+
+The public Guest website is designed to be cloud-hosted as a static site, so it does not depend on the home Mac, home Wi-Fi, ESP32, or an ngrok tunnel merely to remain viewable.
+
+The private live sensor dashboard is different because its Python backend and private data store must run somewhere. If that backend runs on a Mac, the Mac must remain available. Fully removing that dependency requires deploying the private backend/database to a managed cloud host; the project documentation does not describe a Mac-hosted process as guaranteed always-online.
 
 ## Claim boundaries
 
