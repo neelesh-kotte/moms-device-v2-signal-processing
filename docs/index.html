@@ -1,134 +1,77 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="Technical portfolio for the MOM Device, an independent biomedical engineering project exploring low-cost gastroacoustic sensing and reproducible spectral analysis." />
-  <title>MOM Device | Biomedical Engineering Technical Portfolio</title>
-  <style>
-    :root{--bg:#07111f;--panel:#0d1b2d;--panel2:#10243a;--ink:#edf6ff;--muted:#a8bdd2;--line:#21405f;--cyan:#6ee7f2;--green:#86efac;--gold:#f8d477;--red:#fda4af;--max:1120px}
-    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(circle at 80% 0%,#123352 0,transparent 34%),var(--bg);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.6}a{color:inherit}code{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace}.wrap{width:min(var(--max),calc(100% - 40px));margin:auto}.nav{position:sticky;top:0;z-index:30;background:rgba(7,17,31,.86);backdrop-filter:blur(14px);border-bottom:1px solid rgba(110,231,242,.16)}.navin{display:flex;align-items:center;justify-content:space-between;gap:18px;min-height:66px}.brand{font-weight:800;letter-spacing:.02em}.navlinks{display:flex;gap:18px;flex-wrap:wrap}.navlinks a{text-decoration:none;color:var(--muted);font-size:.92rem}.hero{padding:88px 0 58px}.eyebrow{display:inline-flex;align-items:center;gap:8px;border:1px solid #245d73;background:#0a2637;color:#9cf2f7;border-radius:999px;padding:7px 12px;font-size:.78rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase}.hero h1{font-size:clamp(2.6rem,7vw,5.8rem);line-height:.98;margin:22px 0 20px;letter-spacing:-.055em;max-width:980px}.hero p{font-size:clamp(1.05rem,2vw,1.28rem);max-width:780px;color:var(--muted)}.cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px}.btn{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;border-radius:12px;padding:12px 16px;font-weight:800;border:1px solid var(--line);background:var(--panel)}.btn.primary{background:var(--cyan);color:#03202a;border-color:transparent}.section{padding:54px 0}.section h2{font-size:clamp(1.8rem,3.5vw,3rem);margin:0 0 8px;letter-spacing:-.035em}.lede{color:var(--muted);max-width:820px;margin:0 0 28px}.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}.card{background:linear-gradient(180deg,rgba(16,36,58,.98),rgba(11,27,45,.98));border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:0 18px 50px rgba(0,0,0,.18)}.card h3{margin:0 0 8px}.card p{color:var(--muted);margin:0}.span4{grid-column:span 4}.span6{grid-column:span 6}.span12{grid-column:span 12}.tag{display:inline-block;margin-bottom:12px;font-size:.72rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;border-radius:999px;padding:5px 9px}.verified{background:#123826;color:var(--green);border:1px solid #28643f}.documented{background:#3b3015;color:var(--gold);border:1px solid #6a5725}.gap{background:#3a1f2b;color:#ffc2cc;border:1px solid #6a3447}.metric{font-size:2rem;font-weight:900;letter-spacing:-.04em}.metriclabel{font-size:.88rem;color:var(--muted)}.arch{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:22px}.node{min-width:155px;text-align:center;padding:14px 13px;background:#091827;border:1px solid #2b567a;border-radius:13px;font-weight:800}.arrow{color:var(--cyan);font-size:1.4rem}.schematic{background:#06101c;border:1px solid #244665;border-radius:14px;padding:18px;overflow:auto;color:#d4eefc;white-space:pre;line-height:1.45}.steps{counter-reset:step;display:grid;gap:12px}.step{position:relative;padding:18px 18px 18px 62px;background:#0b1b2d;border:1px solid var(--line);border-radius:15px}.step:before{counter-increment:step;content:counter(step);position:absolute;left:18px;top:16px;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:#163f58;color:var(--cyan);font-weight:900}.step b{display:block}.step span{color:var(--muted)}.tablewrap{overflow:auto;border:1px solid var(--line);border-radius:14px}table{width:100%;border-collapse:collapse;background:#0b1b2d}th,td{text-align:left;padding:13px 14px;border-bottom:1px solid #1d3854}th{color:#cfe8f6;font-size:.78rem;text-transform:uppercase;letter-spacing:.07em}td{color:var(--muted)}tr:last-child td{border-bottom:0}.note{border-left:3px solid var(--gold);padding:12px 15px;background:#241f12;color:#e8ddbd;border-radius:0 10px 10px 0}.footer{border-top:1px solid var(--line);padding:32px 0 46px;color:var(--muted);font-size:.92rem}.small{font-size:.88rem;color:var(--muted)}
-    @media(max-width:780px){.navlinks{display:none}.span4,.span6{grid-column:span 12}.hero{padding-top:60px}.arch{align-items:stretch}.node{width:100%}.arrow{transform:rotate(90deg);margin:auto}}
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="MOM Device technical portfolio: a low-cost abdominal-acoustic capture and analysis prototype using ESP32, MAX4466, stethoscope coupling, personalized SenseLoop software, and a separate cross-corpus signal-processing research track.">
+<title>MOM Device | Biomedical Engineering Technical Portfolio</title>
+<style>
+:root{--bg:#07110f;--panel:#0d1b17;--panel2:#10241e;--ink:#f1faf6;--muted:#a9c2b8;--line:#23473b;--mint:#85e2bb;--mint2:#bcf4dc;--gold:#f1d17d;--red:#f4a6ad;--max:1140px}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(circle at 82% 0,#153a30 0,transparent 34%),var(--bg);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.6}a{color:inherit}code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}.wrap{width:min(var(--max),calc(100% - 38px));margin:auto}.nav{position:sticky;top:0;z-index:30;background:rgba(7,17,15,.87);backdrop-filter:blur(14px);border-bottom:1px solid rgba(133,226,187,.14)}.navin{display:flex;align-items:center;justify-content:space-between;gap:18px;min-height:66px}.brand{font-weight:900;letter-spacing:.03em}.navlinks{display:flex;gap:18px;flex-wrap:wrap}.navlinks a{text-decoration:none;color:var(--muted);font-size:.91rem}.hero{padding:92px 0 60px}.eyebrow{display:inline-flex;border:1px solid #2d6755;background:#0d2c23;color:var(--mint2);border-radius:999px;padding:7px 12px;font-size:.76rem;font-weight:900;letter-spacing:.09em;text-transform:uppercase}.hero h1{font-size:clamp(2.8rem,7vw,5.9rem);line-height:.97;margin:22px 0 20px;letter-spacing:-.057em;max-width:1020px}.hero p{font-size:clamp(1.05rem,2vw,1.28rem);max-width:820px;color:var(--muted)}.cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px}.btn{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;border-radius:12px;padding:12px 16px;font-weight:850;border:1px solid var(--line);background:var(--panel)}.btn.primary{background:var(--mint);color:#062219;border-color:transparent}.section{padding:56px 0}.section h2{font-size:clamp(1.9rem,4vw,3.1rem);margin:0 0 8px;letter-spacing:-.038em}.lede{color:var(--muted);max-width:860px;margin:0 0 28px}.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}.card{background:linear-gradient(180deg,rgba(16,36,30,.98),rgba(10,25,21,.98));border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:0 18px 48px rgba(0,0,0,.14)}.card h3{margin:0 0 8px}.card p{color:var(--muted);margin:0}.span4{grid-column:span 4}.span6{grid-column:span 6}.span12{grid-column:span 12}.tag{display:inline-block;margin-bottom:12px;font-size:.72rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;border-radius:999px;padding:5px 9px}.built{background:#123a2a;color:var(--mint2);border:1px solid #2d684a}.research{background:#24331a;color:#d8ef9a;border:1px solid #556b31}.limit{background:#36261b;color:#f5d2a2;border:1px solid #6d4d2f}.arch{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:22px}.node{min-width:150px;text-align:center;padding:14px 13px;background:#091914;border:1px solid #2c5c4b;border-radius:13px;font-weight:800}.arrow{color:var(--mint);font-size:1.35rem}.metric{font-size:2.05rem;font-weight:950;letter-spacing:-.045em}.metriclabel{font-size:.88rem;color:var(--muted)}.steps{counter-reset:step;display:grid;gap:12px}.step{position:relative;padding:18px 18px 18px 62px;background:#0b1c18;border:1px solid var(--line);border-radius:15px}.step:before{counter-increment:step;content:counter(step);position:absolute;left:18px;top:16px;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:#174334;color:var(--mint2);font-weight:900}.step b{display:block}.step span{color:var(--muted)}.quote{border-left:3px solid var(--mint);background:#0b211a;padding:18px;border-radius:0 14px 14px 0;font-size:1.12rem}.tablewrap{overflow:auto;border:1px solid var(--line);border-radius:14px}table{width:100%;border-collapse:collapse;background:#0b1b17}th,td{text-align:left;padding:13px 14px;border-bottom:1px solid #1e3b32}th{color:#d8eee5;font-size:.76rem;text-transform:uppercase;letter-spacing:.07em}td{color:var(--muted)}tr:last-child td{border-bottom:0}.footer{border-top:1px solid var(--line);padding:34px 0 48px;color:var(--muted);font-size:.92rem}.small{font-size:.88rem;color:var(--muted)}.boundary{display:grid;grid-template-columns:1fr 1fr;gap:16px}.yes,.no{padding:22px;border:1px solid var(--line);border-radius:18px;background:#0b1b17}.yes h3{color:var(--mint2)}.no h3{color:#f1d17d}.clean{color:var(--muted);padding-left:20px}.clean li{margin:7px 0}
+@media(max-width:800px){.navlinks{display:none}.span4,.span6{grid-column:span 12}.hero{padding-top:62px}.arch{align-items:stretch}.node{width:100%}.arrow{transform:rotate(90deg);margin:auto}.boundary{grid-template-columns:1fr}}
+</style>
 </head>
 <body>
-  <header class="nav"><div class="wrap navin"><div class="brand">MOM DEVICE</div><nav class="navlinks"><a href="#evidence">Evidence</a><a href="#system">System</a><a href="#methods">Methods</a><a href="#results">Results</a><a href="#limits">Limits</a></nav></div></header>
-
-  <main>
-    <section class="hero"><div class="wrap">
-      <span class="eyebrow">Independent Biomedical Engineering Research</span>
-      <h1>Low-cost gastroacoustic sensing, tested across datasets.</h1>
-      <p>The MOM Device project combines accessible sensing hardware with transparent physiological-acoustic analysis. The research track tests a fixed bowel-sound spectral ratio in seven derivation recordings and a separate 19-subject corpus while keeping the failed primary endpoint distinct from an exploratory rank pattern.</p>
-      <div class="cta">
-        <a class="btn primary" href="https://github.com/neelesh-kotte/moms-device-v2-signal-processing">Open public GitHub repository</a>
-        <a class="btn" href="https://doi.org/10.6084/m9.figshare.28595741.v1">Figshare corpus</a>
-        <a class="btn" href="https://doi.org/10.34740/KAGGLE/DSV/2825527">External corpus</a>
-      </div>
-    </div></section>
-
-    <section class="section" id="evidence"><div class="wrap">
-      <h2>Evidence, not just claims.</h2>
-      <p class="lede">“Verified public” means a reviewer can inspect the linked resource now. “Documented analysis” means the result is reported in the updated manuscripts and repository documentation, while the full external-corpus V8 executable package is not yet present on the public branch.</p>
-      <div class="grid">
-        <article class="card span4"><span class="tag verified">Verified public</span><h3>GitHub repository</h3><p>Public derivation code, dependencies, updated study documentation, reproducibility instructions, and versioned history.</p><p style="margin-top:14px"><a href="https://github.com/neelesh-kotte/moms-device-v2-signal-processing">View repository →</a></p></article>
-        <article class="card span4"><span class="tag verified">Verified public</span><h3>Two source datasets</h3><p>Seven annotated Figshare recordings form the derivation corpus. A separate Kaggle release contains 1,606 clips from 19 anonymized subjects.</p><p style="margin-top:14px"><a href="https://doi.org/10.6084/m9.figshare.28595741.v1">Figshare →</a> &nbsp; <a href="https://doi.org/10.34740/KAGGLE/DSV/2825527">Kaggle →</a></p></article>
-        <article class="card span4"><span class="tag verified">Verified public</span><h3>Updated methodology</h3><p>The repository documents the fixed estimator, participant-weighted transport test, exploratory rank analysis, power decomposition, sensitivity checks, and interpretation limits.</p><p style="margin-top:14px"><a href="https://github.com/neelesh-kotte/moms-device-v2-signal-processing/blob/main/README.md">Read methodology →</a></p></article>
-        <article class="card span4"><span class="tag documented">Documented prototype</span><h3>Hardware schematic</h3><p>The prototype uses an ESP32-WROOM-32, MAX4466 microphone amplifier, and stethoscope-based acoustic coupling. Hardware validation is separate from the public-data analysis.</p></article>
-        <article class="card span4"><span class="tag documented">Documented analysis</span><h3>Cross-corpus transport study</h3><p>The fixed ratio was tested without retuning in an independent corpus. The primary median shift failed to transfer; a secondary post-hoc rank pattern remained exploratory.</p></article>
-        <article class="card span4"><span class="tag gap">Not yet public</span><h3>Expanded V8 package</h3><p>The external-corpus scripts, machine-readable transport outputs, and expanded verification suite described in the manuscripts are not yet included on the public branch. No claim here treats them as presently downloadable.</p></article>
-      </div>
-    </div></section>
-
-    <section class="section" id="system"><div class="wrap">
-      <h2>System architecture</h2>
-      <p class="lede">The hardware and research tracks answer different questions. The prototype explores low-cost acquisition; the cross-corpus study tests whether a fixed spectral estimator transports across acquisition domains.</p>
-      <div class="card span12"><div class="arch">
-        <div class="node">Abdominal acoustic signal</div><div class="arrow">→</div>
-        <div class="node">Stethoscope coupling</div><div class="arrow">→</div>
-        <div class="node">MAX4466 amplifier</div><div class="arrow">→</div>
-        <div class="node">ESP32 GPIO32 ADC</div><div class="arrow">→</div>
-        <div class="node">Python DSP / FFT</div>
-      </div></div>
-      <div class="grid" style="margin-top:16px">
-        <article class="card span6"><h3>Prototype electrical schematic</h3><p class="small">Prototype wiring only; no fabricated custom PCB is claimed.</p><pre class="schematic">MAX4466                     ESP32-WROOM-32
-────────                    ──────────────
-VCC   ───────────────────→  3V3
-GND   ───────────────────→  GND
-OUT   ───────────────────→  GPIO32 / ADC1_CH4
-
-Stethoscope diaphragm
-        ↓ acoustic coupling
-MAX4466 microphone + adjustable gain
-        ↓ analog signal
-ESP32 ADC acquisition</pre></article>
-        <article class="card span6"><h3>Fixed spectral estimator</h3><p>Audio is mean-centered, resampled to 8 kHz, divided into non-overlapping 500 ms windows, tapered with <code>numpy.hanning(4000)</code>, and transformed with a real FFT.</p><p style="margin-top:14px">The feature is <code>power(120–480 Hz) / power(20–2,000 Hz)</code>, using inclusive frequency boundaries. It was not retuned for the external corpus.</p></article>
-      </div>
-    </div></section>
-
-    <section class="section" id="methods"><div class="wrap">
-      <h2>Cross-corpus analysis methodology</h2>
-      <p class="lede">The design separates descriptive acoustic windows from independent biological units and preserves the difference between the frozen primary endpoint and post-hoc analyses.</p>
-      <div class="steps">
-        <div class="step"><b>Analyze the derivation corpus</b><span>Seven public 48 kHz recordings produced 10,922 complete windows. Because participant and sensor mappings are unresolved, inference remains recording-level and conditional.</span></div>
-        <div class="step"><b>Reconstruct the external corpus</b><span>1,606 two-second, 44.1 kHz clips and 6,413 source annotations were organized into 19 anonymized subject records; duplicate boundary-spanning annotations were removed.</span></div>
-        <div class="step"><b>Apply one fixed estimator</b><span>Both corpora use the same 8 kHz resampling, 500 ms windows, boundary guard, Hann taper, FFT, and 120–480/20–2,000 Hz ratio.</span></div>
-        <div class="step"><b>Respect independent units</b><span>Pooled windows are descriptive. The external primary analysis gives each eligible subject one median difference and equal weight.</span></div>
-        <div class="step"><b>Test the frozen primary endpoint</b><span>The subject-level event-minus-non-event median difference receives a t-based interval and exact two-sided sign-flip test.</span></div>
-        <div class="step"><b>Label exploratory work explicitly</b><span>After heterogeneity was observed, within-subject Mann–Whitney probability of superiority was added post hoc. It does not replace the primary endpoint.</span></div>
-        <div class="step"><b>Stress-test the result</b><span>Checks include participant bootstrapping, leave-one-subject-out analysis, minimum class counts, alternative labels, Holm correction, power decomposition, and estimator verification.</span></div>
-      </div>
-      <div class="cta"><a class="btn" href="https://github.com/neelesh-kotte/moms-device-v2-signal-processing/blob/main/README.md">Inspect updated research documentation</a></div>
-    </div></section>
-
-    <section class="section" id="results"><div class="wrap">
-      <h2>Results across two corpora</h2>
-      <p class="lede">The main result is not a single positive finding. The stable median-shift claim failed in the external corpus, while a different post-hoc rank estimand showed exploratory ordering.</p>
-      <div class="grid">
-        <div class="card span4"><div class="metric">17,346</div><div class="metriclabel">complete 500 ms windows across both corpora</div></div>
-        <div class="card span4"><div class="metric">19</div><div class="metriclabel">external subjects; 16 had both guarded classes</div></div>
-        <div class="card span4"><div class="metric">0.0089</div><div class="metriclabel">external primary mean median difference</div></div>
-        <div class="card span4"><div class="metric">p = 0.455</div><div class="metriclabel">failed external primary sign-flip test</div></div>
-        <div class="card span4"><div class="metric">0.598</div><div class="metriclabel">exploratory external probability of superiority</div></div>
-        <div class="card span4"><div class="metric">14 / 16</div><div class="metriclabel">external subjects with rank probability above 0.5</div></div>
-      </div>
-      <div class="tablewrap" style="margin-top:16px"><table><thead><tr><th>Outcome</th><th>Derivation corpus</th><th>Independent corpus</th></tr></thead><tbody>
-        <tr><td>Complete windows</td><td>10,922</td><td>6,424</td></tr>
-        <tr><td>Event / non-event / excluded</td><td>3,881 / 5,878 / 1,163</td><td>3,050 / 2,340 / 1,034</td></tr>
-        <tr><td>Pooled event / non-event medians</td><td>0.426 / 0.089</td><td>0.056 / 0.059</td></tr>
-        <tr><td>Primary independent-unit effect</td><td>Conditional four-group mean 0.218</td><td>Mean subject effect 0.0089</td></tr>
-        <tr><td>95% interval</td><td>−0.023 to 0.459</td><td>−0.0151 to 0.0329</td></tr>
-        <tr><td>Median-shift sign-flip p</td><td>0.125, conditional</td><td>0.455</td></tr>
-        <tr><td>Rank probability mean</td><td>0.718, conditional</td><td>0.598, exploratory</td></tr>
-        <tr><td>Rank 95% interval</td><td>0.570–0.865</td><td>0.540–0.655</td></tr>
-        <tr><td>Rank sign-flip p</td><td>0.031, conditional</td><td>0.0032, exploratory</td></tr>
-      </tbody></table></div>
-      <div class="grid" style="margin-top:16px">
-        <article class="card span6"><h3>Absolute-power transport failed</h3><p>External target, outside-target, and total power factors were 1.46, 0.99, and 1.08. Every corresponding interval included zero, so the derivation power-amplification pattern did not transfer.</p></article>
-        <article class="card span6"><h3>Why the endpoints differ</h3><p>Medians test one point in each distribution. Probability of superiority summarizes all event–non-event pair orderings. Similar medians can coexist with distributed rank separation, but the post-hoc rank result remains hypothesis-generating.</p></article>
-      </div>
-    </div></section>
-
-    <section class="section"><div class="wrap">
-      <h2>Verification and robustness</h2>
-      <div class="grid">
-        <article class="card span6"><span class="tag verified">Current public script</span><h3>Derivation reproduction</h3><p><code>python process_gut_audio.py --download --verify</code> retrieves Figshare v1, recomputes the seven-recording analysis, and checks reported verification targets.</p></article>
-        <article class="card span6"><span class="tag documented">Expanded study</span><h3>Transport checks</h3><p>The manuscripts report exact sign-flip tests, participant bootstrap intervals, leave-one-subject-out means, minimum class-count checks, alternative label definitions, and Holm correction.</p></article>
-        <article class="card span6"><span class="tag documented">Estimator validation</span><h3>Numerical verification</h3><p>The expanded analysis reports 28 deterministic tests, 991 end-to-end resampling checks with maximum discrepancy 1.79 × 10⁻¹¹, and 100 independent periodogram comparisons with maximum difference 2.22 × 10⁻¹⁶.</p></article>
-        <article class="card span6"><span class="tag documented">Publication record</span><h3>Research manuscripts</h3><p>The original work was published through the Journal of Emerging Investigators and extended into a cross-corpus transport paper and Columbia Junior Science Journal research brief.</p></article>
-      </div>
-    </div></section>
-
-    <section class="section" id="limits"><div class="wrap">
-      <h2>Limitations and scope</h2>
-      <div class="note"><strong>Research result, not a medical device.</strong> This work does not establish diagnostic accuracy, gastrointestinal motility measurement, a biological mechanism, a clinical threshold, or hardware safety and effectiveness.</div>
-      <div class="grid" style="margin-top:16px">
-        <article class="card span4"><h3>Metadata limitation</h3><p>Corpus 1 lacks verified participant and sensor mappings. The corpora also differ in formats, sensors, protocols, gains, and annotation systems.</p></article>
-        <article class="card span4"><h3>Interpretation limitation</h3><p>The external primary median shift and absolute-power mechanism did not transfer. The rank result was selected after the primary outcome and must remain exploratory.</p></article>
-        <article class="card span4"><h3>Prototype limitation</h3><p>Consumer-grade microphones and mechanical coupling remain sensitive to placement, motion, pressure, gain, and room noise. Hardware validation is separate from the public-data result.</p></article>
-      </div>
-    </div></section>
-  </main>
-
-  <footer class="footer"><div class="wrap"><strong>MOM Device Technical Portfolio</strong><br />Independent biomedical engineering research by Neelesh Kotte. Evidence links identify the public repository and both source datasets. Updated August 2026.</div></footer>
+<header class="nav"><div class="wrap navin"><div class="brand">MOM DEVICE</div><nav class="navlinks"><a href="#prototype">Prototype</a><a href="#senseloop">SenseLoop V3</a><a href="#guest">Guest Mode</a><a href="#research">Research</a><a href="#limits">Limits</a></nav></div></header>
+<main>
+<section class="hero"><div class="wrap">
+<span class="eyebrow">Independent Biomedical Engineering Project</span>
+<h1>From abdominal sound capture to a personal SenseLoop.</h1>
+<p>MOM is a low-cost prototype for abdominal-acoustic data capture and analysis. I designed the hardware around an ESP32, MAX4466 microphone amplifier, and stethoscope-based acoustic coupling, then built software for recording, signal-quality checks, personalized check-ins, uncertainty-aware estimates, multi-user sharing, preference learning, and review.</p>
+<div class="cta"><a class="btn primary" href="https://github.com/neelesh-kotte/moms-device-v2-signal-processing">Open GitHub repository</a><a class="btn" href="#research">See research evidence</a><a class="btn" href="#limits">See claim boundaries</a></div>
+</div></section>
+<section class="section" id="prototype"><div class="wrap">
+<h2>The engineering problem</h2><p class="lede">Abdominal acoustics are messy. A useful prototype has to deal with contact pressure, sensor placement, motion, environmental noise, amplifier gain, clipping, network reliability, and repeatability before any model is worth discussing.</p>
+<div class="grid">
+<article class="card span4"><span class="tag built">Built</span><h3>Low-cost capture stack</h3><p>Classic ESP32-WROOM-32, MAX4466 manual-gain microphone amplifier, and stethoscope coupling form the physical acquisition system.</p></article>
+<article class="card span4"><span class="tag built">Iterated</span><h3>Noise + contact controls</h3><p>Repeated hardware testing focused on movement artifacts, environmental noise, microphone gain, sensor position, mounting pressure, headroom, and stable contact.</p></article>
+<article class="card span4"><span class="tag built">Software</span><h3>Acquisition + review</h3><p>Python and Flask/Waitress services receive sensor windows, extract acoustic features, reject bad-quality input, save guided sessions, and power the web interface.</p></article>
+</div>
+<div class="card span12" style="margin-top:16px"><div class="arch"><div class="node">Abdominal acoustic signal</div><div class="arrow">→</div><div class="node">Stethoscope coupling</div><div class="arrow">→</div><div class="node">MAX4466</div><div class="arrow">→</div><div class="node">ESP32 GPIO32 ADC</div><div class="arrow">→</div><div class="node">Python / SenseLoop</div></div></div>
+</div></section>
+<section class="section" id="senseloop"><div class="wrap">
+<h2>MOM SenseLoop V3</h2><p class="lede">V3 turns the capture system into a human-in-the-loop personal learning prototype. The goal is not to claim that a sensor can “know” hunger. It is to test whether a person's abdominal-acoustic patterns can add useful information to their own repeated self-reported check-ins.</p>
+<div class="steps">
+<div class="step"><b>Select the wearer</b><span>Separate profiles let multiple people share one physical device without mixing recordings, labels, models, or food-preference history.</span></div>
+<div class="step"><b>Record a guided session</b><span>The interface checks connection, clipping, movement/noise, and signal quality while collecting a short acoustic session.</span></div>
+<div class="step"><b>Add the label</b><span>The user reports current hunger from 0–10 and can add meal timing, activity, unusual-noise, and sensor-position context.</span></div>
+<div class="step"><b>Aggregate the recording</b><span>Session features include candidate bowel-sound event rate/duration, RMS, spectral bandwidth, band power, centroid, entropy, and quality indicators.</span></div>
+<div class="step"><b>Compare three model views</b><span>Time-only baseline versus sounds-only versus a personalized model combining sound with the user's own context and previous check-ins.</span></div>
+<div class="step"><b>Abstain when needed</b><span>Poor signal quality, insufficient history, weak maturity, or high uncertainty can return “Not enough information.”</span></div>
+<div class="step"><b>Ask, don't declare</b><span>Notifications are gated by quality, recent-period agreement, model maturity, and cooldown, then ask the wearer to confirm the estimate.</span></div>
+<div class="step"><b>Learn preferences</b><span>Optional savory/sweet/fresh/warm/crunchy/filling selections and practical constraints can rank food ideas. DoorDash is only a user-initiated handoff.</span></div>
+</div>
+<div class="quote" style="margin-top:18px"><strong>Product wording:</strong> “Estimated self-reported hunger based on your past patterns.”</div>
+</div></section>
+<section class="section" id="guest"><div class="wrap">
+<h2>Guest Mode: show the project, not somebody's profile</h2><p class="lede">The device-hosted V3 site now separates a public educational surface from the private user application. A visitor can understand MOM without getting access to a real person's sensor stream or history.</p>
+<div class="boundary">
+<div class="yes"><h3>Guest Mode can show</h3><ul class="clean"><li>What MOM is and why it exists</li><li>How the hardware/software loop works</li><li>A clearly labeled illustrative sample session</li><li>How check-ins, uncertainty, and preference learning work</li><li>Claim boundaries and limitations</li></ul></div>
+<div class="no"><h3>Guest Mode cannot show</h3><ul class="clean"><li>Profile names</li><li>Live ESP32 sensor readings</li><li>Recorded sessions or hunger check-ins</li><li>Food-preference history</li><li>Personal model outputs</li><li>Private API data</li></ul></div>
+</div>
+<p class="small" style="margin-top:14px">Remote private-dashboard access remains access-code protected. The physical ESP32 ingestion endpoint remains local-network only.</p>
+</div></section>
+<section class="section" id="research"><div class="wrap">
+<h2>Separate research track: cross-corpus spectral analysis</h2><p class="lede">The product prototype and research evidence are kept separate. The research track tests one fixed feature, <code>power(120–480 Hz) / power(20–2,000 Hz)</code>, using public de-identified bowel-sound datasets.</p>
+<div class="grid">
+<div class="card span4"><div class="metric">10,922</div><div class="metriclabel">complete 500 ms derivation windows</div></div>
+<div class="card span4"><div class="metric">19</div><div class="metriclabel">subjects in the independent corpus; 16 with both guarded classes</div></div>
+<div class="card span4"><div class="metric">0.0089</div><div class="metriclabel">external primary mean median difference</div></div>
+<div class="card span4"><div class="metric">p = 0.455</div><div class="metriclabel">external frozen primary sign-flip test</div></div>
+<div class="card span4"><div class="metric">0.598</div><div class="metriclabel">exploratory external probability of superiority</div></div>
+<div class="card span4"><div class="metric">14 / 16</div><div class="metriclabel">eligible subjects with exploratory rank probability above 0.5</div></div>
+</div>
+<div class="tablewrap" style="margin-top:16px"><table><thead><tr><th>Question</th><th>Result</th><th>Interpretation</th></tr></thead><tbody><tr><td>Did the derivation median shift transport?</td><td>0.0089; 95% CI −0.0151 to 0.0329; p=0.455</td><td>Primary endpoint inconclusive / not confirmed.</td></tr><tr><td>Was there within-subject pairwise ordering?</td><td>Exploratory rank mean 0.598; p=0.0032</td><td>Post-hoc hypothesis-generating pattern, not a replacement primary endpoint.</td></tr><tr><td>Does this validate V3 hunger estimation?</td><td>No</td><td>The public-data study concerns bowel-sound event/non-event acoustics, not hunger prediction or clinical validation.</td></tr></tbody></table></div>
+<div class="cta"><a class="btn" href="https://github.com/neelesh-kotte/moms-device-v2-signal-processing/blob/main/README.md">Read full research documentation</a></div>
+</div></section>
+<section class="section" id="limits"><div class="wrap">
+<h2>Claim boundaries</h2><p class="lede">The strongest version of the project is the accurate one. The engineering work does not need inflated clinical language.</p>
+<div class="boundary">
+<div class="yes"><h3>Appropriate</h3><ul class="clean"><li>Low-cost prototype for abdominal-acoustic data capture and analysis</li><li>Independent biomedical engineering project</li><li>Personalized association model with uncertainty</li><li>Preference learning from previous choices</li><li>Cross-corpus acoustic signal-processing research</li></ul></div>
+<div class="no"><h3>Not supported</h3><ul class="clean"><li>Diagnostic device</li><li>Detecting gastrointestinal disease</li><li>Clinical detector</li><li>Disease-screening system</li><li>Medically validated device</li><li>Mind-reading or thought decoding</li></ul></div>
+</div>
+</div></section>
+<section class="section"><div class="wrap"><h2>Engineering evidence to keep building</h2><p class="lede">The highest-value next step is external technical evaluation, backed by a clean record of how the device evolved.</p><div class="grid"><article class="card span4"><h3>Physical evidence</h3><p>Dated prototype photographs, sensor mounting images, wiring diagrams, and demonstration footage.</p></article><article class="card span4"><h3>Iteration evidence</h3><p>Technical-testing logs, failed approaches, design revisions, noise/contact troubleshooting, and configuration-lock records.</p></article><article class="card span4"><h3>External review</h3><p>Engineering feedback plus faculty, clinician, or biomedical-device evaluation focused on measurement quality, usability, and next experiments.</p></article></div></div></section>
+</main>
+<footer class="footer"><div class="wrap"><strong>MOM Device</strong> • Designed and developed by Neelesh Kotte. Independent prototype; not a diagnostic or medically validated device.</div></footer>
 </body>
 </html>
