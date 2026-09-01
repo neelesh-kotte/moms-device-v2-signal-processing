@@ -226,11 +226,11 @@ var MOM;
     }
     function Button({ children, onClick, variant = 'secondary', disabled = false, type = 'button', className = '', ariaLabel }) {
         const styles = {
-            primary: 'border-mint bg-mint text-[#F1EEE5] hover:bg-mint2',
-            secondary: 'border-line bg-panel2 text-warm hover:border-mint/55 hover:bg-[#F1EEE5]',
+            primary: 'border-mint bg-mint text-[#071014] hover:bg-mint2',
+            secondary: 'border-line bg-panel2 text-warm hover:border-mint/55 hover:bg-[#071014]',
             ghost: 'border-transparent bg-transparent text-slate hover:bg-white/5 hover:text-warm',
-            danger: 'border-coral/45 bg-coral/10 text-[#C4402F] hover:bg-coral/20',
-            google: 'border-white/20 bg-white text-[#F1EEE5] hover:bg-[#121714]'
+            danger: 'border-coral/45 bg-coral/10 text-[#62B5A6] hover:bg-coral/20',
+            google: 'border-white/20 bg-white text-[#071014] hover:bg-[#EAF0EF]'
         };
         return React.createElement("button", { type: type, "aria-label": ariaLabel, disabled: disabled, onClick: onClick, className: `ui-button ui-button--${variant} ${className}` }, children);
     }
@@ -238,9 +238,9 @@ var MOM;
         const map = {
             neutral: 'border-line bg-white/[0.035] text-slate2',
             good: 'border-mint/35 bg-mint/10 text-mint2',
-            warn: 'border-amber/35 bg-amber/10 text-[#C4402F]',
-            demo: 'border-amber/35 bg-amber/10 text-[#C4402F]',
-            coral: 'border-coral/35 bg-coral/10 text-[#C4402F]'
+            warn: 'border-amber/35 bg-amber/10 text-[#62B5A6]',
+            demo: 'border-amber/35 bg-amber/10 text-[#62B5A6]',
+            coral: 'border-coral/35 bg-coral/10 text-[#62B5A6]'
         };
         return React.createElement("span", { className: `ui-badge ui-badge--${tone}` }, children);
     }
@@ -263,12 +263,12 @@ var MOM;
             const y = h / 2 - (v / max) * (h * 0.38);
             return `${x.toFixed(1)},${y.toFixed(1)}`;
         }).join(' ');
-        return React.createElement("div", { className: "relative overflow-hidden rounded-2xl border border-line bg-[#F1EEE5] p-4", role: "img", "aria-label": `${demo ? 'Demo data. ' : ''}${label}` },
+        return React.createElement("div", { className: "relative overflow-hidden rounded-2xl border border-line bg-[#071014] p-4", role: "img", "aria-label": `${demo ? 'Demo data. ' : ''}${label}` },
             demo && React.createElement("div", { className: "absolute left-3 top-3 z-10" },
                 React.createElement(Badge, { tone: "demo" }, "Demo data")),
             React.createElement("svg", { viewBox: `0 0 ${w} ${h}`, className: `w-full ${compact ? 'h-20' : 'h-44'}`, preserveAspectRatio: "none", "aria-hidden": "true" },
-                [.25, .5, .75].map(v => React.createElement("line", { key: v, x1: "0", x2: w, y1: h * v, y2: h * v, stroke: "#A9AA9F", strokeWidth: "1" })),
-                React.createElement("polyline", { points: points, fill: "none", stroke: "#C4402F", strokeWidth: compact ? 4 : 3, strokeLinejoin: "miter", strokeLinecap: "square" })));
+                [.25, .5, .75].map(v => React.createElement("line", { key: v, x1: "0", x2: w, y1: h * v, y2: h * v, stroke: "#283A42", strokeWidth: "1" })),
+                React.createElement("polyline", { points: points, fill: "none", stroke: "#62B5A6", strokeWidth: compact ? 4 : 3, strokeLinejoin: "miter", strokeLinecap: "square" })));
     }
     function LoadingState({ label = 'Loading MOM SenseLoop…' }) {
         return React.createElement("div", { className: "grid min-h-[240px] place-items-center rounded-[22px] border border-line bg-panel/70 p-8 text-center", role: "status", "aria-live": "polite" },
@@ -295,11 +295,19 @@ var MOM;
         }, []);
         return React.createElement("div", { className: "fixed inset-0 z-[100] grid place-items-center overflow-y-auto bg-black/75 p-4", role: "dialog", "aria-modal": "true", "aria-label": title, onMouseDown: e => { if (e.currentTarget === e.target)
                 onClose(); } },
-            React.createElement("div", { ref: ref, tabIndex: -1, className: `relative max-h-[90vh] w-full ${width} overflow-y-auto rounded-[24px] border border-line bg-[#F1EEE5] p-6 focus:outline-none` },
+            React.createElement("div", { ref: ref, tabIndex: -1, className: `relative max-h-[90vh] w-full ${width} overflow-y-auto rounded-[24px] border border-line bg-[#071014] p-6 focus:outline-none` },
                 React.createElement("button", { onClick: onClose, className: "absolute right-4 top-4 grid h-11 w-11 place-items-center rounded-xl text-slate2 hover:bg-white/5 hover:text-warm focus-visible:ring-2 focus-visible:ring-mint", "aria-label": "Close dialog" },
                     React.createElement(Icon, { name: "x" })),
                 React.createElement("h2", { className: "pr-12 text-2xl font-black tracking-tight text-warm" }, title),
                 React.createElement("div", { className: "mt-5" }, children)));
+    }
+    function scrollPublicSection(id) {
+        if (readRoute().view !== 'home') {
+            pushRoute('home');
+            window.setTimeout(() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
+            return;
+        }
+        document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
     function PublicNav({ onPrivate }) {
         const [mobile, setMobile] = useState(false);
@@ -308,7 +316,9 @@ var MOM;
                 React.createElement("button", { onClick: () => pushRoute('home'), className: "rounded-xl text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mint" },
                     React.createElement(Logo, null)),
                 React.createElement("nav", { className: "site-header__nav", "aria-label": "Public navigation" },
-                    React.createElement(Button, { variant: "ghost", onClick: () => pushRoute('how') }, "How MOM works"),
+                    React.createElement(Button, { variant: "ghost", onClick: () => scrollPublicSection('hardware') }, "Hardware"),
+                    React.createElement(Button, { variant: "ghost", onClick: () => scrollPublicSection('validation') }, "Validation"),
+                    React.createElement(Button, { variant: "ghost", onClick: () => pushRoute('how') }, "Technical brief"),
                     React.createElement(Button, { variant: "ghost", onClick: () => pushRoute('guest') }, "Guest Mode"),
                     React.createElement(Button, { variant: "primary", onClick: onPrivate },
                         React.createElement(Icon, { name: "lock-keyhole" }),
@@ -317,22 +327,93 @@ var MOM;
                     React.createElement(Icon, { name: mobile ? 'x' : 'menu' }))),
             mobile && React.createElement("nav", { className: "border-t border-line bg-panel px-4 py-3 md:hidden", "aria-label": "Mobile public navigation" },
                 React.createElement("div", { className: "grid gap-2" },
-                    React.createElement(Button, { variant: "ghost", onClick: () => { setMobile(false); pushRoute('how'); } }, "How MOM works"),
+                    React.createElement(Button, { variant: "ghost", onClick: () => { setMobile(false); scrollPublicSection('hardware'); } }, "Hardware"),
+                    React.createElement(Button, { variant: "ghost", onClick: () => { setMobile(false); scrollPublicSection('validation'); } }, "Validation"),
+                    React.createElement(Button, { variant: "ghost", onClick: () => { setMobile(false); pushRoute('how'); } }, "Technical brief"),
                     React.createElement(Button, { variant: "ghost", onClick: () => { setMobile(false); pushRoute('guest'); } }, "Guest Mode"),
                     React.createElement(Button, { variant: "primary", onClick: () => { setMobile(false); onPrivate(); } }, "Private Dashboard"))));
     }
     function HeroVisual() {
-        return React.createElement("div", { className: "signal-figure" },
-            React.createElement("div", { className: "absolute inset-0 opacity-40 [background-image:linear-gradient(rgba(142,228,190,.055)_1px,transparent_1px),linear-gradient(90deg,rgba(142,228,190,.055)_1px,transparent_1px)] [background-size:30px_30px]" }),
-            React.createElement("div", { className: "relative z-10 flex h-full min-h-[382px] flex-col items-center justify-center" },
-                React.createElement("div", { className: "grid h-24 w-24 place-items-center rounded-full border border-mint/45 bg-mint/10 text-lg font-black tracking-tight text-mint2" },
-                    React.createElement(Icon, { name: "stethoscope", size: 33 })),
-                React.createElement("div", { className: "h-12 w-px editorial-flat-rule" }),
-                React.createElement("div", { className: "w-full max-w-sm" },
-                    React.createElement(Waveform, { compact: true, demo: false, label: "Abstract illustration of captured sound" })),
-                React.createElement("div", { className: "mt-4 grid w-full max-w-sm grid-cols-2 gap-2 text-sm" }, ['Capture sound', 'Review quality', 'Keep profiles separate', 'Learn carefully'].map((x, i) => React.createElement("div", { key: x, className: "flex items-center gap-2 rounded-xl border border-line bg-bg/70 p-3 font-bold text-slate2" },
-                    React.createElement("span", { className: "grid h-6 w-6 place-items-center rounded-full bg-mint/10 text-xs text-mint2" }, i + 1),
-                    x)))));
+        return React.createElement("figure", { className: "signal-figure", "aria-label": "Illustrative MOM signal acquisition monitor" },
+            React.createElement("figcaption", { className: "instrument-header" },
+                React.createElement("span", null, "ACQUISITION / DEMO"),
+                React.createElement("span", { className: "instrument-live" }, "● READY")),
+            React.createElement("div", { className: "instrument-readout" },
+                React.createElement("div", { className: "instrument-id" }, "MOM–SL / CH.01"),
+                React.createElement("div", { className: "instrument-wave" }, React.createElement(Waveform, { compact: true, demo: false, label: "Illustrative abdominal-acoustic waveform" })),
+                React.createElement("div", { className: "instrument-ledger" },
+                    React.createElement("div", null, React.createElement("span", null, "SAMPLE RATE"), React.createElement("strong", null, "8.0 kHz")),
+                    React.createElement("div", null, React.createElement("span", null, "WINDOW"), React.createElement("strong", null, "4096 smp")),
+                    React.createElement("div", null, React.createElement("span", null, "QUALITY GATE"), React.createElement("strong", null, "ENABLED")))),
+            React.createElement("div", { className: "instrument-chain" },
+                ["STETHOSCOPE", "MAX4466", "ESP32", "PYTHON DSP"].map((x, i) => React.createElement("span", { key: x }, `${String(i + 1).padStart(2, '0')} / ${x}`))));
+    }
+    function EvidenceLedger() {
+        const items = [
+            ["~$19", "prototype BOM"],
+            ["32+", "controlled tests"],
+            ["8+", "technical reviewers"],
+            ["V1 → V3", "documented iterations"]
+        ];
+        return React.createElement("section", { className: "evidence-ledger", "aria-label": "Project evidence summary" },
+            items.map(([value, label]) => React.createElement("div", { key: label },
+                React.createElement("strong", null, value),
+                React.createElement("span", null, label))));
+    }
+    function HardwareEvolution() {
+        const versions = [
+            ["V1", "Capture feasibility", "Established that the low-cost ESP32 and MAX4466 chain could acquire abdominal-acoustic signals through a stethoscope-style interface."],
+            ["V2", "Controlled validation", "Added contiguous acquisition, measured sample-rate checks, duplicate rejection, clipping checks, and source-separated playback evaluation."],
+            ["V3", "SenseLoop platform", "Connects guided recording, quality gates, separated profiles, optional check-ins, privacy controls, and uncertainty-aware research summaries."]
+        ];
+        return React.createElement("section", { id: "hardware", className: "lab-section hardware-section" },
+            React.createElement("div", { className: "lab-section__intro" },
+                React.createElement("span", { className: "lab-kicker" }, "01 / HARDWARE EVOLUTION"),
+                React.createElement("h2", null, "Three iterations. Every failure becomes a design input."),
+                React.createElement("p", null, "The project is documented as an engineering research prototype: sensor placement, acoustic coupling, motion, noise, clipping, coverage, and reproducibility are treated as measurable constraints.")),
+            React.createElement("div", { className: "version-timeline" }, versions.map(([v, title, copy], i) =>
+                React.createElement("article", { key: v, className: "version-row" },
+                    React.createElement("div", { className: "version-code" }, v),
+                    React.createElement("div", { className: "version-index" }, `0${i + 1}`),
+                    React.createElement("div", null, React.createElement("h3", null, title), React.createElement("p", null, copy))))));
+    }
+    function SignalPipeline() {
+        const stages = [
+            ["INPUT", "Stethoscope coupling", "fixed placement + contact"],
+            ["ADC", "ESP32 / MAX4466", "8 kHz contiguous windows"],
+            ["GATE", "Signal quality", "rate · clipping · motion · noise"],
+            ["DSP", "Python analysis", "RMS · spectrum · entropy · bandwidth"],
+            ["VIEW", "SenseLoop", "profile-specific research summary"]
+        ];
+        return React.createElement("section", { id: "pipeline", className: "lab-section pipeline-section" },
+            React.createElement("div", { className: "lab-section__intro" },
+                React.createElement("span", { className: "lab-kicker" }, "02 / SIGNAL PROCESSING"),
+                React.createElement("h2", null, "A visible acquisition path, not a black box."),
+                React.createElement("p", null, "Each step exposes its inputs, quality checks, and limits. The interface can abstain with “Not enough information” instead of forcing a prediction.")),
+            React.createElement("div", { className: "pipeline-console" },
+                React.createElement("div", { className: "console-top" }, React.createElement("span", null, "PIPELINE / MOM-SL-V3"), React.createElement("span", null, "RESEARCH MODE")),
+                React.createElement("div", { className: "pipeline-stages" }, stages.map(([tag, title, meta], i) => React.createElement("div", { key: tag, className: "pipeline-stage" },
+                    React.createElement("span", { className: "pipeline-tag" }, tag),
+                    React.createElement("strong", null, title),
+                    React.createElement("small", null, meta),
+                    i < stages.length - 1 && React.createElement("i", { "aria-hidden": "true" }, "→"))))));
+    }
+    function ValidationProgram() {
+        const rows = [
+            ["Acquisition integrity", "sample rate / clipping / window coverage", "automatic rejection"],
+            ["Physical setup", "placement / coupling / gain / motion", "controlled protocol"],
+            ["Data integrity", "duplicates / corruption / split leakage", "hash + source checks"],
+            ["Model evaluation", "held-out sources / balanced metrics", "no test-phase tuning"],
+            ["Human review", "8+ technical reviewers", "feedback integrated"]
+        ];
+        return React.createElement("section", { id: "validation", className: "lab-section validation-section" },
+            React.createElement("div", { className: "validation-aside" },
+                React.createElement("span", { className: "lab-kicker" }, "03 / EMPIRICAL RIGOR"),
+                React.createElement("strong", null, "32+"),
+                React.createElement("p", null, "controlled engineering tests across the device, acquisition path, data preparation, and evaluation workflow.")),
+            React.createElement("div", { className: "validation-table" },
+                React.createElement("div", { className: "validation-head" }, React.createElement("span", null, "CONTROL"), React.createElement("span", null, "OBSERVED"), React.createElement("span", null, "RULE")),
+                rows.map(([a, b, c]) => React.createElement("div", { key: a, className: "validation-row" }, React.createElement("strong", null, a), React.createElement("span", null, b), React.createElement("code", null, c)))));
     }
     function PublicHome({ onPrivate }) {
         return React.createElement(React.Fragment, null,
@@ -340,28 +421,32 @@ var MOM;
             React.createElement("main", { id: "main-content" },
                 React.createElement("section", { className: "public-hero" },
                     React.createElement("div", null,
-                        React.createElement(Badge, { tone: "neutral" }, "Public guest experience"),
+                        React.createElement("div", { className: "hero-overline" }, "MOM DEVICE / SENSELOOP V3 / OPEN RESEARCH"),
                         React.createElement("h1", { className: "mt-6 text-5xl font-black leading-[.96] tracking-[-0.06em] text-warm sm:text-6xl lg:text-7xl" },
                             "Listen closer.",
                             React.createElement("br", null),
                             React.createElement("span", { className: "text-mint2" }, "Learn carefully.")),
-                        React.createElement("p", { className: "mt-6 max-w-2xl text-lg leading-8 text-slate2" }, "MOM SenseLoop is an experimental device that listens to abdominal sounds, checks whether a recording is clear enough to use, and helps each person explore their own recordings and optional check-ins over time."),
+                        React.createElement("p", { className: "mt-6 max-w-2xl text-lg leading-8 text-slate2" }, "A ~\$19 open-science gastroacoustic prototype for studying recording consistency, acoustic coupling, signal quality, and cautious profile-specific patterns over time."),
                         React.createElement("div", { className: "mt-7 flex flex-wrap gap-3" },
                             React.createElement(Button, { variant: "primary", onClick: () => pushRoute('how') },
                                 React.createElement(Icon, { name: "play-circle" }),
-                                " Explore the device"),
+                                " Technical brief"),
                             React.createElement(Button, { onClick: () => pushRoute('guest') },
                                 React.createElement(Icon, { name: "sparkles" }),
-                                " Try Guest Mode"),
+                                " Open Guest Mode"),
                             React.createElement(Button, { variant: "ghost", onClick: onPrivate },
                                 React.createElement(Icon, { name: "lock-keyhole" }),
                                 " Private Dashboard")),
-                        React.createElement("div", { className: "mt-7 flex max-w-2xl gap-3 rounded-2xl border border-amber/30 bg-amber/10 p-4 text-sm leading-6 text-[#C4402F]" },
+                        React.createElement("div", { className: "mt-7 flex max-w-2xl gap-3 rounded-2xl border border-amber/30 bg-amber/10 p-4 text-sm leading-6 text-[#62B5A6]" },
                             React.createElement(Icon, { name: "shield-check" }),
                             React.createElement("span", null,
                                 React.createElement("strong", null, "Research and personal exploration only."),
-                                " MOM SenseLoop is not a medical device and does not provide diagnoses."))),
+                                " MOM SenseLoop is an exploratory prototype. It does not diagnose conditions, measure an objective hunger level, read thoughts, or make medical or nutritional decisions."))),
                     React.createElement(HeroVisual, null)),
+                React.createElement(EvidenceLedger, null),
+                React.createElement(HardwareEvolution, null),
+                React.createElement(SignalPipeline, null),
+                React.createElement(ValidationProgram, null),
                 React.createElement("section", { className: "editorial-section editorial-section--ruled" },
                     React.createElement("div", { className: "editorial-inner" },
                         React.createElement(SectionTitle, { kicker: "The product story", title: "Capture \u2192 Review \u2192 Learn carefully", copy: "You do not need to know anything about signal processing to understand the workflow." }),
@@ -382,12 +467,14 @@ var MOM;
                                 React.createElement("h3", { className: "text-xl font-black text-warm" }, "Learn carefully"),
                                 React.createElement("p", { className: "mt-2 text-slate2" }, "Over time, your own recordings and optional check-ins can support profile-specific research summaries. If support is weak, MOM says \u201CNot enough information.\u201D"))))),
                 React.createElement("section", { className: "mx-auto max-w-[1180px] px-4 py-16 sm:px-6" },
-                    React.createElement(SectionTitle, { kicker: "What MOM can do", title: "A simple experience on top of careful engineering" }),
+                    React.createElement(SectionTitle, { kicker: "SenseLoop software", title: "A careful interface on top of measurable engineering" }),
                     React.createElement("div", { className: "feature-index" }, [
                         ['route', 'Guided recording', 'Capture a short session with step-by-step support.'],
                         ['activity', 'Signal-quality review', 'See whether the recording is steady, clear, and usable.'],
                         ['users-round', 'Profile-separated history', 'Each person’s recordings and optional check-ins remain separate.'],
-                        ['circle-help', 'Honest summaries', 'MOM only shows supported experimental views and abstains when information is insufficient.']
+                        ['circle-help', 'Honest summaries', 'MOM only shows supported experimental views and abstains when information is insufficient.'],
+                        ['settings', 'Voluntary preferences', 'Craving and food-category preferences are optional, editable, and never treated as physiological facts.'],
+                        ['arrow-right', 'Optional food-app handoff', 'MOM may open a user-selected food service after confirmation. It never purchases or places an order.']
                     ].map(([icon, title, copy]) => React.createElement(Card, { key: title },
                         React.createElement("div", { className: "mb-4 text-mint2" },
                             React.createElement(Icon, { name: icon })),
@@ -407,7 +494,7 @@ var MOM;
                                         React.createElement(Icon, { name: "arrow-right" }))))),
                         React.createElement(Card, null,
                             React.createElement("div", { className: "flex items-start gap-4" },
-                                React.createElement("div", { className: "grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-amber/10 text-[#C4402F]" },
+                                React.createElement("div", { className: "grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-amber/10 text-[#62B5A6]" },
                                     React.createElement(Icon, { name: "scale" })),
                                 React.createElement("div", null,
                                     React.createElement("h3", { className: "text-xl font-black text-warm" }, "Experimental pattern summary, not a medical conclusion."),
@@ -430,7 +517,7 @@ var MOM;
                 React.createElement("button", { onClick: () => pushRoute('home'), className: "mb-8 inline-flex items-center gap-2 rounded-xl text-sm font-bold text-slate2 hover:text-warm focus-visible:ring-2 focus-visible:ring-mint" },
                     React.createElement(Icon, { name: "arrow-left" }),
                     " Public home"),
-                React.createElement(SectionTitle, { kicker: "How MOM works", title: "How MOM SenseLoop turns a recording into a careful research view.", copy: "The engineering is real, but the first explanation stays simple." }),
+                React.createElement(SectionTitle, { kicker: "Technical brief / open research", title: "From a ~\$19 sensor chain to an uncertainty-aware research view.", copy: "Hardware, acquisition, data checks, and interpretation limits remain visible throughout the workflow." }),
                 React.createElement("div", { className: "grid gap-4 lg:grid-cols-4" }, [
                     ['1', 'Capture sound', 'The ESP32 + MAX4466 sensor uses stethoscope-based acoustic coupling to capture a short abdominal recording.', 'mic-2'],
                     ['2', 'Check the signal', 'The system reviews clarity, movement, contact consistency, background noise, clipping, and completion.', 'scan-line'],
@@ -445,11 +532,33 @@ var MOM;
                     React.createElement("p", { className: "mt-2 text-sm leading-6 text-slate2" }, copy)))),
                 React.createElement(Card, { className: "mt-6 overflow-hidden" },
                     React.createElement("h3", { className: "text-xl font-black text-warm" }, "Device and data flow"),
-                    React.createElement("div", { className: "mt-5 flex flex-col items-stretch gap-2 md:flex-row md:items-center" }, ['Stethoscope coupling', 'MAX4466 microphone', 'ESP32', 'Cloud session', 'Quality review', 'Profile history', 'Experimental view'].map((x, i) => React.createElement(React.Fragment, { key: x },
+                    React.createElement("div", { className: "mt-5 flex flex-col items-stretch gap-2 md:flex-row md:items-center" }, ['Stethoscope coupling', 'MAX4466 microphone', 'ESP32', 'Quality gate', 'Python DSP', 'Profile history', 'Experimental view'].map((x, i) => React.createElement(React.Fragment, { key: x },
                         React.createElement("div", { className: "flex-1 rounded-xl border border-line bg-bg/60 px-3 py-3 text-center text-sm font-bold text-slate2" }, x),
                         i < 6 && React.createElement("div", { className: "grid place-items-center text-mint2" },
                             React.createElement(Icon, { name: window.innerWidth < 768 ? 'arrow-down' : 'arrow-right' })))))),
                 React.createElement("div", { className: "mt-6 grid gap-4 lg:grid-cols-2" },
+                    React.createElement(Card, null,
+                        React.createElement("h3", { className: "text-xl font-black text-warm" }, "Reference hardware and software"),
+                        React.createElement("div", { className: "mt-4 divide-y divide-line" }, [
+                            ['Sensor', 'MAX4466 electret microphone amplifier'],
+                            ['Controller', 'ESP32 acquisition and network transport'],
+                            ['Coupling', 'Stethoscope-style acoustic interface'],
+                            ['Acquisition', '8 kHz contiguous 4096-sample windows'],
+                            ['Analysis', 'Python quality checks and frequency-aware DSP'],
+                            ['Cost target', 'Approximately \$19 for the core research prototype']
+                        ].map(([term, copy]) => React.createElement("div", { key: term, className: "grid grid-cols-[120px_1fr] gap-4 py-3 text-sm" },
+                            React.createElement("strong", { className: "font-mono text-mint2" }, term),
+                            React.createElement("span", { className: "text-slate2" }, copy))))),
+                    React.createElement(Card, null,
+                        React.createElement("h3", { className: "text-xl font-black text-warm" }, "Reproducibility controls"),
+                        React.createElement("ul", { className: "mt-4 space-y-3 text-sm text-slate2" }, [
+                            'Measured sample-rate and clipping rejection',
+                            'Continuous-window coverage checks',
+                            'SHA-256 duplicate detection',
+                            'Source-separated calibration and evaluation',
+                            'Untouched test phase with no tuning',
+                            'Versioned logs, figures, metrics, and reports'
+                        ].map(x => React.createElement("li", { key: x, className: "flex gap-3" }, React.createElement(Icon, { name: "check", size: 16, className: "text-mint2" }), React.createElement("span", null, x))))),
                     React.createElement(Card, null,
                         React.createElement("h3", { className: "text-xl font-black text-warm" }, "Technical terms, translated"),
                         React.createElement("div", { className: "mt-4 divide-y divide-line" }, terms.map(([term, copy]) => React.createElement("details", { key: term, className: "py-3" },
@@ -462,8 +571,8 @@ var MOM;
                                 React.createElement("strong", { className: "text-mint2" }, "Can show"),
                                 React.createElement("p", { className: "mt-1 text-sm text-slate2" }, "Recording-quality observations, profile history, optional self-reports, acoustic research outputs, time-based baselines, and supported profile-specific model outputs.")),
                             React.createElement("div", { className: "rounded-xl border border-amber/25 bg-amber/5 p-4" },
-                                React.createElement("strong", { className: "text-[#C4402F]" }, "Does not claim"),
-                                React.createElement("p", { className: "mt-1 text-sm text-slate2" }, "Diagnosis, treatment, medical safety, disease detection, a digestive-health score, nutritional prescriptions, or mind-reading."))))),
+                                React.createElement("strong", { className: "text-[#62B5A6]" }, "Does not claim"),
+                                React.createElement("p", { className: "mt-1 text-sm text-slate2" }, "Diagnosis, treatment, medical safety, disease detection, a digestive-health score, objective hunger measurement, nutritional prescriptions, or mind-reading."))))),
                 React.createElement("div", { className: "mt-8 flex flex-wrap gap-3" },
                     React.createElement(Button, { variant: "primary", onClick: () => pushRoute('guest') }, "Explore Guest Mode"),
                     React.createElement(Button, { onClick: onPrivate }, "Start a guided recording"))),
@@ -596,7 +705,7 @@ var MOM;
                     React.createElement("p", { className: "mx-auto mt-3 max-w-lg text-slate2" }, "Your Google-authenticated MOM account keeps private profiles and research history separate from other users."),
                     React.createElement("div", { className: "mt-7" },
                         React.createElement(Button, { variant: "google", className: "w-full", disabled: checking, onClick: signIn },
-                            React.createElement("span", { className: "text-lg font-black text-[#C4402F]" }, "G"),
+                            React.createElement("span", { className: "text-lg font-black text-[#62B5A6]" }, "G"),
                             " ",
                             checking ? 'Checking Google sign-in…' : 'Continue with Google')),
                     React.createElement("div", { className: "mt-4 min-h-6 text-sm text-amber", "aria-live": "polite" }, message),
@@ -606,7 +715,7 @@ var MOM;
     }
     function DevicePill({ devices, demo = false }) {
         const online = demo || isOnline(devices);
-        return React.createElement("div", { className: `inline-flex min-h-10 items-center gap-2 rounded-full border px-3 py-2 text-xs font-extrabold ${online ? 'border-mint/30 bg-mint/10 text-mint2' : 'border-amber/30 bg-amber/10 text-[#C4402F]'}` },
+        return React.createElement("div", { className: `inline-flex min-h-10 items-center gap-2 rounded-full border px-3 py-2 text-xs font-extrabold ${online ? 'border-mint/30 bg-mint/10 text-mint2' : 'border-amber/30 bg-amber/10 text-[#62B5A6]'}` },
             React.createElement("span", { className: `h-2.5 w-2.5 rounded-full ${online ? 'bg-mint' : 'bg-amber'}` }),
             demo ? 'Demo data' : online ? 'Device connected' : 'Device offline');
     }
@@ -940,9 +1049,9 @@ var MOM;
                     React.createElement("label", { className: "flex items-center justify-between gap-4 font-bold text-warm" },
                         React.createElement("span", null, "Optional 0\u201310 self-rating"),
                         React.createElement("span", null, shareRating ? `${rating.toFixed(1)} / 10` : 'Not shared')),
-                    React.createElement("input", { disabled: !shareRating, value: rating, onChange: e => setRating(Number(e.target.value)), className: "mt-4 w-full accent-[#C4402F]", type: "range", min: "0", max: "10", step: "0.5" }),
+                    React.createElement("input", { disabled: !shareRating, value: rating, onChange: e => setRating(Number(e.target.value)), className: "mt-4 w-full accent-[#62B5A6]", type: "range", min: "0", max: "10", step: "0.5" }),
                     React.createElement("label", { className: "mt-3 flex items-center gap-2 text-sm text-slate2" },
-                        React.createElement("input", { type: "checkbox", checked: shareRating, onChange: e => setShareRating(e.target.checked), className: "h-5 w-5 accent-[#C4402F]" }),
+                        React.createElement("input", { type: "checkbox", checked: shareRating, onChange: e => setShareRating(e.target.checked), className: "h-5 w-5 accent-[#62B5A6]" }),
                         " Share this optional self-rating")),
                 React.createElement("label", { className: "mt-5 flex items-center gap-2 rounded-xl border border-line bg-bg/45 p-3 text-sm text-slate2" },
                     React.createElement("input", { type: "checkbox", checked: preferLess, onChange: e => { setPreferLess(e.target.checked); if (e.target.checked) {
@@ -951,7 +1060,7 @@ var MOM;
                             setActive(false);
                             setNoisy(false);
                             setNote('');
-                        } }, className: "h-5 w-5 accent-[#C4402F]" }),
+                        } }, className: "h-5 w-5 accent-[#62B5A6]" }),
                     " I would rather not share more context"),
                 !preferLess && React.createElement(React.Fragment, null,
                     React.createElement("div", { className: "mt-5 grid gap-4 md:grid-cols-2" },
@@ -963,10 +1072,10 @@ var MOM;
                             React.createElement("input", { value: sensorPosition, onChange: e => setSensorPosition(e.target.value), placeholder: "Optional", className: "min-h-11 rounded-xl border border-line bg-bg px-3 text-warm placeholder:text-slate" }))),
                     React.createElement("div", { className: "mt-4 flex flex-wrap gap-4" },
                         React.createElement("label", { className: "flex items-center gap-2 text-sm text-slate2" },
-                            React.createElement("input", { type: "checkbox", checked: active, onChange: e => setActive(e.target.checked), className: "h-5 w-5 accent-[#C4402F]" }),
+                            React.createElement("input", { type: "checkbox", checked: active, onChange: e => setActive(e.target.checked), className: "h-5 w-5 accent-[#62B5A6]" }),
                             " I was active recently"),
                         React.createElement("label", { className: "flex items-center gap-2 text-sm text-slate2" },
-                            React.createElement("input", { type: "checkbox", checked: noisy, onChange: e => setNoisy(e.target.checked), className: "h-5 w-5 accent-[#C4402F]" }),
+                            React.createElement("input", { type: "checkbox", checked: noisy, onChange: e => setNoisy(e.target.checked), className: "h-5 w-5 accent-[#62B5A6]" }),
                             " The environment was noisy")),
                     React.createElement("label", { className: "mt-4 grid gap-2 text-sm font-bold text-warm" },
                         "Optional notes",
@@ -1058,8 +1167,8 @@ var MOM;
             chart.current?.destroy?.();
             chart.current = new window.Chart(ref.current, {
                 type: 'line',
-                data: { labels: points.map(c => fmtShort(c.created_at)), datasets: [{ label: 'Optional self-reported rating', data: points.map(c => Number(c.hunger_rating)), borderColor: '#C4402F', backgroundColor: 'rgba(142,228,190,.12)', pointBackgroundColor: '#C4402F', tension: .25, fill: true }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#121714' } } }, scales: { x: { ticks: { color: '#A9AA9F' }, grid: { color: 'rgba(36,72,61,.35)' } }, y: { min: 0, max: 10, ticks: { color: '#A9AA9F' }, grid: { color: 'rgba(36,72,61,.35)' } } } }
+                data: { labels: points.map(c => fmtShort(c.created_at)), datasets: [{ label: 'Optional self-reported rating', data: points.map(c => Number(c.hunger_rating)), borderColor: '#62B5A6', backgroundColor: 'rgba(142,228,190,.12)', pointBackgroundColor: '#62B5A6', tension: .25, fill: true }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#EAF0EF' } } }, scales: { x: { ticks: { color: '#283A42' }, grid: { color: 'rgba(36,72,61,.35)' } }, y: { min: 0, max: 10, ticks: { color: '#283A42' }, grid: { color: 'rgba(36,72,61,.35)' } } } }
             });
             return () => chart.current?.destroy?.();
         }, [checkins.length]);
@@ -1141,7 +1250,7 @@ var MOM;
                                 React.createElement("strong", { className: "text-mint2" }, "Can compare"),
                                 React.createElement("p", { className: "mt-1" }, "Patterns within this profile\u2019s usable recordings, optional self-reports, meal timing, and uploaded research-model outputs.")),
                             React.createElement("div", { className: "rounded-xl border border-amber/25 bg-amber/5 p-4 text-slate2" },
-                                React.createElement("strong", { className: "text-[#C4402F]" }, "Cannot conclude"),
+                                React.createElement("strong", { className: "text-[#62B5A6]" }, "Cannot conclude"),
                                 React.createElement("p", { className: "mt-1" }, "Disease, physiology, objective hunger, nutritional need, medical safety, or causation.")))))));
     }
     function PreferencesView({ user, profile, preferences, save, remove, onOpenDoorDash }) {
@@ -1323,9 +1432,9 @@ var MOM;
                     React.createElement("div", { className: "mt-3 text-sm text-slate2", "aria-live": "polite" }, msg),
                     pair && React.createElement("div", { className: "mt-4 rounded-2xl border border-amber/30 bg-amber/5 p-4" },
                         React.createElement("strong", { className: "text-warm" }, "Copy this credential once"),
-                        React.createElement("div", { className: "mt-2 overflow-x-auto rounded-xl bg-[#F1EEE5] p-3 font-mono text-xs text-mint2" }, pair.token),
+                        React.createElement("div", { className: "mt-2 overflow-x-auto rounded-xl bg-[#071014] p-3 font-mono text-xs text-mint2" }, pair.token),
                         React.createElement("p", { className: "mt-3 text-xs text-slate2" }, "Cloud endpoint"),
-                        React.createElement("div", { className: "mt-1 overflow-x-auto rounded-xl bg-[#F1EEE5] p-3 font-mono text-xs text-slate2" }, pair.endpoint))),
+                        React.createElement("div", { className: "mt-1 overflow-x-auto rounded-xl bg-[#071014] p-3 font-mono text-xs text-slate2" }, pair.endpoint))),
                 React.createElement(Card, null,
                     React.createElement("h3", { className: "text-xl font-black text-warm" }, "Recommended next step"),
                     React.createElement("div", { className: `mt-4 rounded-2xl border-l-4 p-4 ${online ? 'border-mint bg-mint/5' : 'border-amber bg-amber/5'}` },
@@ -1474,7 +1583,7 @@ var MOM;
                             React.createElement("p", { className: "mt-2 text-slate2" }, "Record, review, and explore profile-separated research history.")),
                         React.createElement(DevicePill, { devices: devices }))),
                 React.createElement(ProfileBar, { profiles: profiles, current: profile, onSwitch: requestSwitch, newName: newName, setNewName: setNewName, createProfile: () => setCreateProfileOpen(true), devices: devices }),
-                error && React.createElement("div", { className: "mb-5 rounded-2xl border-l-4 border-coral bg-coral/10 p-4 text-sm text-[#C4402F]", role: "alert" }, error),
+                error && React.createElement("div", { className: "mb-5 rounded-2xl border-l-4 border-coral bg-coral/10 p-4 text-sm text-[#62B5A6]", role: "alert" }, error),
                 loading ? React.createElement(LoadingState, { label: "Loading your private MOM data\u2026" }) : React.createElement(React.Fragment, null,
                     tab === 'home' && React.createElement(DashboardHome, { profile: profile, sessions: sessions, checkins: checkins, devices: devices, preferences: preferences, setTab: setTab }),
                     tab === 'record' && React.createElement(RecordingFlow, { user: user, profile: profile, sessions: sessions, devices: devices, refresh: refresh, saveCheckin: saveCheckin, updateSession: updateSession }),
@@ -1524,10 +1633,10 @@ var MOM;
                 fmt(session.started_at),
                 ". This self-report is optional and is not a medical assessment."),
             React.createElement("label", { className: "mt-5 flex items-center gap-2 text-sm text-slate2" },
-                React.createElement("input", { type: "checkbox", checked: share, onChange: e => setShare(e.target.checked), className: "h-5 w-5 accent-[#C4402F]" }),
+                React.createElement("input", { type: "checkbox", checked: share, onChange: e => setShare(e.target.checked), className: "h-5 w-5 accent-[#62B5A6]" }),
                 " Share an optional 0\u201310 self-rating"),
             share && React.createElement(React.Fragment, null,
-                React.createElement("input", { type: "range", min: "0", max: "10", step: ".5", value: rating, onChange: e => setRating(Number(e.target.value)), className: "mt-4 w-full accent-[#C4402F]" }),
+                React.createElement("input", { type: "range", min: "0", max: "10", step: ".5", value: rating, onChange: e => setRating(Number(e.target.value)), className: "mt-4 w-full accent-[#62B5A6]" }),
                 React.createElement("div", { className: "text-right text-sm font-bold text-warm" },
                     rating.toFixed(1),
                     " / 10")),
@@ -1589,4 +1698,3 @@ var MOM;
     if (mount)
         ReactDOM.createRoot(mount).render(React.createElement(App, null));
 })(MOM || (MOM = {}));
-
