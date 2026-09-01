@@ -1,1 +1,27 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MOM SenseLoop</title></head><body style="margin:0;background:#07110f;color:#f4faf7;font-family:system-ui"><main style="min-height:100vh;display:grid;place-items:center;padding:24px;text-align:center"><div><h1>Loading MOM SenseLoop…</h1><p>Opening the current public experience.</p></div></main><script>(async()=>{try{const r=await fetch('https://raw.githubusercontent.com/neelesh-kotte/moms-device-v2-signal-processing/project-portfolio-site/docs/index.html?cb='+Date.now(),{cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);const h=await r.text();document.open();document.write(h);document.close()}catch(e){document.body.innerHTML='<main style="min-height:100vh;display:grid;place-items:center;padding:24px;text-align:center"><div><h1>MOM SenseLoop</h1><p>The current site could not load. Please refresh.</p></div></main>'}})()</script></body></html>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#F1EEE5">
+    <meta name="description" content="MOM SenseLoop is an experimental abdominal-acoustic research prototype for guided recording, signal-quality review, and careful personal pattern exploration.">
+    <title>MOM SenseLoop — Research Prototype</title>
+    <link rel="stylesheet" href="assets/base.css">
+    <link rel="stylesheet" href="assets/editorial.css">
+  </head>
+  <body>
+    <div id="root">
+      <main style="min-height:100vh;display:grid;place-items:center;padding:2rem">
+        <p>Loading MOM SenseLoop…</p>
+      </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/react@18.3.1/umd/react.production.min.js" crossorigin></script>
+    <script src="https://cdn.jsdelivr.net/npm/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js" crossorigin></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js" crossorigin></script>
+    <script src="assets/data.js"></script>
+    <script src="assets/cloud-service.js"></script>
+    <script src="assets/app.js"></script>
+  </body>
+</html>
