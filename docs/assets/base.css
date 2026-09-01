@@ -8,8 +8,8 @@
       "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
     --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
       "Courier New", monospace;
-    --color-black: #EAF0EF;
-    --color-white: #EAF0EF;
+    --color-black: #000000;
+    --color-white: #ffffff;
     --spacing: 0.25rem;
     --container-sm: 24rem;
     --container-lg: 32rem;
@@ -56,17 +56,17 @@
     --default-transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
     --default-font-family: var(--font-sans);
     --default-mono-font-family: var(--font-mono);
-    --color-bg: #071014;
-    --color-panel: #0C171C;
-    --color-panel2: #101E24;
-    --color-line: #283A42;
-    --color-warm: #EAF0EF;
-    --color-slate: #81939A;
-    --color-slate2: #A7B5B9;
-    --color-mint: #62B5A6;
-    --color-mint2: #62B5A6;
-    --color-amber: #62B5A6;
-    --color-coral: #62B5A6;
+    --color-bg: #F4F1E8;
+    --color-panel: #FBF9F3;
+    --color-panel2: #ECE8DC;
+    --color-line: #D0CABD;
+    --color-warm: #19251F;
+    --color-slate: #647069;
+    --color-slate2: #4E5B55;
+    --color-mint: #2F6B5F;
+    --color-mint2: #2F6B5F;
+    --color-amber: #A45E3F;
+    --color-coral: #A44A40;
   }
 }
 @layer base {
@@ -1874,4 +1874,3 @@
 }
 
 html{scroll-behavior:smooth;background:#071014}body{margin:0;background:#071014;color:#EAF0EF;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:16px;line-height:1.55}*{box-sizing:border-box}::selection{background:rgba(98,181,166,.32)}.shadow-card,.shadow-glow{box-shadow:none!important}.hero-grid{isolation:isolate}button,input,select,textarea{font:inherit}input,select,textarea{outline:none}input:focus-visible,select:focus-visible,textarea:focus-visible{box-shadow:0 0 0 2px #62B5A6}a{color:inherit}@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}@media(max-width:640px){body{font-size:16px}}.skip-link{position:fixed;left:12px;top:-80px;z-index:999;background:#EAF0EF;color:#071014;padding:10px 14px;border-radius:0}.skip-link:focus{top:12px}
-
