@@ -1,1 +1,27 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#06100d"><title>MOM SenseLoop</title><style>body{margin:0;background:#06100d;color:#f4faf7;font-family:Inter,system-ui,sans-serif}main{min-height:100vh;display:grid;place-items:center;padding:24px;text-align:center}p{color:#83978f}</style></head><body><main><div><h1>MOM SenseLoop</h1><p>Loading the SenseLoop experience…</p></div></main><script>(async()=>{try{const stamp=Date.now();const files=["senseloop-final-01.txt", "senseloop-final-02.txt", "senseloop-final-03.txt", "senseloop-final-04a.txt", "senseloop-final-04b.txt", "senseloop-final-05.txt", "senseloop-final-06.txt", "senseloop-final-07.txt", "senseloop-final-08.txt", "senseloop-final-09.txt", "senseloop-final-10.txt", "senseloop-final-11.txt"];const parts=await Promise.all(files.map(f=>fetch(`${f}?cb=${stamp}`,{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error(`${f}: ${r.status}`);return r.text()})));const binary=atob(parts.join(''));const bytes=Uint8Array.from(binary,c=>c.charCodeAt(0));if(!('DecompressionStream' in window))throw new Error('This browser does not support the required decompression API. Please use a current version of Chrome, Safari, Edge, or Firefox.');const stream=new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'));const html=await new Response(stream).text();document.open();document.write(html);document.close()}catch(e){document.body.innerHTML='<main><div><h1>MOM SenseLoop</h1><p>The application could not load. Refresh the page or use a current browser.</p></div></main>';console.error(e)}})()</script></body></html>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#F1EEE5">
+    <meta name="description" content="MOM SenseLoop is an experimental abdominal-acoustic research prototype for guided recording, signal-quality review, and careful personal pattern exploration.">
+    <title>MOM SenseLoop — Research Prototype</title>
+    <link rel="stylesheet" href="assets/base.css">
+    <link rel="stylesheet" href="assets/editorial.css">
+  </head>
+  <body>
+    <div id="root">
+      <main style="min-height:100vh;display:grid;place-items:center;padding:2rem">
+        <p>Loading MOM SenseLoop…</p>
+      </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/react@18.3.1/umd/react.production.min.js" crossorigin></script>
+    <script src="https://cdn.jsdelivr.net/npm/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js" crossorigin></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js" crossorigin></script>
+    <script src="assets/data.js"></script>
+    <script src="assets/cloud-service.js"></script>
+    <script src="assets/app.js"></script>
+  </body>
+</html>
