@@ -162,3 +162,8 @@ If you reuse the source audio or annotations, cite the original Figshare dataset
 ## Author
 
 Neelesh Kotte
+
+
+## Public evidence package
+
+The public engineering evidence page is available at [engineering-validation.html](docs/engineering-validation.html). The underlying audit records and executable external-corpus package remain in the [main branch](https://github.com/neelesh-kotte/moms-device-v2-signal-processing/tree/main).

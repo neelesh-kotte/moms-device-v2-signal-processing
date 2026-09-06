@@ -319,6 +319,7 @@ var MOM;
                     React.createElement(Button, { variant: "ghost", onClick: () => scrollPublicSection('how-it-works') }, "How it works"),
                     React.createElement(Button, { variant: "ghost", onClick: () => scrollPublicSection('proof') }, "Why trust it"),
                     React.createElement(Button, { variant: "ghost", onClick: () => pushRoute('how') }, "Research details"),
+                    React.createElement("a", { href: "engineering-validation.html", className: "ui-button ui-button--ghost" }, "Engineering evidence"),
                     React.createElement(Button, { variant: "ghost", onClick: () => scrollPublicSection('contact') }, "Contact"),
                     React.createElement(Button, { variant: "primary", onClick: onPrivate },
                         React.createElement(Icon, { name: "lock-keyhole" }),
@@ -330,6 +331,7 @@ var MOM;
                     React.createElement(Button, { variant: "ghost", onClick: () => { setMobile(false); scrollPublicSection('how-it-works'); } }, "How it works"),
                     React.createElement(Button, { variant: "ghost", onClick: () => { setMobile(false); scrollPublicSection('proof'); } }, "Why trust it"),
                     React.createElement(Button, { variant: "ghost", onClick: () => { setMobile(false); pushRoute('how'); } }, "Research details"),
+                    React.createElement("a", { href: "engineering-validation.html", className: "ui-button ui-button--ghost", onClick: () => setMobile(false) }, "Engineering evidence"),
                     React.createElement(Button, { variant: "ghost", onClick: () => { setMobile(false); scrollPublicSection('contact'); } }, "Contact"),
                     React.createElement(Button, { variant: "primary", onClick: () => { setMobile(false); onPrivate(); } }, "Private Dashboard"))));
     }
@@ -619,7 +621,8 @@ var MOM;
                                 React.createElement("p", { className: "mt-1 text-sm text-slate2" }, "Diagnosis, treatment, medical safety, disease detection, a digestive-health score, objective hunger measurement, nutritional prescriptions, or mind-reading."))))),
                 React.createElement("div", { className: "mt-8 flex flex-wrap gap-3" },
                     React.createElement(Button, { variant: "primary", onClick: () => pushRoute('guest') }, "Explore Guest Mode"),
-                    React.createElement(Button, { onClick: onPrivate }, "Start a guided recording"))),
+                    React.createElement(Button, { onClick: onPrivate }, "Start a guided recording"),
+                    React.createElement("a", { href: "engineering-validation.html", className: "ui-button ui-button--secondary" }, "Open engineering evidence")),
             React.createElement(Footer, null));
     }
     function GuestMode({ onPrivate }) {
