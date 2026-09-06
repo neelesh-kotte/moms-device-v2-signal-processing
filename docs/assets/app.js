@@ -622,7 +622,7 @@ var MOM;
                 React.createElement("div", { className: "mt-8 flex flex-wrap gap-3" },
                     React.createElement(Button, { variant: "primary", onClick: () => pushRoute('guest') }, "Explore Guest Mode"),
                     React.createElement(Button, { onClick: onPrivate }, "Start a guided recording"),
-                    React.createElement("a", { href: "engineering-validation.html", className: "ui-button ui-button--secondary" }, "Open engineering evidence")),
+                    React.createElement("a", { href: "engineering-validation.html", className: "ui-button ui-button--secondary" }, "Open engineering evidence"))),
             React.createElement(Footer, null));
     }
     function GuestMode({ onPrivate }) {
