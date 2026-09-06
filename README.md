@@ -209,7 +209,7 @@ A successful run prints:
 REPRODUCIBILITY CHECK PASSED
 ```
 
-**Scope note:** the executable script presently on `main` covers the seven-recording derivation corpus. SenseLoop V3 product code and personal user data are not published in this repository. The external 19-subject transport package described in the updated manuscripts is also not represented by the executable script currently on `main`.
+**Scope note:** process_gut_audio.py covers the seven-recording derivation corpus. external_validation/run_external_validation.py recomputes the independent public-corpus protocol. SenseLoop V3 product code and personal user data are not published in this repository. Raw public audio is not redistributed here.
 
 ## Data availability
 
@@ -226,3 +226,16 @@ Project portfolio: https://neelesh-kotte.github.io/moms-device-v2-signal-process
 
 Neelesh Kotte  
 Los Osos High School, Rancho Cucamonga, California, USA
+
+
+## Public evidence package
+
+The public repository now includes an evidence record that separates engineering evidence from the personal SenseLoop product prototype:
+
+- [Engineering validation record](evidence/engineering-validation.md)
+- [Hardware iteration and quantified change](evidence/hardware-iteration.md)
+- [Independent operator evidence](evidence/independent-operator-evidence.md)
+- [External reviewer documentation](evidence/external-reviewers.md)
+- [External-corpus executable package](external_validation/README.md)
+
+The external package downloads the public Kaggle corpus when requested, applies the fixed 8 kHz / 500 ms / 120–480 Hz over 20–2,000 Hz protocol, writes fresh window- and subject-level outputs, and keeps the primary external result labeled inconclusive. Raw audio and private MOM records remain outside this repository.

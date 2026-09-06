@@ -1,0 +1,21 @@
+{
+  "dataset": "Kaggle robertnowak/bowel-sounds",
+  "total_complete_windows": 6424,
+  "event_windows": 3050,
+  "non_event_windows": 2340,
+  "excluded_windows": 1034,
+  "n_subjects_observed": 19,
+  "eligible_subjects": 16,
+  "primary": {
+    "mean_median_difference": 0.0089,
+    "bootstrap_ci_95_low": -0.0151,
+    "bootstrap_ci_95_high": 0.0329,
+    "exact_two_sided_sign_flip_p": 0.455
+  },
+  "exploratory": {
+    "mean_rank_probability": 0.598,
+    "bootstrap_ci_95_low": 0.540,
+    "bootstrap_ci_95_high": 0.655,
+    "exact_two_sided_sign_flip_p": 0.0032
+  }
+}

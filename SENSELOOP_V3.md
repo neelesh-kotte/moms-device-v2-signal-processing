@@ -123,3 +123,10 @@ Not supported:
 ## Research track
 
 The separate public-data research track evaluates a fixed bowel-sound spectral estimator across two datasets. See the repository README for the frozen primary result, exploratory rank analysis, and interpretation limits.
+
+
+## Public evidence package
+
+The engineering evidence is organized in evidence/engineering-validation.md. It records the V1 → V2 → V3 progression, 32+ controlled experiments, the project’s approximately 30% to 10–12% within-condition variability change, two unsupervised operator reproductions, and 8+ external engineering reviewers.
+
+The separate external-corpus package in external_validation/README.md recomputes the independent public-data endpoint. Its primary median-shift result remains explicitly inconclusive; the exploratory rank result is not treated as a replacement or a clinical claim.
