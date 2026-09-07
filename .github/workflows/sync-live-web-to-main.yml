@@ -41,6 +41,10 @@ jobs:
           ! grep -q 'recording-control.js' index.html
           grep -q 'recordingReadyDevice' assets/app.js
           grep -q 'getSessionForCommand' assets/cloud-service.js
+          grep -q 'function LearningPath' assets/app.js
+          grep -q 'function LearnPage' assets/app.js
+          grep -q "route.view === 'learn'" assets/app.js
+          grep -q 'engineering-validation.html' assets/app.js
 
       - name: Commit canonical web source
         run: |
