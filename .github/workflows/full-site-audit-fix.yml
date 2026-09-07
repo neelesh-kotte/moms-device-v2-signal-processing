@@ -1,0 +1,71 @@
+name: Full site audit fix
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/scripts/full_site_audit_fix.py'
+      - '.github/workflows/full-site-audit-fix.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  audit-fix:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out live GitHub Pages branch
+        uses: actions/checkout@v4
+        with:
+          ref: project-portfolio-site
+          fetch-depth: 0
+
+      - name: Fetch audit fixer from main
+        run: |
+          git fetch origin main
+          git show origin/main:.github/scripts/full_site_audit_fix.py > /tmp/full_site_audit_fix.py
+
+      - name: Verify Chart.js is unused before removing it
+        run: |
+          if grep -Eq '(^|[^A-Za-z0-9_])Chart([^A-Za-z0-9_]|$)' docs/assets/app.js; then
+            echo 'Chart global is used; refusing to remove Chart.js'
+            exit 1
+          fi
+
+      - name: Apply guarded full-site fixes
+        run: python /tmp/full_site_audit_fix.py
+
+      - name: Remove stray deployment chunks
+        run: rm -f docs/app-gzip-*.txt
+
+      - name: Verify JavaScript syntax
+        run: |
+          node --check docs/assets/app.js
+          node --check docs/assets/cloud-service.js
+          node --check docs/assets/device-provisioning.js
+
+      - name: Verify architecture and copy
+        run: |
+          ! grep -q 'site-hardening.js' docs/index.html
+          ! grep -q 'device-provisioning.js' docs/index.html
+          ! grep -q 'esp-web-tools' docs/index.html
+          ! grep -q 'chart.js' docs/index.html
+          ! grep -q 'window.innerWidth < 768' docs/assets/app.js
+          ! grep -q 'alert(' docs/assets/app.js
+          ! grep -q 'MutationObserver(scheduleEnhance)' docs/assets/device-provisioning.js
+          grep -q 'MOMDeviceProvisioning.open({ profileId: profile.id' docs/assets/app.js
+          grep -q 'not independently measured' docs/assets/app.js
+          grep -q 'timing indicator only' docs/assets/app.js
+          grep -q 'max-width: 1099px' docs/assets/scientific.css
+
+      - name: Commit live audit fixes
+        run: |
+          if git diff --quiet -- .; then
+            echo 'No changes required'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A docs
+          git commit -m 'Complete full-site UX, accessibility, performance, and copy audit [skip ci]'
+          git push origin HEAD:project-portfolio-site
