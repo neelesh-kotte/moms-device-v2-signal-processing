@@ -1,0 +1,203 @@
+/* Final visual-polish pass: preserve the editorial design while smoothing edge-width rhythm. */
+
+:where(.public-home, main[id="main-content"], .ev-hero, .ev-section, .ev-ledger) > * {
+  min-width: 0;
+}
+
+.ui-button {
+  line-height: 1.25;
+  text-align: center;
+}
+
+.public-home h1,
+.public-home h2,
+.public-home h3,
+.section-title__heading,
+.ev-hero h1,
+.ev-copy h2,
+.ev-card h3 {
+  text-wrap: balance;
+}
+
+.public-home p,
+.editorial-panel p,
+.ev-copy p,
+.ev-card p,
+.ev-result p,
+.ev-item p {
+  text-wrap: pretty;
+}
+
+.editorial-panel > .section-title {
+  margin-bottom: 34px;
+}
+
+.editorial-panel > :first-child {
+  margin-top: 0;
+}
+
+.editorial-panel > :last-child {
+  margin-bottom: 0;
+}
+
+.hero-actions,
+.trust-actions,
+.ev-actions {
+  align-items: stretch;
+}
+
+/* Once the editorial cards collapse from three columns, remove the desktop staircase. */
+@media (max-width: 1000px) {
+  .process-list > *:nth-child(2),
+  .process-list > *:nth-child(3) {
+    margin-top: 0 !important;
+  }
+}
+
+/* Avoid three narrow feature cards in the awkward tablet band. */
+@media (max-width: 900px) {
+  .feature-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .feature-item {
+    min-height: 0;
+    border-right: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    padding: 28px 26px 34px;
+  }
+
+  .feature-item:last-child {
+    border-bottom: 0;
+  }
+
+  .feature-item h3 {
+    margin-top: 44px;
+  }
+
+  .section-title {
+    margin-bottom: 50px;
+  }
+}
+
+@media (max-width: 760px) {
+  .section-title {
+    margin-bottom: 40px;
+  }
+
+  .editorial-panel > .section-title {
+    margin-bottom: 28px;
+  }
+
+  .public-home .public-hero {
+    gap: 54px;
+    padding-top: 68px;
+    padding-bottom: 88px;
+  }
+
+  .public-home .home-section {
+    padding-top: 92px;
+    padding-bottom: 92px;
+  }
+
+  .review-themes article,
+  .trust-list article {
+    padding-top: 24px;
+    padding-bottom: 26px;
+  }
+}
+
+@media (max-width: 520px) {
+  .site-header__inner {
+    gap: 14px;
+    padding-right: 16px;
+    padding-left: 16px;
+  }
+
+  .mom-logo {
+    gap: 10px;
+  }
+
+  .mom-logo__mark {
+    width: 36px;
+    height: 36px;
+  }
+
+  .public-home .public-hero,
+  .public-home .home-section {
+    padding-right: 18px;
+    padding-left: 18px;
+  }
+
+  .public-home .public-hero h1 {
+    font-size: clamp(46px, 14vw, 62px) !important;
+    line-height: .94 !important;
+  }
+
+  .public-home .home-section h2 {
+    font-size: clamp(37px, 11.5vw, 52px);
+    line-height: 1;
+  }
+
+  .hero-actions,
+  .trust-actions,
+  .ev-actions {
+    gap: 8px;
+  }
+
+  .hero-actions .ui-button,
+  .trust-actions .ui-button,
+  .ev-actions .ui-button {
+    width: 100%;
+  }
+
+  .evidence-ledger {
+    grid-template-columns: 1fr;
+  }
+
+  .evidence-ledger > div {
+    min-height: 104px;
+  }
+
+  .editorial-panel {
+    padding: 20px;
+  }
+
+  .instrument-readout {
+    padding: 20px 16px;
+  }
+
+  .ev-hero {
+    gap: 2.5rem;
+    padding-top: 3.5rem;
+    padding-bottom: 5rem;
+  }
+
+  .ev-hero h1 {
+    max-width: 10ch;
+    font-size: clamp(3.25rem, 15vw, 4.5rem);
+    line-height: .9;
+  }
+
+  .ev-lede {
+    margin-top: 1.5rem;
+  }
+
+  .ev-section {
+    padding-top: 5rem;
+    padding-bottom: 5rem;
+  }
+
+  .ev-copy h2 {
+    font-size: clamp(2.55rem, 12vw, 4rem);
+    line-height: .97;
+  }
+
+  .ev-results,
+  .ev-versions,
+  .ev-table,
+  .ev-list,
+  .ev-package {
+    margin-top: 2.5rem;
+  }
+}
