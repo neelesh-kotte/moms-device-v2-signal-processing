@@ -57,17 +57,42 @@ jobs:
           cp "$BOOT_APP0" firmware/web/boot_app0.bin
           ls -lh firmware/web/*.bin
 
-      - name: Publish generated firmware binaries
+      - name: Publish generated firmware binaries on main
         run: |
           set -euo pipefail
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add firmware/web/*.bin
+          if ! git diff --cached --quiet; then
+            git commit -m 'Build MOM browser firmware [skip ci]'
+            git fetch origin main
+            git rebase origin/main
+            git push origin HEAD:main
+          else
+            echo 'Main-branch firmware binaries are already current.'
+          fi
+
+      - name: Publish firmware to live GitHub Pages branch
+        run: |
+          set -euo pipefail
+          git fetch origin project-portfolio-site
+          rm -rf /tmp/mom-pages
+          git worktree add /tmp/mom-pages origin/project-portfolio-site
+          mkdir -p /tmp/mom-pages/docs/firmware/web
+          cp firmware/web/firmware.bin /tmp/mom-pages/docs/firmware/web/firmware.bin
+          cp firmware/web/bootloader.bin /tmp/mom-pages/docs/firmware/web/bootloader.bin
+          cp firmware/web/partitions.bin /tmp/mom-pages/docs/firmware/web/partitions.bin
+          cp firmware/web/boot_app0.bin /tmp/mom-pages/docs/firmware/web/boot_app0.bin
+          cp firmware/web/manifest.json /tmp/mom-pages/docs/firmware/web/manifest.json
+          cd /tmp/mom-pages
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add docs/firmware/web
           if git diff --cached --quiet; then
-            echo 'Firmware binaries are already current.'
+            echo 'Live-site firmware is already current.'
             exit 0
           fi
-          git commit -m 'Build MOM browser firmware [skip ci]'
-          git fetch origin main
-          git rebase origin/main
-          git push origin HEAD:main
+          git commit -m 'Update live MOM browser firmware [skip ci]'
+          git fetch origin project-portfolio-site
+          git rebase origin/project-portfolio-site
+          git push origin HEAD:project-portfolio-site
