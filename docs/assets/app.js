@@ -837,7 +837,7 @@ var MOM;
                 React.createElement(Button, { variant: "ghost", onClick: onInsights }, "Why am I seeing this?")));
     }
     function DashboardHome({ profile, sessions, checkins, devices, preferences, setTab }) {
-        const online = isOnline(devices), usable = usableSessions(sessions), summary = summaryFor(sessions, checkins), recent = sessions.slice(0, 5), latest = latestSession(sessions);
+        const online = isOnline(devices), readyDevice = recordingReadyDevice(devices), ready = Boolean(readyDevice), usable = usableSessions(sessions), summary = summaryFor(sessions, checkins), recent = sessions.slice(0, 5), latest = latestSession(sessions);
         const prefEnabled = Boolean(preferences?.categories?.length || Object.values(preferences?.constraints ?? {}).some(Boolean));
         if (!profile)
             return React.createElement(EmptyState, { icon: "user-round-plus", title: "Choose or create a profile", copy: "A profile keeps recordings, optional check-ins, preferences, and research history separated from other people who may share the device." });
@@ -847,17 +847,17 @@ var MOM;
                     React.createElement("div", { className: "absolute -right-16 -top-16 h-48 w-48 rounded-full bg-mint/5 hidden" }),
                     React.createElement("div", { className: "relative" },
                         React.createElement("div", { className: "text-xs font-black uppercase tracking-[.16em] text-mint2" }, "Next step"),
-                        React.createElement("h1", { className: "mt-3 text-4xl font-black tracking-[-.05em] text-warm" }, online ? 'Ready to capture a new session?' : 'Connect the MOM device to begin'),
-                        React.createElement("p", { className: "mt-3 max-w-2xl text-slate2" }, online ? React.createElement(React.Fragment, null,
+                        React.createElement("h1", { className: "mt-3 text-4xl font-black tracking-[-.05em] text-warm" }, ready ? 'Ready to capture a new session?' : online ? 'Update the MOM device to record' : 'Connect the MOM device to begin'),
+                        React.createElement("p", { className: "mt-3 max-w-2xl text-slate2" }, ready ? React.createElement(React.Fragment, null,
                             "Record a short abdominal-sound session, review whether it was clear enough to use, and build ",
                             profile.display_name,
-                            "\u2019s profile-separated research history.") : React.createElement(React.Fragment, null, "Not enough information for a current recording while the device is offline. Once your ESP32-based sensor reconnects, you can begin a guided recording. Your saved history remains available.")),
+                            "\u2019s profile-separated research history.") : online ? React.createElement(React.Fragment, null, "Your ESP32 can reach MOM cloud, but its firmware is not verified for physical recording yet. Update it once from Device, then return here to record.") : React.createElement(React.Fragment, null, "The device is offline. Once your ESP32-based sensor reconnects, you can begin a guided recording. Your saved history remains available.")),
                         React.createElement("div", { className: "mt-5 flex flex-wrap gap-3" },
-                            online ? React.createElement(Button, { variant: "primary", onClick: () => setTab('record') },
+                            ready ? React.createElement(Button, { variant: "primary", onClick: () => setTab('record') },
                                 React.createElement(Icon, { name: "mic-2" }),
                                 " Start guided recording") : React.createElement(Button, { variant: "primary", onClick: () => setTab('device') },
                                 React.createElement(Icon, { name: "radio-tower" }),
-                                " Connect MOM device"),
+                                online ? " Update MOM firmware" : " Connect MOM device"),
                             React.createElement(Button, { variant: "ghost", onClick: () => pushRoute('how') }, "How MOM works"),
                             !online && React.createElement(Button, { variant: "ghost", onClick: () => pushRoute('guest') }, "Explore demo")),
                         React.createElement("div", { className: "mt-5 grid grid-cols-[auto_1fr_auto_1fr_auto] items-center gap-2 rounded-2xl border border-line bg-bg/45 p-4 text-xs font-extrabold text-slate2", "aria-label": "MOM signal flow: sensor capture, quality review, profile history" },
@@ -891,14 +891,14 @@ var MOM;
                 ['activity', 'Signal-quality review', 'Plain-language recording checks.', 'sessions'],
                 ['users-round', 'Profile separation', 'Other profiles are not used here.', 'privacy'],
                 ['circle-help', 'Honest summaries', 'MOM abstains when support is weak.', 'insights']
-            ].map(([icon, title, copy, tab]) => React.createElement("button", { key: title, onClick: () => setTab(tab), className: "text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mint rounded-[22px]" },
+            ].map(([icon, title, copy, tab]) => React.createElement("button", { key: title, onClick: () => setTab(tab === 'record' && !ready ? 'device' : tab), className: "text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mint rounded-[22px]" },
                 React.createElement(Card, { className: "h-full transition hover:border-mint/35" },
                     React.createElement("div", { className: "text-mint2" },
                         React.createElement(Icon, { name: icon })),
                     React.createElement("h3", { className: "mt-4 font-black text-warm" }, title),
                     React.createElement("p", { className: "mt-2 text-sm leading-6 text-slate2" }, copy))))),
             React.createElement("div", { className: "grid gap-5 lg:grid-cols-2" },
-                React.createElement(SummaryCard, { summary: summary, onRecord: () => setTab('record'), onInsights: () => setTab('insights') }),
+                React.createElement(SummaryCard, { summary: summary, onRecord: () => setTab(ready ? 'record' : 'device'), onInsights: () => setTab('insights') }),
                 React.createElement(Card, null,
                     React.createElement("div", { className: "flex items-center justify-between gap-4" },
                         React.createElement("h3", { className: "text-xl font-black text-warm" }, "Your recent activity"),

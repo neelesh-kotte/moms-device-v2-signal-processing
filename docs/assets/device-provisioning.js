@@ -259,8 +259,9 @@
     if (!ssid) { status.innerHTML = statusBox('Choose or type a Wi-Fi network first.', true); return; }
     if (!activePort?.writable) { status.innerHTML = statusBox('The USB connection was lost. Go back and reconnect the device.', true); return; }
     button.disabled = true; button.textContent = 'Setting up…'; setProgress(3); status.innerHTML = statusBox('Creating the device registration and sending Wi-Fi settings to the ESP32…');
+    let cloud = null; let pairing = null; let verified = false;
     try {
-      const { cloud, userId, profileId } = await cloudContext(); const pairedAt = Date.now(); const pairing = await cloud.pairDevice(userId, profileId);
+      const context = await cloudContext(); cloud = context.cloud; const userId = context.userId; const profileId = context.profileId; const pairedAt = Date.now(); pairing = await cloud.pairDevice(userId, profileId);
       const outcomePromise = waitForSerial((message) => message?.type === 'provisioning' && ['online','wifi_error','cloud_error','error'].includes(message?.status), 45000);
       await writeSerial({ command:'provision', protocol:PROTOCOL, wifi_ssid:ssid, wifi_password:password, device_token:pairing.token, endpoint:pairing.endpoint });
       status.innerHTML = statusBox('ESP32 received the setup. Connecting to Wi-Fi and checking the MOM cloud…');
@@ -268,9 +269,14 @@
       if (outcome.status === 'wifi_error') throw new Error('The ESP32 could not join that Wi-Fi network. Check the Wi-Fi name/password, then try again.');
       if (outcome.status === 'cloud_error') throw new Error('The ESP32 joined Wi-Fi, but its authenticated MOM cloud check-in failed.');
       if (outcome.status === 'error') throw new Error(outcome.message || 'The ESP32 rejected the setup data.');
-      status.innerHTML = statusBox('Cloud check-in received from the ESP32. Verifying the dashboard record…');
+      verified = true;
+      await cloud.finalizeDeviceProvisioning(pairing.deviceId, pairing.keyId);
+      status.innerHTML = statusBox('Authenticated device check-in received. Verifying recording readiness…');
       const device = await waitForCloudHeartbeat(cloud, profileId, pairedAt); await showSuccess(device);
-    } catch (error) { status.innerHTML = statusBox(error?.message || 'Setup could not be completed.', true); button.disabled = false; button.textContent = 'Try Finish Setup again'; }
+    } catch (error) {
+      if (cloud && pairing && !verified) { try { await cloud.abortDeviceProvisioning(pairing.keyId); } catch (_) {} }
+      status.innerHTML = statusBox(error?.message || 'Setup could not be completed.', true); button.disabled = false; button.textContent = 'Try Finish Setup again';
+    }
   }
   async function waitForCloudHeartbeat(cloud, profileId, pairedAt) {
     for (let attempt = 0; attempt < POLL_ATTEMPTS; attempt++) {
@@ -279,12 +285,17 @@
       if (timestamp >= pairedAt - 5000 && Date.now() - timestamp < HEARTBEAT_WINDOW_MS) return candidate;
       await sleep(POLL_INTERVAL_MS);
     }
-    throw new Error('The ESP32 reported that it was online, but the dashboard did not receive a fresh heartbeat. Refresh the page and run “Run connection check.”');
+    throw new Error('The ESP32 reported that it was online, but the dashboard did not receive a fresh heartbeat. Refresh the page and run “Check device status.”');
   }
   async function showSuccess(device) {
     setProgress(4); const content = contentNode(); const profileName = currentProfileName(); const lastSeen = device?.last_seen_at ? new Date(device.last_seen_at).toLocaleString([], { hour:'numeric', minute:'2-digit' }) : 'Just now';
-    content.innerHTML = `<div class="mom-setup-success"><div class="mom-setup-success-dot">✓</div><div class="mom-setup-kicker">CONNECTED</div><h3 class="mom-setup-title" style="font-size:30px">MOM Device Connected</h3><p class="mom-setup-subtitle" style="margin-left:auto;margin-right:auto">The cloud received a fresh authenticated heartbeat from the physical ESP32.</p></div><div class="mom-setup-card"><div class="mom-setup-row"><span class="mom-setup-muted">Profile</span><strong>${escapeHtml(profileName)}</strong></div><div class="mom-setup-row" style="margin-top:10px"><span class="mom-setup-muted">Last seen</span><strong>${escapeHtml(lastSeen)}</strong></div><div class="mom-setup-row" style="margin-top:10px"><span class="mom-setup-muted">Firmware</span><strong>${escapeHtml(device?.firmware_version || 'MOM SenseLoop 1.0')}</strong></div><div class="mom-setup-row" style="margin-top:10px"><span class="mom-setup-muted">Cloud status</span><strong>Verified online</strong></div></div><div class="mom-setup-actions"><button type="button" class="mom-setup-button primary" data-action="done">Done</button></div>`;
+    const capabilities = Array.isArray(device?.capabilities) ? device.capabilities : []; const ready = capabilities.includes('record_session');
+    const title = ready ? 'MOM Device Ready' : 'MOM Device Connected';
+    const subtitle = ready ? 'Cloud check-in verified. This firmware can accept physical recording commands.' : 'Cloud check-in verified, but this firmware is not yet recording-capable. Install the current MOM firmware before recording.';
+    const cloudStatus = ready ? 'Ready to record' : 'Online · update required';
+    content.innerHTML = `<div class="mom-setup-success"><div class="mom-setup-success-dot">✓</div><div class="mom-setup-kicker">${ready ? 'READY' : 'CONNECTED'}</div><h3 class="mom-setup-title" style="font-size:30px">${escapeHtml(title)}</h3><p class="mom-setup-subtitle" style="margin-left:auto;margin-right:auto">${escapeHtml(subtitle)}</p></div><div class="mom-setup-card"><div class="mom-setup-row"><span class="mom-setup-muted">Profile</span><strong>${escapeHtml(profileName)}</strong></div><div class="mom-setup-row" style="margin-top:10px"><span class="mom-setup-muted">Last seen</span><strong>${escapeHtml(lastSeen)}</strong></div><div class="mom-setup-row" style="margin-top:10px"><span class="mom-setup-muted">Firmware</span><strong>${escapeHtml(device?.firmware_version || 'Unknown')}</strong></div><div class="mom-setup-row" style="margin-top:10px"><span class="mom-setup-muted">Device status</span><strong>${escapeHtml(cloudStatus)}</strong></div></div><div class="mom-setup-actions"><button type="button" class="mom-setup-button primary" data-action="done">Done</button>${ready ? '' : '<button type="button" class="mom-setup-button" data-action="installer">Update firmware</button>'}</div>`;
     await closeSerial(); content.querySelector('[data-action="done"]').addEventListener('click', async () => { await closeDialog(); location.reload(); });
+    content.querySelector('[data-action="installer"]')?.addEventListener('click', showInstaller);
   }
   async function showInstaller() {
     await closeSerial(); setProgress(1); const content = contentNode();
