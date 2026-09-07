@@ -1,0 +1,29 @@
+{
+  "name": "MOM SenseLoop",
+  "version": "1.0.0",
+  "new_install_prompt_erase": true,
+  "builds": [
+    {
+      "chipFamily": "ESP32",
+      "improv": false,
+      "parts": [
+        {
+          "path": "https://raw.githubusercontent.com/neelesh-kotte/moms-device-v2-signal-processing/main/firmware/web/bootloader.bin",
+          "offset": 4096
+        },
+        {
+          "path": "https://raw.githubusercontent.com/neelesh-kotte/moms-device-v2-signal-processing/main/firmware/web/partitions.bin",
+          "offset": 32768
+        },
+        {
+          "path": "https://raw.githubusercontent.com/neelesh-kotte/moms-device-v2-signal-processing/main/firmware/web/boot_app0.bin",
+          "offset": 57344
+        },
+        {
+          "path": "https://raw.githubusercontent.com/neelesh-kotte/moms-device-v2-signal-processing/main/firmware/web/firmware.bin",
+          "offset": 65536
+        }
+      ]
+    }
+  ]
+}
