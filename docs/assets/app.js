@@ -90,6 +90,12 @@ var MOM;
     function isOnline(devices) {
         return devices.some(d => d.last_seen_at && Date.now() - new Date(d.last_seen_at).getTime() < 120000);
     }
+    function recordingReadyDevice(devices) {
+        return [...devices]
+            .filter(d => d.last_seen_at && Date.now() - new Date(d.last_seen_at).getTime() < 120000)
+            .sort((a, b) => +new Date(b.last_seen_at || 0) - +new Date(a.last_seen_at || 0))
+            .find(d => Array.isArray(d.capabilities) && d.capabilities.includes('record_session')) || null;
+    }
     function latestSession(sessions) {
         return sessions.length ? [...sessions].sort((a, b) => +new Date(b.started_at) - +new Date(a.started_at))[0] : null;
     }
@@ -317,23 +323,23 @@ var MOM;
                     React.createElement(Logo, null)),
                 React.createElement("nav", { className: "site-header__nav", "aria-label": "Public navigation" },
                     React.createElement(Button, { variant: "ghost", onClick: () => scrollPublicSection('how-it-works') }, "How it works"),
-                    React.createElement(Button, { variant: "ghost", onClick: () => scrollPublicSection('proof') }, "Why trust it"),
+                    React.createElement(Button, { variant: "ghost", onClick: () => scrollPublicSection('proof') }, "Evidence & limitations"),
                     React.createElement(Button, { variant: "ghost", onClick: () => pushRoute('how') }, "Research details"),
                     React.createElement("a", { href: "engineering-validation.html", className: "ui-button ui-button--ghost" }, "Engineering evidence"),
                     React.createElement(Button, { variant: "ghost", onClick: () => scrollPublicSection('contact') }, "Contact"),
                     React.createElement(Button, { variant: "primary", onClick: onPrivate },
                         React.createElement(Icon, { name: "lock-keyhole" }),
-                        " Private Dashboard")),
+                        " Open dashboard")),
                 React.createElement("button", { className: "grid h-11 w-11 place-items-center rounded-xl border border-line text-warm md:hidden", onClick: () => setMobile(!mobile), "aria-expanded": mobile, "aria-label": "Open navigation" },
                     React.createElement(Icon, { name: mobile ? 'x' : 'menu' }))),
             mobile && React.createElement("nav", { className: "border-t border-line bg-panel px-4 py-3 md:hidden", "aria-label": "Mobile public navigation" },
                 React.createElement("div", { className: "grid gap-2" },
                     React.createElement(Button, { variant: "ghost", onClick: () => { setMobile(false); scrollPublicSection('how-it-works'); } }, "How it works"),
-                    React.createElement(Button, { variant: "ghost", onClick: () => { setMobile(false); scrollPublicSection('proof'); } }, "Why trust it"),
+                    React.createElement(Button, { variant: "ghost", onClick: () => { setMobile(false); scrollPublicSection('proof'); } }, "Evidence & limitations"),
                     React.createElement(Button, { variant: "ghost", onClick: () => { setMobile(false); pushRoute('how'); } }, "Research details"),
                     React.createElement("a", { href: "engineering-validation.html", className: "ui-button ui-button--ghost", onClick: () => setMobile(false) }, "Engineering evidence"),
                     React.createElement(Button, { variant: "ghost", onClick: () => { setMobile(false); scrollPublicSection('contact'); } }, "Contact"),
-                    React.createElement(Button, { variant: "primary", onClick: () => { setMobile(false); onPrivate(); } }, "Private Dashboard"))));
+                    React.createElement(Button, { variant: "primary", onClick: () => { setMobile(false); onPrivate(); } }, "Open dashboard"))));
     }
     function HeroVisual() {
         return React.createElement("figure", { className: "hero-object", "aria-labelledby": "hero-object-caption" },
@@ -747,7 +753,7 @@ var MOM;
                     React.createElement(Badge, { tone: "neutral" },
                         React.createElement("span", { className: "inline-flex items-center gap-2" },
                             React.createElement(Icon, { name: "shield-check", size: 14 }),
-                            " Private Dashboard")),
+                            " Open dashboard")),
                     React.createElement("h1", { className: "mt-5 text-4xl font-black tracking-[-.05em] text-warm" }, "Sign in with Google."),
                     React.createElement("p", { className: "mx-auto mt-3 max-w-lg text-slate2" }, "Your Google-authenticated MOM account keeps private profiles and research history separate from other users."),
                     React.createElement("div", { className: "mt-7" },
@@ -762,9 +768,11 @@ var MOM;
     }
     function DevicePill({ devices, demo = false }) {
         const online = demo || isOnline(devices);
-        return React.createElement("div", { className: `inline-flex min-h-10 items-center gap-2 rounded-full border px-3 py-2 text-xs font-extrabold ${online ? 'border-mint/30 bg-mint/10 text-mint2' : 'border-amber/30 bg-amber/10 text-[#62B5A6]'}` },
-            React.createElement("span", { className: `h-2.5 w-2.5 rounded-full ${online ? 'bg-mint' : 'bg-amber'}` }),
-            demo ? 'Demo data' : online ? 'Device connected' : 'Device offline');
+        const ready = demo || Boolean(recordingReadyDevice(devices));
+        const label = demo ? 'Demo data' : ready ? 'Ready to record' : online ? 'Update required' : 'Device offline';
+        return React.createElement("div", { className: `inline-flex min-h-10 items-center gap-2 rounded-full border px-3 py-2 text-xs font-extrabold ${ready ? 'border-mint/30 bg-mint/10 text-mint2' : 'border-amber/30 bg-amber/10 text-[#62B5A6]'}` },
+            React.createElement("span", { className: `h-2.5 w-2.5 rounded-full ${ready ? 'bg-mint' : 'bg-amber'}` }),
+            label);
     }
     function DashboardNav({ tab, setTab, onPublic, onSignOut }) {
         const [mobile, setMobile] = useState(false);
@@ -939,12 +947,14 @@ var MOM;
                         React.createElement("div", { className: "mt-3 flex flex-wrap gap-2" }, [...(preferences?.categories ?? []), String(preferences?.constraints?.availableTime ?? ''), String(preferences?.constraints?.budgetRange ?? ''), String(preferences?.constraints?.deliveryPreference ?? '')].filter(Boolean).slice(0, 6).map(x => React.createElement(Badge, { key: x, tone: "neutral" }, x)))),
                     React.createElement(Button, { variant: "primary", onClick: () => setTab('preferences') }, "Explore suggestions"))));
     }
-    function RecordingFlow({ user, profile, sessions, devices, refresh, saveCheckin, updateSession }) {
+    function RecordingFlow({ cloud, user, profile, sessions, devices, refresh, saveCheckin, updateSession }) {
         const [step, setStep] = useState(0);
         const [seconds, setSeconds] = useState(60);
         const [started, setStarted] = useState(null);
         const [matched, setMatched] = useState(null);
         const [saving, setSaving] = useState(false);
+        const [starting, setStarting] = useState(false);
+        const [commandId, setCommandId] = useState(null);
         const [message, setMessage] = useState('');
         const [state, setState] = useState('Neutral');
         const [rating, setRating] = useState(5);
@@ -956,6 +966,7 @@ var MOM;
         const [noisy, setNoisy] = useState(false);
         const [preferLess, setPreferLess] = useState(false);
         const online = isOnline(devices);
+        const readyDevice = recordingReadyDevice(devices);
         useEffect(() => {
             if (step !== 2)
                 return;
@@ -966,18 +977,44 @@ var MOM;
             const t = setInterval(() => setSeconds((s) => s - 1), 1000);
             return () => clearInterval(t);
         }, [step, seconds]);
-        const begin = () => { if (!profile || !online)
-            return; setStarted(new Date().toISOString()); setMatched(null); setSeconds(60); setStep(2); };
+        const begin = async () => {
+            if (!profile || !readyDevice || starting)
+                return;
+            setStarting(true);
+            setMessage('Starting the physical MOM device…');
+            try {
+                const command = await cloud.queueRecording(profile.id, 60);
+                await cloud.waitForCommandClaim(command.id, 15000);
+                setCommandId(command.id);
+                setStarted(new Date().toISOString());
+                setMatched(null);
+                setSeconds(60);
+                setMessage('Physical recording started. Keep the sensor steady.');
+                setStep(2);
+            }
+            catch (e) {
+                setMessage(e instanceof Error ? e.message : 'The physical MOM recording could not be started.');
+            }
+            finally {
+                setStarting(false);
+            }
+        };
         const finish = () => { setStep(3); };
         const findUploaded = async () => {
-            if (!started)
+            if (!commandId)
                 return;
-            setMessage('Checking for the uploaded device session…');
-            const fresh = await refresh();
-            const threshold = new Date(started).getTime() - 5000;
-            const candidate = (fresh?.sessions ?? sessions).find(s => new Date(s.started_at).getTime() >= threshold) ?? null;
-            setMatched(candidate);
-            setMessage(candidate ? 'Uploaded device session matched to this recording window.' : 'No uploaded session has arrived yet. Nothing was silently saved.');
+            setMessage('Uploading your recording…');
+            try {
+                await cloud.waitForCommandCompletion(commandId, 45000);
+                const candidate = await cloud.getSessionForCommand(commandId);
+                setMatched(candidate);
+                setMessage(candidate ? 'Recording received from the physical MOM device.' : 'The device completed the command, but the matching session could not be found.');
+                await refresh();
+            }
+            catch (e) {
+                setMatched(null);
+                setMessage(e instanceof Error ? e.message : 'The recording upload could not be confirmed.');
+            }
         };
         useEffect(() => { if (step === 3 && started) {
             const t = setTimeout(findUploaded, 500);
@@ -992,7 +1029,7 @@ var MOM;
                 await saveCheckin({ owner_id: user.id, profile_id: profile.id, session_id: matched?.id ?? null, hunger_rating: shareRating ? rating : null, minutes_since_eating: meal ? Math.max(0, Math.min(10080, Math.round(Number(meal)))) : null, optional_context: { state, prefer_not_to_share_more: preferLess, active_recently: preferLess ? undefined : active, noisy_environment: preferLess ? undefined : noisy, sensor_position: preferLess ? undefined : (sensorPosition || undefined), note: preferLess ? undefined : (note || undefined) } });
                 setMessage('Check-in saved to this profile’s history.');
                 await refresh();
-                setTimeout(() => { setStep(0); setStarted(null); setMatched(null); setMessage(''); }, 700);
+                setTimeout(() => { setStep(0); setStarted(null); setMatched(null); setCommandId(null); setMessage(''); }, 700);
             }
             catch (e) {
                 setMessage(e instanceof Error ? e.message : 'Could not save the check-in.');
@@ -1046,9 +1083,10 @@ var MOM;
                     React.createElement("div", { className: "text-sm text-slate2" }, x),
                     React.createElement("strong", { className: "mt-1 block text-sm text-warm" }, online ? 'Live metric not reported yet' : 'Waiting for device')))),
                 React.createElement("div", { className: "mt-5 flex flex-wrap gap-3" },
-                    React.createElement(Button, { variant: "primary", disabled: !online, onClick: begin }, "Begin 60-second recording"),
+                    React.createElement(Button, { variant: "primary", disabled: !readyDevice || starting, onClick: begin }, starting ? "Starting device…" : "Begin 60-second recording"),
                     React.createElement(Button, { variant: "ghost", onClick: () => setStep(0) }, "Back")),
-                !online && React.createElement("p", { className: "mt-3 text-sm text-amber" }, "Start becomes available after a paired device checks in.")),
+                !online && React.createElement("p", { className: "mt-3 text-sm text-amber" }, "Start becomes available after a paired device checks in."),
+                online && !readyDevice && React.createElement("p", { className: "mt-3 text-sm text-amber" }, "This device is online, but its firmware does not support physical recording commands yet. Open Device and install the current MOM firmware once.")),
             step === 2 && React.createElement(Card, { className: "text-center" },
                 React.createElement(Badge, { tone: "coral" }, "\u25CF Recording"),
                 React.createElement("div", { className: "mt-6 text-7xl font-black tracking-[-.06em] text-warm sm:text-8xl" },
@@ -1059,18 +1097,19 @@ var MOM;
                 React.createElement("div", { className: "mx-auto mt-6 max-w-2xl" },
                     React.createElement(Waveform, { values: MOM.demoWaveform.map((v, i) => v * (1 + ((i + seconds) % 7) / 9)), label: "Animated recording-state visualization, not stored raw audio" })),
                 React.createElement("div", { className: "mt-6 flex justify-center gap-3" },
-                    React.createElement(Button, { onClick: finish }, "Finish recording"),
+                    React.createElement(Button, { disabled: true }, "Recording ends automatically"),
                     React.createElement(Button, { variant: "ghost", onClick: () => { if (confirm('Cancel this guided timer? No browser-created session will be saved.')) {
                             setStep(0);
                             setStarted(null);
+                            setCommandId(null);
                         } } }, "Cancel and discard"))),
             step === 3 && React.createElement(Card, null,
                 React.createElement(SectionTitle, { kicker: "Step 4 \u00B7 Review", title: "Review recording quality." }),
                 React.createElement("div", { className: `rounded-2xl border-l-4 p-4 ${matched ? (matched.quality_label === 'good' ? 'border-mint bg-mint/5' : 'border-amber bg-amber/5') : 'border-amber bg-amber/5'}` }, matched ? React.createElement(React.Fragment, null,
                     React.createElement("strong", { className: "text-lg text-warm" }, matched.quality_label === 'good' ? 'This uploaded recording looks usable for research analysis.' : 'This session was saved, but its signal quality was limited'),
                     React.createElement("p", { className: "mt-2 text-slate2" }, String(matched.quality_summary?.guidance ?? 'The session was received from the paired device. Review the quality details below.'))) : React.createElement(React.Fragment, null,
-                    React.createElement("strong", { className: "text-lg text-warm" }, "Waiting for the device upload."),
-                    React.createElement("p", { className: "mt-2 text-slate2" }, "The browser timer completed, but MOM has not matched a newly uploaded physical-device session yet. Nothing is silently invented or saved by the browser."))),
+                    React.createElement("strong", { className: "text-lg text-warm" }, "Uploading your recording…"),
+                    React.createElement("p", { className: "mt-2 text-slate2" }, "Keep the MOM device powered on while the physical session is transferred. MOM only shows measurements received from the device."))),
                 matched && React.createElement("div", { className: "mt-4" },
                     qualityMetricRows(matched).map(r => React.createElement("div", { key: r.label, className: "border-b border-line py-3" },
                         React.createElement("div", { className: "flex justify-between gap-4" },
@@ -1080,13 +1119,13 @@ var MOM;
                     React.createElement("div", { className: "mt-4" },
                         React.createElement(Badge, { tone: matched.learning_eligible ? 'good' : 'warn' }, matched.learning_eligible ? 'Eligible for research-model learning' : 'Saved for reference; not used for learning'))),
                 matched && React.createElement("p", { className: "mt-4 text-sm text-slate2" },
-                    React.createElement("strong", { className: "text-warm" }, "Would you like to keep this uploaded session?"),
-                    " The physical device has already saved it to your private cloud history, so these controls decide whether it remains learning-eligible or reference-only."),
+                    React.createElement("strong", { className: "text-warm" }, "How should MOM use this recording?"),
+                    " The recording is already in your private history. Choose whether it can contribute to this profile’s research history or remain reference-only."),
                 React.createElement("div", { className: "mt-5 flex flex-wrap gap-3" },
-                    matched && React.createElement(Button, { variant: "primary", onClick: () => { setMessage('Session kept with its current learning status.'); setStep(4); } }, "Save session"),
+                    matched && React.createElement(Button, { variant: "primary", onClick: () => { setMessage('Session kept with its current learning status.'); setStep(4); } }, "Use in my research history"),
                     matched && React.createElement(Button, { onClick: async () => { await updateSession(matched.id, { learning_eligible: false }); setMatched({ ...matched, learning_eligible: false }); setMessage('Session saved for reference only and excluded from model learning.'); await refresh(); } }, "Save for reference only"),
-                    React.createElement(Button, { onClick: findUploaded }, "Refresh uploaded session"),
-                    React.createElement(Button, { variant: "ghost", onClick: () => { setStep(0); setMatched(null); setStarted(null); } }, "Try again")),
+                    React.createElement(Button, { onClick: findUploaded }, "Check upload again"),
+                    React.createElement(Button, { variant: "ghost", onClick: () => { setStep(0); setMatched(null); setStarted(null); setCommandId(null); } }, "Start a new recording")),
                 React.createElement("div", { className: "mt-3 text-sm text-slate2", "aria-live": "polite" }, message)),
             step === 4 && React.createElement(Card, null,
                 React.createElement(SectionTitle, { kicker: "Step 5 \u00B7 Optional check-in", title: "How would you describe your current state?", copy: "Check-ins are optional and are not a medical assessment." }),
@@ -1443,48 +1482,40 @@ var MOM;
                     React.createElement("p", { className: "mt-2 text-sm text-slate2" }, "Storage configuration: private profile records are stored in the MOM Supabase cloud project and protected by Row Level Security tied to the authenticated account. Guest Mode does not query those tables."))));
     }
     function DeviceView({ user, profile, devices, sessions, refresh, cloud }) {
-        const [checking, setChecking] = useState(false), [msg, setMsg] = useState(''), [pair, setPair] = useState(null);
-        const d = devices[0] ?? null, online = isOnline(devices), latest = latestSession(sessions), acoustic = latest?.acoustic_summary ?? {};
-        const connectionCheck = async () => { setChecking(true); setMsg('Refreshing device status…'); const fresh = await refresh(); setChecking(false); setMsg(isOnline(fresh?.devices ?? devices) ? 'A recent device heartbeat is available.' : 'No recent device heartbeat was found.'); };
-        const pairDevice = async () => { if (!profile)
-            return; setMsg('Creating a one-time device credential…'); try {
-            const out = await cloud.pairDevice(user.id, profile.id);
-            setPair(out);
-            setMsg('Device credential created. Copy it once into firmware configuration; MOM stores only its hash.');
-            await refresh();
-        }
-        catch (e) {
-            setMsg(e instanceof Error ? e.message : 'Could not create device credential.');
-        } };
+        const [checking, setChecking] = useState(false), [msg, setMsg] = useState('');
+        const d = devices[0] ?? null, online = isOnline(devices), readyDevice = recordingReadyDevice(devices), ready = Boolean(readyDevice), latest = latestSession(sessions), acoustic = latest?.acoustic_summary ?? {};
+        const connectionCheck = async () => { setChecking(true); setMsg('Checking device status…'); const fresh = await refresh(); const freshDevices = fresh?.devices ?? devices; setChecking(false); setMsg(recordingReadyDevice(freshDevices) ? 'Ready to record. The device is online and supports physical recording commands.' : isOnline(freshDevices) ? 'Device is online, but a firmware update is required before physical recording.' : 'Device is offline. Check power and Wi-Fi, then try again.'); };
+        const openSetup = () => {
+            if (window.MOMDeviceProvisioning?.open)
+                window.MOMDeviceProvisioning.open();
+            else
+                setMsg('Device setup is still loading. Refresh the page and try again.');
+        };
         if (!profile)
             return React.createElement(EmptyState, { title: "Choose a profile first", copy: "A paired physical device is attached to one profile so uploaded sessions do not mix between wearers." });
-        const issue = !online ? ['No device found', 'The dashboard is cloud-hosted, but the paired ESP32 has not checked in recently.', 'Power the ESP32 and make sure it can reach a saved Wi-Fi network or phone hotspot.'] : latest?.quality_label === 'poor' ? ['Recording quality needs attention', String(latest.quality_summary?.guidance ?? 'Movement, noise, or inconsistent contact may have limited the latest recording.'), 'Keep the sensor steady, reduce background noise, and review gain if clipping is reported.'] : ['Device ready', 'A paired device checked in recently.', 'Use the guided recording flow when you are ready.'];
+        const issue = !online ? ['Device offline', 'The paired ESP32 has not checked in recently.', 'Check power and Wi-Fi, then run Check device status.'] : !ready ? ['Firmware update required', 'The device is online, but it cannot accept physical recording commands yet.', 'Open Connect MOM Device and install the current MOM firmware once.'] : latest?.quality_label === 'poor' ? ['Recording quality needs attention', String(latest.quality_summary?.guidance ?? 'Movement, noise, or inconsistent contact may have limited the latest recording.'), 'Keep the sensor steady and review the latest quality details.'] : ['Ready to record', 'The device is online and recording-capable.', 'Use the guided recording flow when you are ready.'];
         return React.createElement("div", null,
-            React.createElement(SectionTitle, { kicker: "Device settings", title: "Connection first. Technical detail only when you want it.", copy: "Normal use does not require Arduino after firmware is flashed once. The ESP32 still needs electricity and an internet path for cloud upload." }),
+            React.createElement(SectionTitle, { kicker: "Device settings", title: "Connect, verify, then record.", copy: "Set up the device once over USB, then normal recordings run over Wi-Fi. MOM distinguishes a simple heartbeat from a device that is actually ready to record." }),
             React.createElement("div", { className: "grid gap-5 lg:grid-cols-[1.1fr_.9fr]" },
                 React.createElement(Card, null,
                     React.createElement("div", { className: "flex flex-wrap items-start justify-between gap-3" },
                         React.createElement("div", null,
-                            React.createElement("h3", { className: "text-2xl font-black text-warm" }, online ? 'MOM device connected' : 'MOM device offline'),
-                            React.createElement("p", { className: "mt-2 text-slate2" }, online ? 'A paired device checked in recently and can upload sessions to the cloud.' : 'No paired device has checked in recently.')),
+                            React.createElement("h3", { className: "text-2xl font-black text-warm" }, ready ? 'Ready to record' : online ? 'MOM device online · update required' : 'MOM device offline'),
+                            React.createElement("p", { className: "mt-2 text-slate2" }, ready ? 'The paired device is online and supports physical recording commands.' : online ? 'The device can reach MOM cloud, but its firmware must be updated before recording.' : 'No paired device has checked in recently.')),
                         React.createElement(DevicePill, { devices: devices })),
                     React.createElement("div", { className: "mt-5 grid gap-3 sm:grid-cols-2" }, [
-                        ['ESP32', online ? 'Connected' : 'Offline'], ['Wi-Fi / hotspot', online ? 'Connection inferred from cloud heartbeat' : 'Unknown'], ['Last successful sync', fmt(d?.last_seen_at)], ['Firmware', d?.firmware_version ?? 'Not reported'], ['Microphone gain', metricLabel(latest?.quality_summary?.gainLevel)], ['Calibration / signal check', online ? 'Connection check available' : 'Connect device first']
+                        ['ESP32', ready ? 'Ready to record' : online ? 'Online · update required' : 'Offline'], ['Wi-Fi / hotspot', online ? 'Connection inferred from cloud heartbeat' : 'Unknown'], ['Last successful sync', fmt(d?.last_seen_at)], ['Firmware', d?.firmware_version ?? 'Not reported'], ['Microphone gain', metricLabel(latest?.quality_summary?.gainLevel)], ['Recording capability', ready ? 'Available' : online ? 'Firmware update required' : 'Connect device first']
                     ].map(([l, v]) => React.createElement("div", { key: l, className: "rounded-xl border border-line bg-bg/45 p-3" },
                         React.createElement("div", { className: "text-xs text-slate" }, l),
                         React.createElement("strong", { className: "mt-1 block text-sm text-warm" }, v)))),
                     React.createElement("div", { className: "mt-5 flex flex-wrap gap-3" },
-                        React.createElement(Button, { onClick: connectionCheck, disabled: checking }, checking ? 'Checking…' : 'Run connection check'),
-                        React.createElement(Button, { variant: "primary", onClick: pairDevice }, "Create device credential")),
+                        React.createElement(Button, { onClick: connectionCheck, disabled: checking }, checking ? 'Checking…' : 'Check device status'),
+                        React.createElement(Button, { variant: "primary", onClick: openSetup }, "Connect MOM Device")),
                     React.createElement("div", { className: "mt-3 text-sm text-slate2", "aria-live": "polite" }, msg),
-                    pair && React.createElement("div", { className: "mt-4 rounded-2xl border border-amber/30 bg-amber/5 p-4" },
-                        React.createElement("strong", { className: "text-warm" }, "Copy this credential once"),
-                        React.createElement("div", { className: "mt-2 overflow-x-auto rounded-xl bg-[#071014] p-3 font-mono text-xs text-mint2" }, pair.token),
-                        React.createElement("p", { className: "mt-3 text-xs text-slate2" }, "Cloud endpoint"),
-                        React.createElement("div", { className: "mt-1 overflow-x-auto rounded-xl bg-[#071014] p-3 font-mono text-xs text-slate2" }, pair.endpoint))),
+                ),
                 React.createElement(Card, null,
                     React.createElement("h3", { className: "text-xl font-black text-warm" }, "Recommended next step"),
-                    React.createElement("div", { className: `mt-4 rounded-2xl border-l-4 p-4 ${online ? 'border-mint bg-mint/5' : 'border-amber bg-amber/5'}` },
+                    React.createElement("div", { className: `mt-4 rounded-2xl border-l-4 p-4 ${ready ? 'border-mint bg-mint/5' : 'border-amber bg-amber/5'}` },
                         React.createElement("strong", { className: "text-warm" }, issue[0]),
                         React.createElement("p", { className: "mt-2 text-sm text-slate2" }, issue[1]),
                         React.createElement("p", { className: "mt-2 text-sm font-bold text-warm" }, issue[2])),
@@ -1633,7 +1664,7 @@ var MOM;
                 error && React.createElement("div", { className: "mb-5 rounded-2xl border-l-4 border-coral bg-coral/10 p-4 text-sm text-[#62B5A6]", role: "alert" }, error),
                 loading ? React.createElement(LoadingState, { label: "Loading your private MOM data\u2026" }) : React.createElement(React.Fragment, null,
                     tab === 'home' && React.createElement(DashboardHome, { profile: profile, sessions: sessions, checkins: checkins, devices: devices, preferences: preferences, setTab: setTab }),
-                    tab === 'record' && React.createElement(RecordingFlow, { user: user, profile: profile, sessions: sessions, devices: devices, refresh: refresh, saveCheckin: saveCheckin, updateSession: updateSession }),
+                    tab === 'record' && React.createElement(RecordingFlow, { cloud: cloud, user: user, profile: profile, sessions: sessions, devices: devices, refresh: refresh, saveCheckin: saveCheckin, updateSession: updateSession }),
                     tab === 'sessions' && (profile ? React.createElement(SessionsView, { sessions: sessions, checkins: checkins, profileName: profile.display_name, onDelete: deleteSession, onAddCheckin: startCheckinForSession }) : React.createElement(EmptyState, { title: "Choose a profile", copy: "Sessions belong to one profile at a time." })),
                     tab === 'insights' && (profile ? React.createElement(InsightsView, { sessions: sessions, checkins: checkins }) : React.createElement(EmptyState, { title: "Choose a profile", copy: "Insights are built only from the selected profile\u2019s own history." })),
                     tab === 'preferences' && React.createElement(PreferencesView, { user: user, profile: profile, preferences: preferences, save: savePrefs, remove: removePrefs, onOpenDoorDash: setDoorDashIdea }),
