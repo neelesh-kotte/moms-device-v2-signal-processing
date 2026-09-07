@@ -74,8 +74,14 @@
   function nudgeReviewWhenReady(attempt = 0) {
     const state = window.MOMRecordingState;
     if (!state || state.status !== 'completed') return;
-    const waiting = [...document.querySelectorAll('strong')].some((node) => node.textContent.trim() === 'Waiting for the device upload.');
-    const refreshButton = [...document.querySelectorAll('button')].find((node) => node.textContent.trim() === 'Refresh uploaded session');
+    const waiting = [...document.querySelectorAll('strong')].some((node) => {
+      const text = node.textContent.trim();
+      return text === 'Waiting for the device upload.' || text === 'Uploading your recording…';
+    });
+    const refreshButton = [...document.querySelectorAll('button')].find((node) => {
+      const text = node.textContent.trim();
+      return text === 'Refresh uploaded session' || text === 'Check upload again';
+    });
     if (waiting && refreshButton) {
       refreshButton.click();
       return;
