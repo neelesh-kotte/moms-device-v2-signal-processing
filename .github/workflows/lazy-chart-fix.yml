@@ -1,0 +1,44 @@
+name: Lazy Chart.js fix
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/scripts/lazy_chart_fix.py'
+      - '.github/workflows/lazy-chart-fix.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out live branch
+        uses: actions/checkout@v4
+        with:
+          ref: project-portfolio-site
+          fetch-depth: 0
+
+      - name: Fetch patcher
+        run: |
+          git fetch origin main
+          git show origin/main:.github/scripts/lazy_chart_fix.py > /tmp/lazy_chart_fix.py
+
+      - name: Apply guarded patch
+        run: python /tmp/lazy_chart_fix.py
+
+      - name: Verify
+        run: |
+          node --check docs/assets/app.js
+          ! grep -q 'chart.js@4.4.7/dist/chart.umd.min.js' docs/index.html
+          grep -q 'function ensureChartJs()' docs/assets/app.js
+          grep -q 'mom-chartjs-script' docs/assets/app.js
+
+      - name: Commit live performance fix
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add docs/index.html docs/assets/app.js
+          git commit -m 'Lazy-load Chart.js only for Insights [skip ci]'
+          git push origin HEAD:project-portfolio-site
