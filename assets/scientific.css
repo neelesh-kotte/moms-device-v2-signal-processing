@@ -1829,3 +1829,27 @@ canvas {
     width: 100%;
   }
 }
+
+
+/* Final audit: responsive navigation and flow diagrams */
+.responsive-flow-arrow {
+  display: grid;
+  min-width: 28px;
+  place-items: center;
+  color: var(--accent);
+  font-size: 20px;
+  line-height: 1;
+}
+@media (max-width: 1099px) {
+  .site-header__nav { display: none !important; }
+  .site-header__inner > button[aria-label="Open navigation"] { display: grid !important; }
+  .site-header > nav[aria-label="Mobile public navigation"] { display: block !important; }
+}
+@media (min-width: 1100px) {
+  .site-header__nav { display: flex !important; }
+  .site-header__inner > button[aria-label="Open navigation"] { display: none !important; }
+  .site-header > nav[aria-label="Mobile public navigation"] { display: none !important; }
+}
+@media (max-width: 767px) {
+  .responsive-flow-arrow { transform: rotate(90deg); margin: 4px auto; }
+}
