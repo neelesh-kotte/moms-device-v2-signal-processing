@@ -29,11 +29,11 @@ app = replace_once(
 old_copy = """React.createElement("p", { className: "mt-3 max-w-2xl text-slate2" }, online ? React.createElement(React.Fragment, null,
                             "Record a short abdominal-sound session, review whether it was clear enough to use, and build ",
                             profile.display_name,
-                            "’s profile-separated research history.") : React.createElement(React.Fragment, null, "Not enough information for a current recording while the device is offline. Once your ESP32-based sensor reconnects, you can begin a guided recording. Your saved history remains available."))"""
+                            "\\u2019s profile-separated research history.") : React.createElement(React.Fragment, null, "Not enough information for a current recording while the device is offline. Once your ESP32-based sensor reconnects, you can begin a guided recording. Your saved history remains available."))"""
 new_copy = """React.createElement("p", { className: "mt-3 max-w-2xl text-slate2" }, ready ? React.createElement(React.Fragment, null,
                             "Record a short abdominal-sound session, review whether it was clear enough to use, and build ",
                             profile.display_name,
-                            "’s profile-separated research history.") : online ? React.createElement(React.Fragment, null, "Your ESP32 can reach MOM cloud, but its firmware is not verified for physical recording yet. Update it once from Device, then return here to record.") : React.createElement(React.Fragment, null, "The device is offline. Once your ESP32-based sensor reconnects, you can begin a guided recording. Your saved history remains available."))"""
+                            "\\u2019s profile-separated research history.") : online ? React.createElement(React.Fragment, null, "Your ESP32 can reach MOM cloud, but its firmware is not verified for physical recording yet. Update it once from Device, then return here to record.") : React.createElement(React.Fragment, null, "The device is offline. Once your ESP32-based sensor reconnects, you can begin a guided recording. Your saved history remains available."))"""
 app = replace_once(app, old_copy, new_copy, 'DashboardHome explanation')
 old_cta = """online ? React.createElement(Button, { variant: "primary", onClick: () => setTab('record') },
                                 React.createElement(Icon, { name: "mic-2" }),
@@ -84,7 +84,6 @@ cloud_path.write_text(cloud)
 prov = prov_path.read_text()
 start = prov.index('  async function finishProvisioning() {')
 end = prov.index('  async function waitForCloudHeartbeat', start)
-old_finish = prov[start:end]
 new_finish = """  async function finishProvisioning() {
     const content = contentNode(); const ssid = content.querySelector('[data-ssid]')?.value?.trim() || ''; const password = content.querySelector('[data-password]')?.value || ''; const status = content.querySelector('[data-status]'); const button = content.querySelector('[data-action=\"finish\"]');
     if (!ssid) { status.innerHTML = statusBox('Choose or type a Wi-Fi network first.', true); return; }
