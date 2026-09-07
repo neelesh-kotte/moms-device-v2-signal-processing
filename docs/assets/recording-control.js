@@ -5,114 +5,82 @@
   const RECORD_SECONDS = 60;
   const allowNextClick = new WeakSet();
   let queueBusy = false;
-  let uploadPollTimer = null;
-  let uploadPollCount = 0;
+  let activeCommandId = null;
+  let completionPromise = null;
 
   function selectedProfileId() {
-    const selects = [...document.querySelectorAll('select')];
-    const profileSelect = selects.find((select) =>
-      [...select.options].some((option) => option.textContent.trim() === 'Choose a profile')
+    const select = [...document.querySelectorAll('select')].find((node) =>
+      [...node.options].some((option) => option.textContent.trim() === 'Choose a profile')
     );
-    return profileSelect?.value || '';
+    return select?.value || '';
   }
 
-  function notice(message, error = false) {
+  function notice(message, error = false, persist = false) {
     let node = document.getElementById('mom-recording-command-notice');
     if (!node) {
       node = document.createElement('div');
       node.id = 'mom-recording-command-notice';
-      node.setAttribute('role', 'status');
+      node.setAttribute('role', error ? 'alert' : 'status');
+      node.setAttribute('aria-live', error ? 'assertive' : 'polite');
       Object.assign(node.style, {
-        position: 'fixed',
-        right: '20px',
-        bottom: '20px',
-        zIndex: '10000',
-        width: 'min(430px, calc(100vw - 40px))',
-        border: '1px solid #A9AA9F',
-        borderLeft: '4px solid #C4402F',
-        background: '#F1EEE5',
-        color: '#121714',
-        padding: '14px 16px',
-        fontSize: '13px',
-        lineHeight: '1.55',
+        position: 'fixed', right: '20px', bottom: '20px', zIndex: '10000',
+        width: 'min(430px, calc(100vw - 40px))', border: '1px solid #A9AA9F',
+        borderLeft: '4px solid #C4402F', borderRadius: '14px', background: '#F1EEE5',
+        color: '#121714', padding: '14px 16px', fontSize: '13px', lineHeight: '1.55',
         boxShadow: '0 18px 50px rgba(18,23,20,.18)'
       });
       document.body.appendChild(node);
     }
-    node.style.borderLeftColor = error ? '#C4402F' : '#C4402F';
     node.textContent = message;
-    if (!error) setTimeout(() => node?.remove(), 4200);
+    if (!persist && !error) setTimeout(() => node?.remove(), 4200);
   }
 
-  function makeClient() {
-    if (!window.supabase || !window.MOM?.SUPABASE_URL || !window.MOM?.SUPABASE_KEY) {
-      throw new Error('MOM cloud services are still loading. Refresh the page and try again.');
-    }
-    return window.supabase.createClient(MOM.SUPABASE_URL, MOM.SUPABASE_KEY, {
-      auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
-    });
-  }
-
-  async function waitForDeviceClaim(client, commandId) {
-    const started = Date.now();
-    while (Date.now() - started < 12000) {
-      const { data, error } = await client
-        .from('mom_device_commands')
-        .select('status,error_message')
-        .eq('id', commandId)
-        .maybeSingle();
-      if (error) throw new Error(error.message);
-      if (data?.status === 'claimed' || data?.status === 'completed') return data;
-      if (data?.status === 'failed') throw new Error(data.error_message || 'The MOM device could not start the recording.');
-      await new Promise((resolve) => setTimeout(resolve, 900));
-    }
-    throw new Error('The paired device is online, but it did not accept the recording command. Open Device → Connect MOM Device → Install / repair MOM firmware once, then try recording again.');
+  function cloud() {
+    if (window.MOM?.cloud) return window.MOM.cloud;
+    if (window.MOM?.CloudService) return new window.MOM.CloudService();
+    throw new Error('MOM cloud services are still loading. Refresh the page and try again.');
   }
 
   async function queuePhysicalRecording() {
     const profileId = selectedProfileId();
     if (!profileId) throw new Error('Choose a profile before starting a recording.');
+    const service = cloud();
+    const command = await service.queueRecording(profileId, RECORD_SECONDS);
+    activeCommandId = command.id;
+    window.MOMRecordingState = { commandId: command.id, status: 'pending', sessionId: null };
+    notice('Sending the recording command to your MOM device…', false, true);
+    await service.waitForCommandClaim(command.id);
+    window.MOMRecordingState.status = 'recording';
+    notice('MOM device confirmed the recording. Keep the sensor in place for 60 seconds.');
+    return { service, command };
+  }
 
-    const client = makeClient();
-    const { data: authData, error: authError } = await client.auth.getSession();
-    if (authError) throw new Error(authError.message);
-    const userId = authData?.session?.user?.id;
-    if (!userId) throw new Error('Please sign in again before starting a recording.');
-
-    const { data: device, error: deviceError } = await client
-      .from('mom_devices')
-      .select('id,last_seen_at,firmware_version')
-      .eq('profile_id', profileId)
-      .eq('owner_id', userId)
-      .order('created_at', { ascending: false })
-      .limit(1)
-      .maybeSingle();
-    if (deviceError) throw new Error(deviceError.message);
-    if (!device) throw new Error('No MOM device is paired with this profile yet. Open the Device tab and connect it first.');
-
-    const lastSeen = device.last_seen_at ? new Date(device.last_seen_at).getTime() : 0;
-    if (!lastSeen || Date.now() - lastSeen > 120000) {
-      throw new Error('The paired MOM device is offline. Power it on and wait for the Device tab to show it online.');
+  async function monitorCompletion(service, commandId) {
+    try {
+      const command = await service.waitForCommandCompletion(commandId, 105000);
+      const session = await service.getSessionForCommand(commandId);
+      if (!session || command.result_session_id !== session.id) throw new Error('MOM confirmed completion, but the uploaded session could not be matched.');
+      window.MOMRecordingState = { commandId, status: 'completed', sessionId: session.id, session };
+      notice('Recording uploaded successfully. Preparing the quality review…');
+      nudgeReviewWhenReady();
+      return session;
+    } catch (error) {
+      window.MOMRecordingState = { commandId, status: 'failed', sessionId: null, error: error?.message || 'Recording failed.' };
+      notice(error?.message || 'The recording could not be completed.', true, true);
+      throw error;
     }
+  }
 
-    const expiresAt = new Date(Date.now() + 30000).toISOString();
-    const { data: command, error: commandError } = await client
-      .from('mom_device_commands')
-      .insert({
-        owner_id: userId,
-        device_id: device.id,
-        profile_id: profileId,
-        command: 'record_session',
-        payload: { duration_seconds: RECORD_SECONDS },
-        expires_at: expiresAt
-      })
-      .select('id,status')
-      .single();
-    if (commandError) throw new Error(commandError.message);
-
-    notice('Sending the 60-second recording command to your MOM device…');
-    await waitForDeviceClaim(client, command.id);
-    return command.id;
+  function nudgeReviewWhenReady(attempt = 0) {
+    const state = window.MOMRecordingState;
+    if (!state || state.status !== 'completed') return;
+    const waiting = [...document.querySelectorAll('strong')].some((node) => node.textContent.trim() === 'Waiting for the device upload.');
+    const refreshButton = [...document.querySelectorAll('button')].find((node) => node.textContent.trim() === 'Refresh uploaded session');
+    if (waiting && refreshButton) {
+      refreshButton.click();
+      return;
+    }
+    if (attempt < 40) setTimeout(() => nudgeReviewWhenReady(attempt + 1), 750);
   }
 
   document.addEventListener('click', async (event) => {
@@ -131,56 +99,52 @@
     queueBusy = true;
     const original = button.textContent;
     button.disabled = true;
-    button.textContent = 'Starting physical device…';
+    button.textContent = 'Starting MOM device…';
     try {
-      await queuePhysicalRecording();
-      notice('MOM device accepted the command. Physical recording started.');
+      const { service, command } = await queuePhysicalRecording();
+      completionPromise = monitorCompletion(service, command.id).catch(() => null);
       button.disabled = false;
       button.textContent = original;
       allowNextClick.add(button);
       button.click();
     } catch (error) {
+      activeCommandId = null;
       button.disabled = false;
       button.textContent = original;
-      notice(error?.message || 'The physical MOM recording could not be started.', true);
+      notice(error?.message || 'The physical MOM recording could not be started.', true, true);
     } finally {
       queueBusy = false;
     }
   }, true);
 
-  function stopUploadPolling() {
-    if (uploadPollTimer) clearInterval(uploadPollTimer);
-    uploadPollTimer = null;
-    uploadPollCount = 0;
-  }
-
-  function maybeStartUploadPolling() {
-    const waiting = [...document.querySelectorAll('strong')].some((node) =>
-      node.textContent.trim() === 'Waiting for the device upload.'
-    );
-    if (!waiting) {
-      stopUploadPolling();
-      return;
+  function improveReviewCopy() {
+    const strongs = [...document.querySelectorAll('strong')];
+    for (const strong of strongs) {
+      if (strong.textContent.trim() === 'Waiting for the device upload.') strong.textContent = 'Uploading your recording…';
     }
-    if (uploadPollTimer) return;
-
-    uploadPollCount = 0;
-    uploadPollTimer = setInterval(() => {
-      uploadPollCount += 1;
-      const stillWaiting = [...document.querySelectorAll('strong')].some((node) =>
-        node.textContent.trim() === 'Waiting for the device upload.'
-      );
-      if (!stillWaiting || uploadPollCount > 18) {
-        stopUploadPolling();
-        return;
+    for (const p of [...document.querySelectorAll('p')]) {
+      if (p.textContent.includes('The browser timer completed, but MOM has not matched')) {
+        p.textContent = 'Keep the MOM device powered on while the physical recording is securely transferred. MOM only shows measurements received from the device.';
       }
-      const refreshButton = [...document.querySelectorAll('button')].find((node) =>
-        node.textContent.trim() === 'Refresh uploaded session'
-      );
-      refreshButton?.click();
-    }, 1800);
+      if (p.textContent.includes('No uploaded session has arrived yet. Nothing was silently saved.')) {
+        p.textContent = 'The upload has not been confirmed yet. Keep the device powered on and connected to Wi-Fi, then check again.';
+      }
+    }
+    for (const button of [...document.querySelectorAll('button')]) {
+      if (button.textContent.trim() === 'Refresh uploaded session') button.textContent = 'Check upload again';
+      if (button.textContent.trim() === 'Try again') button.textContent = 'Start a new recording';
+    }
   }
 
-  new MutationObserver(maybeStartUploadPolling).observe(document.body, { childList: true, subtree: true });
-  maybeStartUploadPolling();
+  const observer = new MutationObserver(() => {
+    improveReviewCopy();
+    if (window.MOMRecordingState?.status === 'completed') nudgeReviewWhenReady();
+  });
+  observer.observe(document.body, { childList: true, subtree: true });
+  improveReviewCopy();
+
+  window.MOMRecordingControl = {
+    get commandId() { return activeCommandId; },
+    get completion() { return completionPromise; }
+  };
 })();
