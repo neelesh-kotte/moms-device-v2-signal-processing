@@ -1,0 +1,52 @@
+name: Finalize live MOM consistency
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/finalize-live-mom.yml'
+      - '.github/scripts/finalize_live_mom.py'
+
+permissions:
+  contents: write
+
+jobs:
+  finalize:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out live GitHub Pages branch
+        uses: actions/checkout@v4
+        with:
+          ref: project-portfolio-site
+          fetch-depth: 0
+
+      - name: Fetch finalizer from main
+        run: git show origin/main:.github/scripts/finalize_live_mom.py > /tmp/finalize_live_mom.py
+
+      - name: Apply guarded consistency patch
+        run: python /tmp/finalize_live_mom.py
+
+      - name: Verify JavaScript syntax
+        run: |
+          node --check docs/assets/app.js
+          node --check docs/assets/cloud-service.js
+          node --check docs/assets/device-provisioning.js
+          node --check docs/assets/site-hardening.js
+
+      - name: Verify obsolete bridge is absent
+        run: |
+          ! grep -q 'recording-control.js' docs/index.html
+          grep -q 'recordingReadyDevice' docs/assets/app.js
+          grep -q 'getSessionForCommand' docs/assets/cloud-service.js
+
+      - name: Commit final live hardening
+        run: |
+          if git diff --quiet; then
+            echo "No changes needed"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/assets/app.js docs/assets/cloud-service.js docs/assets/device-provisioning.js docs/index.html
+          git commit -m "Finalize MOM recording and provisioning flows [skip ci]"
+          git push origin HEAD:project-portfolio-site
