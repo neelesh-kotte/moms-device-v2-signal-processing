@@ -27,24 +27,28 @@ jobs:
           mkdir -p assets
           git show origin/project-portfolio-site:docs/index.html > index.html
           git show origin/project-portfolio-site:docs/engineering-validation.html > engineering-validation.html
-          for f in app.js base.css scientific.css cloud-service.js data.js device-provisioning.js site-hardening.js; do
+          for f in app.js base.css scientific.css cloud-service.js data.js device-provisioning.js; do
             git show origin/project-portfolio-site:docs/assets/$f > assets/$f
           done
-          rm -f assets/recording-control.js
+          rm -f assets/recording-control.js assets/site-hardening.js
 
       - name: Verify canonical source
         run: |
           node --check assets/app.js
           node --check assets/cloud-service.js
           node --check assets/device-provisioning.js
-          node --check assets/site-hardening.js
           ! grep -q 'recording-control.js' index.html
+          ! grep -q 'site-hardening.js' index.html
+          ! grep -q 'device-provisioning.js' index.html
+          ! grep -q 'window.innerWidth < 768' assets/app.js
+          ! grep -q 'alert(' assets/app.js
           grep -q 'recordingReadyDevice' assets/app.js
           grep -q 'getSessionForCommand' assets/cloud-service.js
           grep -q 'function LearningPath' assets/app.js
           grep -q 'function LearnPage' assets/app.js
           grep -q "route.view === 'learn'" assets/app.js
           grep -q 'engineering-validation.html' assets/app.js
+          grep -q 'function ensureChartJs' assets/app.js
 
       - name: Commit canonical web source
         run: |
@@ -54,7 +58,7 @@ jobs:
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add index.html engineering-validation.html assets/app.js assets/base.css assets/scientific.css assets/cloud-service.js assets/data.js assets/device-provisioning.js assets/site-hardening.js
-          git add -u assets/recording-control.js 2>/dev/null || true
+          git add index.html engineering-validation.html assets/app.js assets/base.css assets/scientific.css assets/cloud-service.js assets/data.js assets/device-provisioning.js
+          git add -u assets/recording-control.js assets/site-hardening.js 2>/dev/null || true
           git commit -m "Sync hardened MOM web source from live site [skip ci]"
           git push origin HEAD:main
