@@ -130,8 +130,9 @@ var MOM;
             if (error) throw new Error(error.message);
             return true;
         }
-        async pairDevice() {
-            throw new Error('Manual device credentials are disabled. Use Connect MOM Device so the credential stays hidden.');
+        async pairDevice(ownerId, profileId) {
+            if (!document.getElementById('mom-device-setup')) throw new Error('Manual device credentials are disabled. Use Connect MOM Device so the credential stays hidden.');
+            return this.beginDeviceProvisioning(ownerId, profileId);
         }
         async queueRecording(profileId, durationSeconds = 60) {
             const session = await this.getSession();
@@ -142,14 +143,7 @@ var MOM;
             if (!this.isDeviceOnline(device)) throw new Error('Your MOM device is offline. Power it on and wait for Device status to update.');
             if (!this.deviceCanRecord(device)) throw new Error('Your MOM device is online but needs the recording firmware update. Open Device → Update firmware.');
             const duration = Math.max(1, Math.min(600, Math.round(Number(durationSeconds) || 60)));
-            const { data, error } = await this.client.from('mom_device_commands').insert({
-                owner_id: userId,
-                device_id: device.id,
-                profile_id: profileId,
-                command: 'record_session',
-                payload: { duration_seconds: duration },
-                expires_at: new Date(Date.now() + 30000).toISOString()
-            }).select('id,status,created_at').single();
+            const { data, error } = await this.client.from('mom_device_commands').insert({ owner_id: userId, device_id: device.id, profile_id: profileId, command: 'record_session', payload: { duration_seconds: duration }, expires_at: new Date(Date.now() + 30000).toISOString() }).select('id,status,created_at').single();
             if (error) throw new Error(error.message);
             return { ...data, device };
         }
