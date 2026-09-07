@@ -1,0 +1,82 @@
+name: Apply final visual polish
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/apply-visual-polish.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  polish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Save polish stylesheet
+        run: cp assets/visual-polish.css /tmp/visual-polish.css
+
+      - name: Apply to live Pages branch
+        run: |
+          git fetch origin project-portfolio-site
+          git checkout -B project-portfolio-site origin/project-portfolio-site
+          cp /tmp/visual-polish.css docs/assets/visual-polish.css
+          python - <<'PY'
+          from pathlib import Path
+          for name in ['docs/index.html', 'docs/engineering-validation.html']:
+              p = Path(name)
+              s = p.read_text()
+              link = '  <link rel="stylesheet" href="assets/visual-polish.css?v=20260907">\n'
+              if 'visual-polish.css' not in s:
+                  marker = '<link rel="stylesheet" href="assets/scientific.css'
+                  i = s.find(marker)
+                  if i < 0:
+                      raise SystemExit(f'missing scientific stylesheet marker in {name}')
+                  end = s.find('\n', i) + 1
+                  s = s[:end] + link + s[end:]
+              p.write_text(s)
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add docs/index.html docs/engineering-validation.html docs/assets/visual-polish.css
+          if ! git diff --cached --quiet; then
+            git commit -m 'Apply final visual spacing polish [skip ci]'
+            git push origin HEAD:project-portfolio-site
+          fi
+
+      - name: Apply to canonical main source
+        run: |
+          git checkout main
+          python - <<'PY'
+          from pathlib import Path
+          for name in ['index.html', 'engineering-validation.html']:
+              p = Path(name)
+              s = p.read_text()
+              link = '  <link rel="stylesheet" href="assets/visual-polish.css?v=20260907">\n'
+              if 'visual-polish.css' not in s:
+                  marker = '<link rel="stylesheet" href="assets/scientific.css'
+                  i = s.find(marker)
+                  if i < 0:
+                      raise SystemExit(f'missing scientific stylesheet marker in {name}')
+                  end = s.find('\n', i) + 1
+                  s = s[:end] + link + s[end:]
+              p.write_text(s)
+          PY
+          git add index.html engineering-validation.html assets/visual-polish.css
+          if ! git diff --cached --quiet; then
+            git commit -m 'Wire final visual polish into canonical site [skip ci]'
+            git push origin HEAD:main
+          fi
+
+      - name: Verify polish is wired
+        run: |
+          grep -q 'visual-polish.css' index.html
+          grep -q 'visual-polish.css' engineering-validation.html
+          grep -q 'process-list > \*:nth-child(2)' assets/visual-polish.css
+          grep -q '@media (max-width: 520px)' assets/visual-polish.css
