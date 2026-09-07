@@ -1,0 +1,68 @@
+name: Build MOM web firmware
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'firmware/mom_senseloop/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Arduino CLI
+        uses: arduino/setup-arduino-cli@v2
+
+      - name: Install pinned ESP32 core
+        run: |
+          arduino-cli config init
+          arduino-cli core update-index --additional-urls https://espressif.github.io/arduino-esp32/package_esp32_index.json
+          arduino-cli core install esp32:esp32@3.3.11 --additional-urls https://espressif.github.io/arduino-esp32/package_esp32_index.json
+
+      - name: Install pinned firmware dependency
+        run: arduino-cli lib install 'ArduinoJson@7.4.3'
+
+      - name: Compile MOM SenseLoop firmware
+        run: |
+          rm -rf .firmware-build
+          mkdir -p .firmware-build firmware/web
+          arduino-cli compile \
+            --fqbn esp32:esp32:esp32 \
+            --output-dir .firmware-build \
+            firmware/mom_senseloop
+
+      - name: Prepare ESP Web Tools binaries
+        run: |
+          set -euo pipefail
+          APP_BIN=$(find .firmware-build -maxdepth 1 -name '*.ino.bin' -print -quit)
+          BOOT_BIN=$(find .firmware-build -maxdepth 1 -name '*.ino.bootloader.bin' -print -quit)
+          PART_BIN=$(find .firmware-build -maxdepth 1 -name '*.ino.partitions.bin' -print -quit)
+          BOOT_APP0=$(find "$HOME/.arduino15" -name 'boot_app0.bin' -print -quit)
+          test -n "$APP_BIN"
+          test -n "$BOOT_BIN"
+          test -n "$PART_BIN"
+          test -n "$BOOT_APP0"
+          cp "$APP_BIN" firmware/web/firmware.bin
+          cp "$BOOT_BIN" firmware/web/bootloader.bin
+          cp "$PART_BIN" firmware/web/partitions.bin
+          cp "$BOOT_APP0" firmware/web/boot_app0.bin
+          ls -lh firmware/web/*.bin
+
+      - name: Publish generated firmware binaries
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add firmware/web/*.bin
+          if git diff --cached --quiet; then
+            echo 'Firmware binaries are already current.'
+            exit 0
+          fi
+          git commit -m 'Build MOM browser firmware [skip ci]'
+          git push
