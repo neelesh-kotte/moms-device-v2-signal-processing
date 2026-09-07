@@ -1,538 +1,237 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#F4F1E8">
-    <meta name="color-scheme" content="light">
-    <meta name="mom-build" content="warm-minimal-v3">
-    <meta name="description" content="MOM SenseLoop public engineering evidence: V1 to V2 to V3, measured hardware iteration, independent operators, external reviewers, and an executable external-corpus analysis.">
-    <meta property="og:title" content="MOM SenseLoop — Engineering Evidence">
-    <meta property="og:description" content="A public engineering record for the MOM SenseLoop research prototype.">
-    <meta property="og:type" content="website">
-    <title>MOM SenseLoop — Engineering Evidence</title>
-    <link rel="stylesheet" href="https://raw.githubusercontent.com/neelesh-kotte/moms-device-v2-signal-processing/project-portfolio-site/docs/assets/base.css?v=warm-minimal-v3">
-    <link rel="stylesheet" href="https://raw.githubusercontent.com/neelesh-kotte/moms-device-v2-signal-processing/project-portfolio-site/docs/assets/scientific.css?v=warm-minimal-v3">
-    <style>
-      .evidence-page .evidence-table-wrap {
-        overflow-x: auto;
-        border-top: 1px solid var(--line);
-      }
-
-      .evidence-page .evidence-table {
-        min-width: 700px;
-      }
-
-      .evidence-page .evidence-table .validation-head,
-      .evidence-page .evidence-table .validation-row {
-        grid-template-columns: minmax(190px, .86fr) minmax(230px, 1.1fr) minmax(190px, .84fr);
-      }
-
-      .evidence-page .evidence-table .validation-row {
-        padding-top: 21px;
-        padding-bottom: 21px;
-      }
-
-      .evidence-page .package-command {
-        margin-top: 34px;
-        border: 1px solid var(--line);
-        background: var(--surface);
-      }
-
-      .evidence-page .package-command .console-top {
-        border-bottom: 1px solid var(--line);
-      }
-
-      .evidence-page .package-command pre {
-        margin: 0;
-        overflow-x: auto;
-        border: 0;
-        border-radius: 0;
-        background: #071014;
-        padding: 24px;
-        color: #b9d8d0;
-        font-family: var(--mono);
-        font-size: 12px;
-        line-height: 1.8;
-      }
-
-      .evidence-page .package-links {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        margin-top: 22px;
-      }
-
-      .evidence-page .evidence-note {
-        margin-top: 24px;
-        border-left: 2px solid var(--warning);
-        padding-left: 16px;
-        color: var(--muted);
-        font-size: 13px;
-        line-height: 1.7;
-      }
-
-      .evidence-page .evidence-note strong {
-        color: var(--text);
-      }
-
-      .evidence-page .evidence-list {
-        margin-top: 26px;
-        border-top: 1px solid var(--line);
-      }
-
-      .evidence-page .evidence-list p {
-        margin: 0;
-        border-bottom: 1px solid var(--line);
-        padding: 18px 0;
-        color: var(--muted);
-        line-height: 1.7;
-      }
-
-      .evidence-page .evidence-list strong {
-        color: var(--text);
-      }
-
-      .evidence-page .mobile-nav[hidden] {
-        display: none;
-      }
-
-      @media (min-width: 761px) {
-        .evidence-page .mobile-nav {
-          display: none;
-        }
-      }
-
-      @media (max-width: 760px) {
-        .evidence-page .evidence-table-wrap {
-          margin-right: -20px;
-          margin-left: -20px;
-          padding-left: 20px;
-        }
-
-        .evidence-page .package-command pre {
-          font-size: 11px;
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <header class="site-header">
-      <div class="site-header__inner">
-        <a class="rounded-xl text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mint" href="./" aria-label="MOM SenseLoop public home">
-          <div class="mom-logo">
-            <div class="mom-logo__mark">
-              <svg class="mom-icon" viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true">
-                <path d="M2 12h3l2-6 4 12 3-9 3 6h5"></path>
-              </svg>
-            </div>
-            <div>
-              <div class="mom-logo__name">MOM SenseLoop</div>
-              <div class="mom-logo__meta">Research prototype</div>
-            </div>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#F1EEE5">
+  <meta name="color-scheme" content="light">
+  <meta name="description" content="MOM SenseLoop public engineering evidence: hardware iteration, independent operators, external reviewers, and external-corpus validation.">
+  <title>MOM SenseLoop — Engineering Evidence</title>
+  <link rel="stylesheet" href="../assets/base.css?v=20260906-evidence-fix">
+  <link rel="stylesheet" href="../assets/editorial.css?v=20260906-evidence-fix">
+  <style>
+    :root { --ev-paper:#F1EEE5; --ev-ink:#121714; --ev-rule:#A9AA9F; --ev-accent:#C4402F; }
+    body { background:var(--ev-paper); color:var(--ev-ink); }
+    .evidence-page { width:100%; }
+    .evidence-hero { display:grid; grid-template-columns:minmax(0,1.45fr) minmax(300px,.55fr); gap:clamp(3rem,7vw,8rem); align-items:end; width:min(100%,1320px); min-height:calc(100vh - 84px); margin:0 auto; padding:clamp(5rem,9vw,9rem) 2rem clamp(6rem,10vw,10rem); }
+    .eyebrow { margin:0 0 1.3rem; color:var(--ev-accent); font-size:.68rem; font-weight:850; letter-spacing:.16em; text-transform:uppercase; }
+    .evidence-hero h1 { max-width:8.4ch; margin:0; font-family:Georgia,"Times New Roman",serif; font-size:clamp(4rem,8.2vw,8.7rem); font-weight:400; letter-spacing:-.07em; line-height:.84; }
+    .evidence-hero .lede { max-width:680px; margin:2rem 0 0; font-size:clamp(1.05rem,1.5vw,1.35rem); line-height:1.7; }
+    .evidence-actions { display:flex; flex-wrap:wrap; gap:.7rem; margin-top:2rem; }
+    .boundary { max-width:680px; margin:2rem 0 0; padding-top:1.25rem; border-top:1px solid var(--ev-rule); font-size:.9rem; line-height:1.7; }
+    .hero-record { border:1px solid var(--ev-ink); padding:1.4rem; }
+    .hero-record__top { display:flex; justify-content:space-between; gap:1rem; padding-bottom:1rem; border-bottom:1px solid var(--ev-rule); color:var(--ev-accent); font-size:.62rem; font-weight:850; letter-spacing:.14em; text-transform:uppercase; }
+    .hero-record svg { width:100%; height:auto; margin:2.25rem 0; }
+    .hero-record p { margin:0; line-height:1.65; }
+    .ledger { display:grid; grid-template-columns:repeat(4,1fr); width:min(100%,1320px); margin:0 auto; border-top:1px solid var(--ev-rule); border-bottom:1px solid var(--ev-rule); }
+    .ledger div { min-height:150px; padding:1.5rem; border-right:1px solid var(--ev-rule); }
+    .ledger div:last-child { border-right:0; }
+    .ledger strong { display:block; font-family:Georgia,"Times New Roman",serif; font-size:clamp(2.2rem,4vw,4.5rem); font-weight:400; letter-spacing:-.05em; line-height:1; }
+    .ledger span { display:block; margin-top:.8rem; font-size:.78rem; font-weight:800; letter-spacing:.08em; line-height:1.45; text-transform:uppercase; }
+    .evidence-section { width:min(100%,1320px); margin:0 auto; padding:clamp(6rem,10vw,10rem) 2rem; border-top:1px solid var(--ev-rule); }
+    .section-grid { display:grid; grid-template-columns:minmax(180px,.32fr) minmax(0,.68fr); gap:clamp(2rem,6vw,7rem); }
+    .section-index { color:var(--ev-accent); font-size:.68rem; font-weight:850; letter-spacing:.16em; text-transform:uppercase; }
+    .section-copy h2 { max-width:900px; margin:0; font-family:Georgia,"Times New Roman",serif; font-size:clamp(2.8rem,5.6vw,6rem); font-weight:400; letter-spacing:-.055em; line-height:.94; }
+    .section-copy > p { max-width:820px; margin:1.5rem 0 0; font-size:1.03rem; line-height:1.75; }
+    .version-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:0; margin-top:4rem; border-top:1px solid var(--ev-rule); border-bottom:1px solid var(--ev-rule); }
+    .version-card { padding:2rem 1.5rem 2.5rem 0; border-right:1px solid var(--ev-rule); }
+    .version-card + .version-card { padding-left:1.5rem; }
+    .version-card:last-child { border-right:0; }
+    .version-card .tag { color:var(--ev-accent); font-size:.68rem; font-weight:850; letter-spacing:.13em; text-transform:uppercase; }
+    .version-card h3 { margin:.85rem 0 0; font-family:Georgia,"Times New Roman",serif; font-size:2rem; font-weight:400; letter-spacing:-.035em; }
+    .version-card p { margin:1rem 0 0; line-height:1.7; }
+    .evidence-table { margin-top:3.5rem; border-top:1px solid var(--ev-rule); }
+    .evidence-row { display:grid; grid-template-columns:minmax(190px,.9fr) minmax(210px,1.05fr) minmax(220px,1.15fr); gap:1.5rem; padding:1.4rem 0; border-bottom:1px solid var(--ev-rule); align-items:start; }
+    .evidence-row.head { padding:.85rem 0; color:var(--ev-accent); font-size:.64rem; font-weight:850; letter-spacing:.13em; text-transform:uppercase; }
+    .evidence-row strong { font-weight:800; }
+    .evidence-row span,.evidence-row p { margin:0; line-height:1.65; }
+    .result-grid { display:grid; grid-template-columns:1fr 1fr; gap:1px; margin-top:3.5rem; background:var(--ev-rule); border:1px solid var(--ev-rule); }
+    .result-card { background:var(--ev-paper); padding:2rem; }
+    .result-card .label { color:var(--ev-accent); font-size:.66rem; font-weight:850; letter-spacing:.13em; text-transform:uppercase; }
+    .result-card strong { display:block; margin:.8rem 0; font-family:Georgia,"Times New Roman",serif; font-size:clamp(2.1rem,4vw,4rem); font-weight:400; letter-spacing:-.05em; line-height:1; }
+    .result-card p { margin:0; line-height:1.7; }
+    .record-list { margin-top:3.5rem; border-top:1px solid var(--ev-rule); }
+    .record-item { display:grid; grid-template-columns:160px 1fr; gap:2rem; padding:1.5rem 0; border-bottom:1px solid var(--ev-rule); }
+    .record-item strong { color:var(--ev-accent); font-size:.7rem; letter-spacing:.11em; text-transform:uppercase; }
+    .record-item p { margin:0; line-height:1.7; }
+    .package { margin-top:3.5rem; border:1px solid var(--ev-ink); }
+    .package-head { display:flex; justify-content:space-between; gap:1rem; padding:1rem 1.2rem; border-bottom:1px solid var(--ev-rule); font-size:.66rem; font-weight:850; letter-spacing:.13em; text-transform:uppercase; }
+    .package pre { margin:0; overflow:auto; padding:1.4rem; background:#121714; color:#F1EEE5; font:12px/1.8 ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace; }
+    .package-links { display:flex; flex-wrap:wrap; gap:.7rem; margin-top:1.3rem; }
+    .limits { margin-top:3rem; padding:1.3rem 0 0; border-top:1px solid var(--ev-rule); line-height:1.75; }
+    .site-footer { border-top:1px solid var(--ev-rule); }
+    .site-footer__inner { display:flex; width:min(100%,1320px); margin:0 auto; padding:2rem; justify-content:space-between; gap:2rem; font-size:.78rem; line-height:1.6; }
+    @media (max-width:900px) { .evidence-hero{grid-template-columns:1fr;}.hero-record{max-width:620px}.ledger{grid-template-columns:1fr 1fr}.ledger div:nth-child(2){border-right:0}.ledger div:nth-child(-n+2){border-bottom:1px solid var(--ev-rule)}.section-grid{grid-template-columns:1fr}.version-grid{grid-template-columns:1fr}.version-card,.version-card+.version-card{padding:1.7rem 0;border-right:0;border-bottom:1px solid var(--ev-rule)}.version-card:last-child{border-bottom:0}.result-grid{grid-template-columns:1fr}.site-header__nav{display:none}.mobile-menu-button{display:grid!important} }
+    @media (min-width:901px) { .mobile-menu-button,.mobile-evidence-nav{display:none!important} }
+    @media (max-width:680px) { .evidence-hero{padding-inline:1.2rem}.evidence-section{padding-inline:1.2rem}.ledger{margin:0;grid-template-columns:1fr}.ledger div{border-right:0;border-bottom:1px solid var(--ev-rule)}.ledger div:last-child{border-bottom:0}.evidence-row{grid-template-columns:1fr;gap:.35rem}.evidence-row.head{display:none}.record-item{grid-template-columns:1fr;gap:.5rem}.site-footer__inner{flex-direction:column}.site-header__inner{padding-inline:1.2rem} }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="site-header__inner">
+      <a href="../" aria-label="MOM SenseLoop home">
+        <div class="mom-logo">
+          <div class="mom-logo__mark">
+            <svg class="mom-icon" viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.65"><path d="M2 12h3l2-6 4 12 3-9 3 6h5"></path></svg>
           </div>
-        </a>
-
-        <nav class="site-header__nav" aria-label="Public navigation">
-          <a class="ui-button ui-button--ghost" href="./#how-it-works">How it works</a>
-          <a class="ui-button ui-button--ghost" href="./#proof">Why trust it</a>
-          <a class="ui-button ui-button--ghost" href="./?view=how">Research details</a>
-          <a class="ui-button ui-button--ghost" href="#hardware" aria-current="page">Engineering evidence</a>
-          <a class="ui-button ui-button--ghost" href="./#contact">Contact</a>
-          <a class="ui-button ui-button--primary" href="./?view=signin">
-            <svg class="mom-icon" viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true">
-              <path d="M6 10V8a6 6 0 0 1 12 0v2"></path>
-              <path d="M5 10h14v11H5z"></path>
-              <path d="M12 14v3"></path>
-            </svg>
-            Private Dashboard
-          </a>
-        </nav>
-
-        <button id="menu-toggle" class="grid h-11 w-11 place-items-center rounded-xl border border-line text-warm md:hidden" type="button" aria-expanded="false" aria-controls="mobile-nav" aria-label="Open navigation">
-          <svg id="menu-icon" class="mom-icon" viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true">
-            <path d="M4 7h16"></path>
-            <path d="M4 12h16"></path>
-            <path d="M4 17h16"></path>
-          </svg>
-        </button>
-      </div>
-
-      <nav id="mobile-nav" class="mobile-nav border-t border-line bg-panel px-4 py-3 md:hidden" aria-label="Mobile public navigation" hidden>
-        <div class="grid gap-2">
-          <a class="ui-button ui-button--ghost" href="./#how-it-works">How it works</a>
-          <a class="ui-button ui-button--ghost" href="./#proof">Why trust it</a>
-          <a class="ui-button ui-button--ghost" href="./?view=how">Research details</a>
-          <a class="ui-button ui-button--ghost" href="#hardware" aria-current="page">Engineering evidence</a>
-          <a class="ui-button ui-button--ghost" href="./#contact">Contact</a>
-          <a class="ui-button ui-button--primary" href="./?view=signin">Private Dashboard</a>
+          <div><div class="mom-logo__name">MOM SenseLoop</div><div class="mom-logo__meta">Research prototype</div></div>
         </div>
+      </a>
+      <nav class="site-header__nav" aria-label="Public navigation">
+        <a class="ui-button ui-button--ghost" href="../#how-it-works">How it works</a>
+        <a class="ui-button ui-button--ghost" href="../#proof">Why trust it</a>
+        <a class="ui-button ui-button--ghost" href="../?view=how">Research details</a>
+        <a class="ui-button ui-button--ghost" href="#builds" aria-current="page">Engineering evidence</a>
+        <a class="ui-button ui-button--primary" href="../?view=signin">Private Dashboard</a>
       </nav>
-    </header>
+      <button id="menu-toggle" class="mobile-menu-button" type="button" aria-expanded="false" aria-controls="mobile-evidence-nav" style="display:none;width:44px;height:44px;place-items:center;border:1px solid var(--ev-rule);background:transparent">☰</button>
+    </div>
+    <nav id="mobile-evidence-nav" class="mobile-evidence-nav" hidden style="border-top:1px solid var(--ev-rule);padding:1rem 1.2rem">
+      <div style="display:grid;gap:.5rem">
+        <a class="ui-button ui-button--ghost" href="../">Home</a>
+        <a class="ui-button ui-button--ghost" href="#builds">Build history</a>
+        <a class="ui-button ui-button--ghost" href="#external">External corpus</a>
+        <a class="ui-button ui-button--primary" href="../?view=signin">Private Dashboard</a>
+      </div>
+    </nav>
+  </header>
 
-    <main id="main-content" class="public-home evidence-page">
-      <section class="public-hero">
-        <div class="hero-copy">
-          <p class="hero-overline">MOM SENSELOOP V3 · PUBLIC ENGINEERING EVIDENCE</p>
-          <h1>Build history you can inspect.</h1>
-          <p class="hero-subhead">This page connects the physical recording problem, the measured engineering changes, independent workflow reproductions, external technical critique, and the separate public-data validation track.</p>
-          <div class="hero-actions">
-            <a class="ui-button ui-button--primary" href="#hardware">Read the build history</a>
-            <a class="ui-button ui-button--ghost" href="#external">See the external corpus</a>
-          </div>
-          <p class="hero-boundary"><strong>Evidence boundary.</strong> These are engineering and reproducibility claims. MOM is a low-cost abdominal-acoustic prototype, not a diagnostic device or medically validated device.</p>
+  <main class="evidence-page">
+    <section class="evidence-hero">
+      <div>
+        <p class="eyebrow">MOM SENSELOOP V3 · PUBLIC ENGINEERING EVIDENCE</p>
+        <h1>Build history you can inspect.</h1>
+        <p class="lede">This page connects the physical recording problem, measured engineering changes, independent workflow reproductions, external technical critique, and a separate external-corpus validation track.</p>
+        <div class="evidence-actions">
+          <a class="ui-button ui-button--primary" href="#builds">Read the build history</a>
+          <a class="ui-button ui-button--secondary" href="#external">See external validation</a>
         </div>
+        <p class="boundary"><strong>Evidence boundary.</strong> These are engineering and reproducibility claims. MOM is an abdominal-acoustic research prototype, not a diagnostic device, medical device, or objective hunger meter.</p>
+      </div>
+      <aside class="hero-record" aria-label="Engineering record summary">
+        <div class="hero-record__top"><span>Public record</span><span>Limits shown</span></div>
+        <svg viewBox="0 0 420 260" role="img" aria-label="Sensor waveform and verification mark">
+          <circle cx="68" cy="66" r="30" fill="none" stroke="#C4402F" stroke-width="2"></circle><circle cx="68" cy="66" r="8" fill="#C4402F"></circle>
+          <path d="M68 97v48c0 32 24 50 55 50h24" fill="none" stroke="#121714" stroke-width="2"></path>
+          <path d="M146 195h25l13-28 16 57 22-83 19 54h21l15-19 16 19h24l19-40 18 65 17-25h35" fill="none" stroke="#C4402F" stroke-width="3"></path>
+          <path d="M320 72l18 18 38-47" fill="none" stroke="#121714" stroke-width="3"></path>
+        </svg>
+        <p><strong>Sensor → workflow → evidence.</strong><br>The device captures a physical signal. The workflow checks quality. The public record documents what changed and what remains uncertain.</p>
+      </aside>
+    </section>
 
-        <figure class="hero-object" aria-labelledby="hero-object-caption">
-          <div class="hero-object__status">
-            <span>PUBLIC ENGINEERING RECORD</span>
-            <span>LIMITS SHOWN</span>
-          </div>
-          <svg viewBox="0 0 640 430" role="img" aria-label="A sensor, a checked waveform, and an evidence record">
-            <path class="hero-object__line" d="M120 86v92c0 52 38 88 88 88h30"></path>
-            <circle class="hero-object__sensor" cx="120" cy="74" r="31"></circle>
-            <circle class="hero-object__sensor-core" cx="120" cy="74" r="9"></circle>
-            <path class="hero-object__wave" d="M238 266h30l14-30 18 67 23-92 22 55h24l18-22 18 22h30l20-48 20 75 18-27h48"></path>
-            <path class="hero-object__baseline" d="M238 330h284"></path>
-            <path class="hero-object__check" d="M477 105l22 22 45-54"></path>
-          </svg>
-          <figcaption id="hero-object-caption" class="hero-object__caption">
-            <strong>Outside sound → inspectable evidence</strong>
-            <span>The sensor listens. The workflow checks the recording. The public record shows what changed and what remains uncertain.</span>
-          </figcaption>
-        </figure>
-      </section>
+    <section class="ledger" aria-label="Evidence summary">
+      <div><strong>32+</strong><span>controlled engineering tests</span></div>
+      <div><strong>30% → 10–12%</strong><span>within-condition variability</span></div>
+      <div><strong>2</strong><span>independent operators</span></div>
+      <div><strong>8+</strong><span>engineering reviewers</span></div>
+    </section>
 
-      <section class="evidence-ledger" aria-label="Public evidence summary">
-        <div>
-          <strong>32+</strong>
-          <span>controlled engineering tests</span>
-        </div>
-        <div>
-          <strong>30% → 10–12%</strong>
-          <span>within-condition variability</span>
-        </div>
-        <div>
-          <strong>2</strong>
-          <span>independent operators</span>
-        </div>
-        <div>
-          <strong>8+</strong>
-          <span>engineering reviewers</span>
-        </div>
-      </section>
-
-      <section id="hardware" class="home-section feature-section" aria-labelledby="hardware-heading">
-        <div class="section-intro">
-          <p class="eyebrow">01 / V1 → V2 → V3</p>
-          <h2 id="hardware-heading">Three iterations. Every failure became a design input.</h2>
-          <p>The project is documented as an engineering research prototype: sensor placement, acoustic coupling, motion, noise, clipping, coverage, and reproducibility are treated as constraints to measure and improve.</p>
-        </div>
-
-        <div class="feature-grid">
-          <article class="feature-item">
-            <span class="feature-number">V1 · CAPTURE</span>
-            <h3>Hear the signal</h3>
-            <p>Established that the low-cost ESP32 and MAX4466 chain could acquire abdominal-acoustic signals through a stethoscope-style interface.</p>
-          </article>
-          <article class="feature-item">
-            <span class="feature-number">V2 · VALIDATION</span>
-            <h3>Control the chain</h3>
-            <p>Added controlled capture and validation checks around sample rate, clipping, duplicates, source separation, and the acquisition workflow.</p>
-          </article>
-          <article class="feature-item">
-            <span class="feature-number">V3 · SENSELOOP</span>
-            <h3>Make limits visible</h3>
-            <p>Connects guided sessions, quality gates, separated profiles, optional check-ins, privacy controls, and uncertainty-aware research summaries.</p>
-          </article>
-        </div>
-      </section>
-
-      <section id="measurements" class="lab-section validation-section" aria-labelledby="measurements-heading">
-        <div class="validation-aside">
-          <span class="lab-kicker">02 / QUANTIFIED ITERATION</span>
-          <strong>32+</strong>
-          <p>controlled engineering tests across the device, acquisition path, data preparation, and evaluation workflow.</p>
-        </div>
-
-        <div>
-          <h2 id="measurements-heading">The measurements stayed attached to the failure modes.</h2>
-          <p class="section-title__copy">These figures describe the project’s tested repeatability and hardware behavior. They are not sensitivity, specificity, accuracy, or clinical precision.</p>
-
-          <div class="evidence-table-wrap">
-            <div class="evidence-table validation-table">
-              <div class="validation-head">
-                <span>CONTROL</span>
-                <span>OBSERVED CHANGE</span>
-                <span>WHAT IT SUPPORTS</span>
-              </div>
-              <div class="validation-row">
-                <strong>Within-condition variability</strong>
-                <span>Approximately 30% → approximately 10–12%</span>
-                <code>lower recorded variability</code>
-              </div>
-              <div class="validation-row">
-                <strong>Recurring clipping</strong>
-                <span>Recurring failure mode → eliminated in the tested configuration</span>
-                <code>headroom improved</code>
-              </div>
-              <div class="validation-row">
-                <strong>Engineering iteration</strong>
-                <span>32+ controlled experiments</span>
-                <code>repeatable test program</code>
-              </div>
-            </div>
-          </div>
-
-          <p class="evidence-note"><strong>Interpretation rule.</strong> The reported improvement is a project-level engineering summary for the tested configuration. It does not establish performance across all people, rooms, positions, or environments.</p>
-        </div>
-      </section>
-
-      <section id="operators" class="home-section proof-section" aria-labelledby="operators-heading">
-        <div class="proof-lead">
-          <p class="eyebrow">03 / INDEPENDENT OPERATOR TEST</p>
-          <h2 id="operators-heading">Could someone else follow the recording workflow?</h2>
-          <p>Two independent people reproduced the physical recording workflow without direct supervision. The point was to test whether the written process was usable beyond its designer.</p>
-          <a class="ui-button ui-button--secondary" href="#limits">Read the boundary</a>
-        </div>
-
-        <div class="proof-record" aria-label="Independent operator evidence">
-          <dl class="proof-numbers">
-            <div>
-              <dt>Operators</dt>
-              <dd>2</dd>
-            </div>
-            <div>
-              <dt>Direct supervision</dt>
-              <dd>0</dd>
-            </div>
-            <div>
-              <dt>Claim type</dt>
-              <dd>Workflow</dd>
-            </div>
-          </dl>
-
-          <div class="review-themes">
-            <article>
-              <h3>What this supports</h3>
-              <p>The written workflow was usable by more than the designer in this small sample, including the same stethoscope coupling, MAX4466, ESP32 acquisition path, and quality checks.</p>
-            </article>
-            <article>
-              <h3>What it does not support</h3>
-              <p>It is not a population reliability estimate, universal operator agreement, or clinical reproducibility result.</p>
-            </article>
-            <article>
-              <h3>Privacy boundary</h3>
-              <p>Operators are anonymized. Names, health information, and private recordings are not needed for this aggregate engineering claim.</p>
-            </article>
+    <section id="builds" class="evidence-section">
+      <div class="section-grid">
+        <div class="section-index">01 / V1 → V2 → V3</div>
+        <div class="section-copy">
+          <h2>Three versions, each built around a harder question.</h2>
+          <p>The project moved from basic capture feasibility, to controlled acquisition and held-out evaluation, to a human-in-the-loop research prototype that makes signal quality and uncertainty visible.</p>
+          <div class="version-grid">
+            <article class="version-card"><div class="tag">V1 · Capture</div><h3>Can the chain hear the signal?</h3><p>Established a low-cost ESP32, MAX4466 microphone amplifier, and stethoscope-style acoustic coupling as a workable abdominal-acoustic capture path.</p></article>
+            <article class="version-card"><div class="tag">V2 · Validation</div><h3>Can the chain be controlled?</h3><p>Added controlled acquisition, sample-rate checks, clipping checks, duplicate rejection, source-separated evaluation, and held-out analysis.</p></article>
+            <article class="version-card"><div class="tag">V3 · SenseLoop</div><h3>Can the limits be visible?</h3><p>Added guided sessions, quality gates, separated profiles, optional check-ins, privacy controls, and uncertainty-aware summaries that can abstain when evidence is insufficient.</p></article>
           </div>
         </div>
-      </section>
+      </div>
+    </section>
 
-      <section id="external" class="lab-section pipeline-section" aria-labelledby="external-heading">
-        <div class="lab-section__intro">
-          <span class="lab-kicker">04 / EXTERNAL CORPUS</span>
-          <h2 id="external-heading">Fresh calculations, cautious interpretation.</h2>
-          <p>The external-corpus track is separate from V3 device validation. It downloads public data, recomputes the fixed estimator, and reports subject-level results without redistributing audio.</p>
-        </div>
-
-        <div class="pipeline-console">
-          <div class="console-top">
-            <span>EXTERNAL CORPUS / RECOMPUTE</span>
-            <span>PUBLIC SOURCES</span>
+    <section class="evidence-section" id="measurements">
+      <div class="section-grid">
+        <div class="section-index">02 / Quantified iteration</div>
+        <div class="section-copy">
+          <h2>The measurements stayed attached to the failure modes.</h2>
+          <p>These values describe engineering repeatability and hardware behavior in the tested project configuration. They are not clinical sensitivity, specificity, accuracy, or medical precision.</p>
+          <div class="evidence-table" role="table" aria-label="Engineering measurements">
+            <div class="evidence-row head" role="row"><span>Control</span><span>Observed change</span><span>What it supports</span></div>
+            <div class="evidence-row" role="row"><strong>Controlled engineering experiments</strong><span>32+ tests</span><p>Iterative testing across hardware, acquisition, data preparation, and evaluation workflow.</p></div>
+            <div class="evidence-row" role="row"><strong>Within-condition variability</strong><span>Approximately 30% → approximately 10–12%</span><p>Lower variability in the project's recorded repeatability measure after iteration.</p></div>
+            <div class="evidence-row" role="row"><strong>Recurring clipping</strong><span>Recurring failure mode → eliminated in the tested configuration</span><p>A concrete gain/headroom failure mode was identified and addressed.</p></div>
           </div>
-          <div class="pipeline-stages">
-            <div class="pipeline-stage">
-              <span class="pipeline-tag">FIGSHARE</span>
-              <strong>Derivation corpus</strong>
-              <small>10,922 complete windows · 3,881 event · 5,878 eligible non-event · 1,163 excluded</small>
-            </div>
-            <div class="pipeline-stage">
-              <span class="pipeline-tag">KAGGLE</span>
-              <strong>Independent transport</strong>
-              <small>6,424 complete windows · 3,050 event · 2,340 eligible non-event · 1,034 excluded</small>
-            </div>
-            <div class="pipeline-stage">
-              <span class="pipeline-tag">SUBJECTS</span>
-              <strong>Independent cohort</strong>
-              <small>19 anonymized subjects · 16 eligible for the subject-level summary</small>
-            </div>
-            <div class="pipeline-stage">
-              <span class="pipeline-tag">PRIMARY</span>
-              <strong>Median-shift endpoint</strong>
-              <small>mean difference 0.0089 · 95% CI −0.0151 to 0.0329 · exact sign-flip p=0.455</small>
-            </div>
-            <div class="pipeline-stage">
-              <span class="pipeline-tag">EXPLORATORY</span>
-              <strong>Rank-probability endpoint</strong>
-              <small>0.598 · exact sign-flip p=0.0032 · post-hoc exploratory only</small>
-            </div>
-          </div>
+          <p class="limits"><strong>Interpretation rule.</strong> This does not establish performance across all people, rooms, placements, or environments.</p>
         </div>
-      </section>
+      </div>
+    </section>
 
-      <section class="home-section proof-section" aria-labelledby="interpretation-heading">
-        <div class="proof-lead">
-          <p class="eyebrow">EXTERNAL RESULT</p>
-          <h2 id="interpretation-heading">The primary result remains inconclusive.</h2>
-          <p>The exploratory rank result is reported because the package should be complete and inspectable, not because it replaces the pre-specified primary endpoint.</p>
+    <section class="evidence-section" id="operators">
+      <div class="section-grid">
+        <div class="section-index">03 / Independent operators</div>
+        <div class="section-copy">
+          <h2>Could someone else follow the recording workflow?</h2>
+          <p>Two independent people completed the physical recording workflow without direct supervision. The purpose was narrow: test whether the written process was usable beyond its designer.</p>
+          <div class="record-list">
+            <div class="record-item"><strong>Supports</strong><p>The written procedure was usable by more than the designer in this small sample, including the same stethoscope coupling, MAX4466, ESP32 acquisition path, and quality checks.</p></div>
+            <div class="record-item"><strong>Does not support</strong><p>A population reliability estimate, universal operator agreement, inter-rater validity, or clinical reproducibility.</p></div>
+          </div>
+          <div class="package-links"><a class="ui-button ui-button--secondary" href="https://github.com/neelesh-kotte/moms-device-v2-signal-processing/blob/main/evidence/independent-operator-evidence.md">Open operator record</a></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="evidence-section" id="reviewers">
+      <div class="section-grid">
+        <div class="section-index">04 / External review</div>
+        <div class="section-copy">
+          <h2>Technical critique came from outside the build.</h2>
+          <p>Eight or more professional engineering reviewers contributed critique across chemical, mechanical, software, and other technical perspectives. This is external design feedback, not certification, endorsement, or journal peer review.</p>
+          <div class="record-list">
+            <div class="record-item"><strong>Why it matters</strong><p>External critique helps expose assumptions in mounting, robustness, electronics, acquisition workflow, usability, and software behavior that are easy for a single builder to miss.</p></div>
+            <div class="record-item"><strong>Boundary</strong><p>Reviewer participation does not convert MOM into a clinically validated or certified device.</p></div>
+          </div>
+          <div class="package-links"><a class="ui-button ui-button--secondary" href="https://github.com/neelesh-kotte/moms-device-v2-signal-processing/blob/main/evidence/external-reviewers.md">Open reviewer record</a></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="evidence-section" id="external">
+      <div class="section-grid">
+        <div class="section-index">05 / External corpus</div>
+        <div class="section-copy">
+          <h2>The public-data result is reproducible, including the negative primary result.</h2>
+          <p>The external validation package processed 6,424 complete windows from 19 anonymized subject groups. Sixteen subject groups contained both classes and were eligible for the primary paired analysis.</p>
+          <div class="result-grid">
+            <article class="result-card"><div class="label">Frozen primary endpoint</div><strong>0.0089</strong><p>Equal-subject mean event-minus-non-event median spectral-ratio difference. 95% bootstrap interval: −0.0151 to 0.0329. Exact two-sided sign-flip p = 0.455. The primary median-shift result is inconclusive.</p></article>
+            <article class="result-card"><div class="label">Exploratory rank probability</div><strong>0.598</strong><p>Equal-subject mean probability. 95% bootstrap interval: 0.540 to 0.655. Exact two-sided sign-flip p = 0.0032. This exploratory result does not replace the primary endpoint.</p></article>
+          </div>
+          <div class="package">
+            <div class="package-head"><span>Executable package</span><span>Public data only</span></div>
+            <pre>python -m pip install -r external_validation/requirements.txt
+python external_validation/run_external_validation.py --help
+# Follow the README's corpus-specific command, then verify targets as documented.</pre>
+          </div>
           <div class="package-links">
-            <a class="ui-button ui-button--secondary" href="https://figshare.com/articles/media/Bowel_sounds_signal/28595741">Figshare source</a>
-            <a class="ui-button ui-button--secondary" href="https://www.kaggle.com/datasets/robertnowak/bowel-sounds">Kaggle source</a>
+            <a class="ui-button ui-button--primary" href="https://github.com/neelesh-kotte/moms-device-v2-signal-processing/tree/main/external_validation">Open external-corpus package</a>
+            <a class="ui-button ui-button--secondary" href="https://github.com/neelesh-kotte/moms-device-v2-signal-processing/blob/main/evidence/engineering-validation.md">Open full evidence register</a>
+            <a class="ui-button ui-button--secondary" href="https://github.com/neelesh-kotte/moms-device-v2-signal-processing/blob/main/evidence/hardware-iteration.md">Open hardware record</a>
           </div>
+          <p class="limits"><strong>Data boundary.</strong> Raw public audio is not redistributed here. Personal MOM recordings and private dashboard records are not published. The external-corpus work is a research validation track, not a diagnostic threshold, biomarker, or clinical tool.</p>
         </div>
+      </div>
+    </section>
+  </main>
 
-        <div class="proof-record">
-          <dl class="proof-numbers">
-            <div>
-              <dt>Complete windows</dt>
-              <dd>17,346</dd>
-            </div>
-            <div>
-              <dt>Primary exact p</dt>
-              <dd>0.455</dd>
-            </div>
-            <div>
-              <dt>Exploratory rank</dt>
-              <dd>0.598</dd>
-            </div>
-          </dl>
+  <footer class="site-footer"><div class="site-footer__inner"><span>MOM SenseLoop · research prototype</span><span>Engineering evidence is presented with explicit scope and limitations.</span></div></footer>
 
-          <div class="review-themes">
-            <article>
-              <h3>Primary endpoint</h3>
-              <p>Equal-subject mean median difference 0.0089, with a 95% bootstrap interval of −0.0151 to 0.0329. The result is inconclusive.</p>
-            </article>
-            <article>
-              <h3>Exploratory endpoint</h3>
-              <p>Mean within-subject rank probability 0.598 with exact sign-flip p=0.0032. This is explicitly post-hoc and exploratory only.</p>
-            </article>
-            <article>
-              <h3>Interpretation boundary</h3>
-              <p>Neither statistic is a biomarker, diagnostic threshold, mechanism, or clinical tool. Public-corpus analysis does not prove V3 hardware performance.</p>
-            </article>
-          </div>
-        </div>
-      </section>
-
-      <section id="package" class="editorial-section" aria-labelledby="package-heading">
-        <div class="editorial-inner">
-          <div class="section-title">
-            <div class="section-title__kicker">05 / EXECUTABLE PACKAGE</div>
-            <h2 id="package-heading" class="section-title__heading">Run the public calculation from a clean checkout.</h2>
-            <p class="section-title__copy">The repository contains the runner, dependency list, expected-target file, manifest output, and a deterministic self-test. Raw audio stays outside the repository; the full public download is opt-in.</p>
-          </div>
-
-          <div class="process-list">
-            <article>
-              <span class="feature-number">01 / INSTALL</span>
-              <h3>Prepare the environment</h3>
-              <p>Create a Python environment and install the small, declared dependency set for NumPy, pandas, SciPy, and WAV handling.</p>
-            </article>
-            <article>
-              <span class="feature-number">02 / VERIFY</span>
-              <h3>Run the self-test</h3>
-              <p>The synthetic self-test exercises windowing, label handling, subject-level aggregation, and the result contract without downloading external audio.</p>
-            </article>
-            <article>
-              <span class="feature-number">03 / RECOMPUTE</span>
-              <h3>Download and compare</h3>
-              <p>The opt-in run downloads the public corpus, records the archive hash, recomputes the endpoints, and can compare results with the frozen target file.</p>
-            </article>
-          </div>
-
-          <div class="package-command">
-            <div class="console-top">
-              <span>TERMINAL / EXTERNAL VALIDATION</span>
-              <span>SELF-TEST FIRST</span>
-            </div>
-            <pre><code>python3 -m venv .venv
-source .venv/bin/activate
-python -m pip install -r external_validation/requirements.txt
-python external_validation/run_external_validation.py --self-test
-python external_validation/run_external_validation.py --download --verify-targets</code></pre>
-          </div>
-
-          <div class="package-links">
-            <a class="ui-button ui-button--primary" href="https://github.com/neelesh-kotte/moms-device-v2-signal-processing/tree/main/external_validation">Open package files</a>
-            <a class="ui-button ui-button--ghost" href="https://github.com/neelesh-kotte/moms-device-v2-signal-processing/blob/main/external_validation/README.md">Read the run notes</a>
-            <a class="ui-button ui-button--ghost" href="https://github.com/neelesh-kotte/moms-device-v2-signal-processing/blob/main/evidence/engineering-validation.md">Open the evidence record</a>
-          </div>
-        </div>
-      </section>
-
-      <section id="reviewers" class="home-section trust-section" aria-labelledby="reviewers-heading">
-        <div class="trust-statement">
-          <p class="eyebrow">06 / EXTERNAL TECHNICAL REVIEW</p>
-          <h2 id="reviewers-heading">Critique, not endorsement.</h2>
-          <p>Eight or more professional engineering reviewers contributed feedback through volunteering, internships, and FBLA-related technical environments.</p>
-        </div>
-
-        <div class="trust-list">
-          <article>
-            <span>HARDWARE</span>
-            <h3>Chemical and mechanical perspectives</h3>
-            <p>Feedback informed discussion of sensor mounting, acoustic coupling, contact consistency, gain, clipping, and repeatability.</p>
-          </article>
-          <article>
-            <span>SOFTWARE</span>
-            <h3>Data and interface perspectives</h3>
-            <p>Feedback informed data handling, profile separation, failure modes, reproducibility, uncertainty, and public wording.</p>
-          </article>
-          <article>
-            <span>RECOGNITION BOUNDARY</span>
-            <h3>Public dissemination is not an award</h3>
-            <p>The public record documents technical critique and source dissemination. It does not claim certification, peer review, competition recognition, or endorsement by any reviewer or employer.</p>
-          </article>
-        </div>
-      </section>
-
-      <section id="limits" class="editorial-section" aria-labelledby="limits-heading">
-        <div class="editorial-inner">
-          <div class="section-title">
-            <div class="section-title__kicker">07 / LIMITS</div>
-            <h2 id="limits-heading" class="section-title__heading">What this package refuses to claim.</h2>
-            <p class="section-title__copy">MOM is an engineering prototype. The public evidence package is designed to show the work clearly without stretching it into a medical conclusion.</p>
-          </div>
-
-          <div class="editorial-panel">
-            <div class="evidence-list">
-              <p><strong>No diagnosis.</strong> MOM does not diagnose disease, screen for illness, or provide medical advice.</p>
-              <p><strong>No objective hunger meter.</strong> The system does not claim to read thoughts or measure a person’s internal state directly.</p>
-              <p><strong>No clinical validation.</strong> Engineering repeatability, external-corpus analysis, and reviewer feedback are not clinical evidence.</p>
-              <p><strong>No private data exposure.</strong> Guest Mode contains demonstration content; private profiles, live device data, and personal recordings remain outside this page.</p>
-            </div>
-          </div>
-
-          <div class="package-links">
-            <a class="ui-button ui-button--secondary" href="https://github.com/neelesh-kotte/moms-device-v2-signal-processing/tree/main/evidence">Browse evidence files</a>
-            <a class="ui-button ui-button--ghost" href="./">Return to public home</a>
-          </div>
-        </div>
-      </section>
-    </main>
-
-    <footer class="site-footer">
-      <strong class="text-slate2">MOM SenseLoop</strong>
-      <span>&nbsp;·&nbsp; Experimental research prototype&nbsp;·&nbsp; Engineering evidence, not a medical conclusion.</span>
-    </footer>
-
-    <script>
-      (function () {
-        var toggle = document.getElementById('menu-toggle');
-        var nav = document.getElementById('mobile-nav');
-        var icon = document.getElementById('menu-icon');
-        if (!toggle || !nav || !icon) return;
-        toggle.addEventListener('click', function () {
-          var open = toggle.getAttribute('aria-expanded') === 'true';
-          toggle.setAttribute('aria-expanded', String(!open));
-          toggle.setAttribute('aria-label', open ? 'Open navigation' : 'Close navigation');
-          nav.hidden = open;
-          icon.innerHTML = open
-            ? '<path d="M4 7h16"></path><path d="M4 12h16"></path><path d="M4 17h16"></path>'
-            : '<path d="M6 6l12 12"></path><path d="M18 6L6 18"></path>';
-        });
-      }());
-    </script>
-  </body>
+  <script>
+    const toggle = document.getElementById('menu-toggle');
+    const mobile = document.getElementById('mobile-evidence-nav');
+    if (toggle && mobile) {
+      toggle.addEventListener('click', () => {
+        const open = toggle.getAttribute('aria-expanded') === 'true';
+        toggle.setAttribute('aria-expanded', String(!open));
+        mobile.hidden = open;
+      });
+      mobile.querySelectorAll('a').forEach((link) => link.addEventListener('click', () => {
+        toggle.setAttribute('aria-expanded', 'false');
+        mobile.hidden = true;
+      }));
+    }
+  </script>
+</body>
 </html>
