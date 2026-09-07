@@ -24,13 +24,10 @@ jobs:
         run: |
           git fetch origin main
           git show origin/main:.github/scripts/full_site_audit_fix.py > /tmp/full_site_audit_fix.py
-
-      - name: Verify Chart.js is unused before removing it
-        run: |
-          if grep -Eq '(^|[^A-Za-z0-9_])Chart([^A-Za-z0-9_]|$)' docs/assets/app.js; then
-            echo 'Chart global is used; refusing to remove Chart.js'
-            exit 1
-          fi
+          # Chart.js is used by the dashboard. Keep it until its call site is safely lazy-loaded.
+          sed -i '/chart\.js@4\.4\.7\/dist\/chart\.umd\.min\.js/d' /tmp/full_site_audit_fix.py
+          echo 'Chart.js call sites:'
+          grep -n 'Chart' docs/assets/app.js || true
 
       - name: Apply guarded full-site fixes
         run: python /tmp/full_site_audit_fix.py
@@ -49,7 +46,7 @@ jobs:
           ! grep -q 'site-hardening.js' docs/index.html
           ! grep -q 'device-provisioning.js' docs/index.html
           ! grep -q 'esp-web-tools' docs/index.html
-          ! grep -q 'chart.js' docs/index.html
+          grep -q 'chart.js@4.4.7' docs/index.html
           ! grep -q 'window.innerWidth < 768' docs/assets/app.js
           ! grep -q 'alert(' docs/assets/app.js
           ! grep -q 'MutationObserver(scheduleEnhance)' docs/assets/device-provisioning.js
