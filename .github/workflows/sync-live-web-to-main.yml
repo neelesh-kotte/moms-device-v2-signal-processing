@@ -1,0 +1,56 @@
+name: Sync hardened live web to main
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/sync-live-web-to-main.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Fetch live branch
+        run: git fetch origin project-portfolio-site
+
+      - name: Copy hardened web source from deployed branch
+        run: |
+          mkdir -p assets
+          git show origin/project-portfolio-site:docs/index.html > index.html
+          git show origin/project-portfolio-site:docs/engineering-validation.html > engineering-validation.html
+          for f in app.js base.css scientific.css cloud-service.js data.js device-provisioning.js site-hardening.js; do
+            git show origin/project-portfolio-site:docs/assets/$f > assets/$f
+          done
+          rm -f assets/recording-control.js
+
+      - name: Verify canonical source
+        run: |
+          node --check assets/app.js
+          node --check assets/cloud-service.js
+          node --check assets/device-provisioning.js
+          node --check assets/site-hardening.js
+          ! grep -q 'recording-control.js' index.html
+          grep -q 'recordingReadyDevice' assets/app.js
+          grep -q 'getSessionForCommand' assets/cloud-service.js
+
+      - name: Commit canonical web source
+        run: |
+          if git diff --quiet -- .; then
+            echo "Main already matches the live hardened web source"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html engineering-validation.html assets/app.js assets/base.css assets/scientific.css assets/cloud-service.js assets/data.js assets/device-provisioning.js assets/site-hardening.js
+          git add -u assets/recording-control.js 2>/dev/null || true
+          git commit -m "Sync hardened MOM web source from live site [skip ci]"
+          git push origin HEAD:main
