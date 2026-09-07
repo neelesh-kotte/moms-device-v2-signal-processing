@@ -5,6 +5,7 @@
 #include <ArduinoJson.h>
 
 // MOM SenseLoop browser-provisioning firmware.
+// Built for the website's Connect MOM Device setup wizard.
 // This build handles first-time USB provisioning, saved Wi-Fi, and authenticated
 // cloud heartbeats. The acoustic acquisition pipeline can share these helpers.
 
