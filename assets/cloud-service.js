@@ -130,6 +130,12 @@ var MOM;
             if (error) throw new Error(error.message);
             return true;
         }
+        async abortDeviceProvisioning(keyId) {
+            if (!keyId) return false;
+            const { error } = await this.client.from('mom_device_keys').update({ revoked_at: new Date().toISOString() }).eq('id', keyId).is('revoked_at', null);
+            if (error) throw new Error(error.message);
+            return true;
+        }
         async pairDevice(ownerId, profileId) {
             if (!document.getElementById('mom-device-setup')) throw new Error('Manual device credentials are disabled. Use Connect MOM Device so the credential stays hidden.');
             return this.beginDeviceProvisioning(ownerId, profileId);

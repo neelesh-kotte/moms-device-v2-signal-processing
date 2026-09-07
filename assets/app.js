@@ -90,6 +90,12 @@ var MOM;
     function isOnline(devices) {
         return devices.some(d => d.last_seen_at && Date.now() - new Date(d.last_seen_at).getTime() < 120000);
     }
+    function recordingReadyDevice(devices) {
+        return [...devices]
+            .filter(d => d.last_seen_at && Date.now() - new Date(d.last_seen_at).getTime() < 120000)
+            .sort((a, b) => +new Date(b.last_seen_at || 0) - +new Date(a.last_seen_at || 0))
+            .find(d => Array.isArray(d.capabilities) && d.capabilities.includes('record_session')) || null;
+    }
     function latestSession(sessions) {
         return sessions.length ? [...sessions].sort((a, b) => +new Date(b.started_at) - +new Date(a.started_at))[0] : null;
     }
@@ -226,11 +232,11 @@ var MOM;
     }
     function Button({ children, onClick, variant = 'secondary', disabled = false, type = 'button', className = '', ariaLabel }) {
         const styles = {
-            primary: 'border-mint bg-mint text-[#F1EEE5] hover:bg-mint2',
-            secondary: 'border-line bg-panel2 text-warm hover:border-mint/55 hover:bg-[#F1EEE5]',
+            primary: 'border-mint bg-mint text-[#071014] hover:bg-mint2',
+            secondary: 'border-line bg-panel2 text-warm hover:border-mint/55 hover:bg-[#071014]',
             ghost: 'border-transparent bg-transparent text-slate hover:bg-white/5 hover:text-warm',
-            danger: 'border-coral/45 bg-coral/10 text-[#C4402F] hover:bg-coral/20',
-            google: 'border-white/20 bg-white text-[#F1EEE5] hover:bg-[#121714]'
+            danger: 'border-coral/45 bg-coral/10 text-[#62B5A6] hover:bg-coral/20',
+            google: 'border-white/20 bg-white text-[#071014] hover:bg-[#EAF0EF]'
         };
         return React.createElement("button", { type: type, "aria-label": ariaLabel, disabled: disabled, onClick: onClick, className: `ui-button ui-button--${variant} ${className}` }, children);
     }
@@ -238,9 +244,9 @@ var MOM;
         const map = {
             neutral: 'border-line bg-white/[0.035] text-slate2',
             good: 'border-mint/35 bg-mint/10 text-mint2',
-            warn: 'border-amber/35 bg-amber/10 text-[#C4402F]',
-            demo: 'border-amber/35 bg-amber/10 text-[#C4402F]',
-            coral: 'border-coral/35 bg-coral/10 text-[#C4402F]'
+            warn: 'border-amber/35 bg-amber/10 text-[#62B5A6]',
+            demo: 'border-amber/35 bg-amber/10 text-[#62B5A6]',
+            coral: 'border-coral/35 bg-coral/10 text-[#62B5A6]'
         };
         return React.createElement("span", { className: `ui-badge ui-badge--${tone}` }, children);
     }
@@ -263,12 +269,12 @@ var MOM;
             const y = h / 2 - (v / max) * (h * 0.38);
             return `${x.toFixed(1)},${y.toFixed(1)}`;
         }).join(' ');
-        return React.createElement("div", { className: "relative overflow-hidden rounded-2xl border border-line bg-[#F1EEE5] p-4", role: "img", "aria-label": `${demo ? 'Demo data. ' : ''}${label}` },
+        return React.createElement("div", { className: "relative overflow-hidden rounded-2xl border border-line bg-[#071014] p-4", role: "img", "aria-label": `${demo ? 'Demo data. ' : ''}${label}` },
             demo && React.createElement("div", { className: "absolute left-3 top-3 z-10" },
                 React.createElement(Badge, { tone: "demo" }, "Demo data")),
             React.createElement("svg", { viewBox: `0 0 ${w} ${h}`, className: `w-full ${compact ? 'h-20' : 'h-44'}`, preserveAspectRatio: "none", "aria-hidden": "true" },
-                [.25, .5, .75].map(v => React.createElement("line", { key: v, x1: "0", x2: w, y1: h * v, y2: h * v, stroke: "#A9AA9F", strokeWidth: "1" })),
-                React.createElement("polyline", { points: points, fill: "none", stroke: "#C4402F", strokeWidth: compact ? 4 : 3, strokeLinejoin: "miter", strokeLinecap: "square" })));
+                [.25, .5, .75].map(v => React.createElement("line", { key: v, x1: "0", x2: w, y1: h * v, y2: h * v, stroke: "#283A42", strokeWidth: "1" })),
+                React.createElement("polyline", { points: points, fill: "none", stroke: "#62B5A6", strokeWidth: compact ? 4 : 3, strokeLinejoin: "miter", strokeLinecap: "square" })));
     }
     function LoadingState({ label = 'Loading MOM SenseLoop…' }) {
         return React.createElement("div", { className: "grid min-h-[240px] place-items-center rounded-[22px] border border-line bg-panel/70 p-8 text-center", role: "status", "aria-live": "polite" },
@@ -295,11 +301,19 @@ var MOM;
         }, []);
         return React.createElement("div", { className: "fixed inset-0 z-[100] grid place-items-center overflow-y-auto bg-black/75 p-4", role: "dialog", "aria-modal": "true", "aria-label": title, onMouseDown: e => { if (e.currentTarget === e.target)
                 onClose(); } },
-            React.createElement("div", { ref: ref, tabIndex: -1, className: `relative max-h-[90vh] w-full ${width} overflow-y-auto rounded-[24px] border border-line bg-[#F1EEE5] p-6 focus:outline-none` },
+            React.createElement("div", { ref: ref, tabIndex: -1, className: `relative max-h-[90vh] w-full ${width} overflow-y-auto rounded-[24px] border border-line bg-[#071014] p-6 focus:outline-none` },
                 React.createElement("button", { onClick: onClose, className: "absolute right-4 top-4 grid h-11 w-11 place-items-center rounded-xl text-slate2 hover:bg-white/5 hover:text-warm focus-visible:ring-2 focus-visible:ring-mint", "aria-label": "Close dialog" },
                     React.createElement(Icon, { name: "x" })),
                 React.createElement("h2", { className: "pr-12 text-2xl font-black tracking-tight text-warm" }, title),
                 React.createElement("div", { className: "mt-5" }, children)));
+    }
+    function scrollPublicSection(id) {
+        if (readRoute().view !== 'home') {
+            pushRoute('home');
+            window.setTimeout(() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
+            return;
+        }
+        document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
     function PublicNav({ onPrivate }) {
         const [mobile, setMobile] = useState(false);
@@ -308,113 +322,238 @@ var MOM;
                 React.createElement("button", { onClick: () => pushRoute('home'), className: "rounded-xl text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mint" },
                     React.createElement(Logo, null)),
                 React.createElement("nav", { className: "site-header__nav", "aria-label": "Public navigation" },
-                    React.createElement(Button, { variant: "ghost", onClick: () => pushRoute('how') }, "How MOM works"),
-                    React.createElement(Button, { variant: "ghost", onClick: () => pushRoute('guest') }, "Guest Mode"),
+                    React.createElement(Button, { variant: "ghost", onClick: () => scrollPublicSection('how-it-works') }, "How it works"),
+                    React.createElement(Button, { variant: "ghost", onClick: () => scrollPublicSection('proof') }, "Evidence & limitations"),
+                    React.createElement(Button, { variant: "ghost", onClick: () => pushRoute('how') }, "Research details"),
+                    React.createElement("a", { href: "engineering-validation.html", className: "ui-button ui-button--ghost" }, "Engineering evidence"),
+                    React.createElement(Button, { variant: "ghost", onClick: () => scrollPublicSection('contact') }, "Contact"),
                     React.createElement(Button, { variant: "primary", onClick: onPrivate },
                         React.createElement(Icon, { name: "lock-keyhole" }),
-                        " Private Dashboard")),
+                        " Open dashboard")),
                 React.createElement("button", { className: "grid h-11 w-11 place-items-center rounded-xl border border-line text-warm md:hidden", onClick: () => setMobile(!mobile), "aria-expanded": mobile, "aria-label": "Open navigation" },
                     React.createElement(Icon, { name: mobile ? 'x' : 'menu' }))),
             mobile && React.createElement("nav", { className: "border-t border-line bg-panel px-4 py-3 md:hidden", "aria-label": "Mobile public navigation" },
                 React.createElement("div", { className: "grid gap-2" },
-                    React.createElement(Button, { variant: "ghost", onClick: () => { setMobile(false); pushRoute('how'); } }, "How MOM works"),
-                    React.createElement(Button, { variant: "ghost", onClick: () => { setMobile(false); pushRoute('guest'); } }, "Guest Mode"),
-                    React.createElement(Button, { variant: "primary", onClick: () => { setMobile(false); onPrivate(); } }, "Private Dashboard"))));
+                    React.createElement(Button, { variant: "ghost", onClick: () => { setMobile(false); scrollPublicSection('how-it-works'); } }, "How it works"),
+                    React.createElement(Button, { variant: "ghost", onClick: () => { setMobile(false); scrollPublicSection('proof'); } }, "Evidence & limitations"),
+                    React.createElement(Button, { variant: "ghost", onClick: () => { setMobile(false); pushRoute('how'); } }, "Research details"),
+                    React.createElement("a", { href: "engineering-validation.html", className: "ui-button ui-button--ghost", onClick: () => setMobile(false) }, "Engineering evidence"),
+                    React.createElement(Button, { variant: "ghost", onClick: () => { setMobile(false); scrollPublicSection('contact'); } }, "Contact"),
+                    React.createElement(Button, { variant: "primary", onClick: () => { setMobile(false); onPrivate(); } }, "Open dashboard"))));
     }
     function HeroVisual() {
-        return React.createElement("div", { className: "signal-figure" },
-            React.createElement("div", { className: "absolute inset-0 opacity-40 [background-image:linear-gradient(rgba(142,228,190,.055)_1px,transparent_1px),linear-gradient(90deg,rgba(142,228,190,.055)_1px,transparent_1px)] [background-size:30px_30px]" }),
-            React.createElement("div", { className: "relative z-10 flex h-full min-h-[382px] flex-col items-center justify-center" },
-                React.createElement("div", { className: "grid h-24 w-24 place-items-center rounded-full border border-mint/45 bg-mint/10 text-lg font-black tracking-tight text-mint2" },
-                    React.createElement(Icon, { name: "stethoscope", size: 33 })),
-                React.createElement("div", { className: "h-12 w-px editorial-flat-rule" }),
-                React.createElement("div", { className: "w-full max-w-sm" },
-                    React.createElement(Waveform, { compact: true, demo: false, label: "Abstract illustration of captured sound" })),
-                React.createElement("div", { className: "mt-4 grid w-full max-w-sm grid-cols-2 gap-2 text-sm" }, ['Capture sound', 'Review quality', 'Keep profiles separate', 'Learn carefully'].map((x, i) => React.createElement("div", { key: x, className: "flex items-center gap-2 rounded-xl border border-line bg-bg/70 p-3 font-bold text-slate2" },
-                    React.createElement("span", { className: "grid h-6 w-6 place-items-center rounded-full bg-mint/10 text-xs text-mint2" }, i + 1),
-                    x)))));
+        return React.createElement("figure", { className: "hero-object", "aria-labelledby": "hero-object-caption" },
+            React.createElement("div", { className: "hero-object__status" },
+                React.createElement("span", null, "ILLUSTRATIVE SESSION"),
+                React.createElement("span", null, "QUALITY CHECKED")),
+            React.createElement("svg", { viewBox: "0 0 640 430", role: "img", "aria-label": "A stethoscope sensor becoming a checked sound waveform" },
+                React.createElement("path", { className: "hero-object__line", d: "M120 86v92c0 52 38 88 88 88h30" }),
+                React.createElement("circle", { className: "hero-object__sensor", cx: "120", cy: "74", r: "31" }),
+                React.createElement("circle", { className: "hero-object__sensor-core", cx: "120", cy: "74", r: "9" }),
+                React.createElement("path", { className: "hero-object__wave", d: "M238 266h30l14-30 18 67 23-92 22 55h24l18-22 18 22h30l20-48 20 75 18-27h48" }),
+                React.createElement("path", { className: "hero-object__baseline", d: "M238 330h284" }),
+                React.createElement("path", { className: "hero-object__check", d: "M477 105l22 22 45-54" })),
+            React.createElement("figcaption", { id: "hero-object-caption", className: "hero-object__caption" },
+                React.createElement("strong", null, "Outside sound → usable signal"),
+                React.createElement("span", null, "The sensor listens. Software checks the recording before anything is interpreted.")));
+    }
+    function FeatureGrid() {
+        const features = [
+            ["01", "Listen", "A stethoscope-mounted MAX4466 microphone captures quiet sound from the outside of the abdomen."],
+            ["02", "Check", "The software checks clipping, movement, sample rate, noise, contact, and recording completeness first."],
+            ["03", "Explore", "Sessions and optional check-ins can be compared over time, with uncertainty shown plainly."]
+        ];
+        return React.createElement("section", { id: "how-it-works", className: "home-section feature-section", "aria-labelledby": "feature-heading" },
+            React.createElement("div", { className: "section-intro" },
+                React.createElement("p", { className: "eyebrow" }, "THE WHOLE IDEA"),
+                React.createElement("h2", { id: "feature-heading" }, "Listen. Check. Explore."),
+                React.createElement("p", null, "Abdominal acoustics simply means listening to sounds from the abdomen. MOM turns those sounds into data you can inspect.")),
+            React.createElement("div", { className: "feature-grid" }, features.map(([number, title, copy]) => React.createElement("article", { key: number, className: "feature-item" },
+                React.createElement("span", { className: "feature-number" }, number),
+                React.createElement("h3", null, title),
+                React.createElement("p", null, copy)))));
+    }
+    function ReviewProof() {
+        const reviewThemes = [
+            ["Hardware", "Sensor mounting, acoustic coupling, movement, gain, and repeatability."],
+            ["Software", "Data integrity, uncertainty, profile separation, and interface reliability."],
+            ["Research", "Failure modes, held-out evaluation, reproducible protocols, and honest limits."]
+        ];
+        return React.createElement("section", { id: "proof", className: "home-section proof-section", "aria-labelledby": "proof-heading" },
+            React.createElement("div", { className: "proof-lead" },
+                React.createElement("p", { className: "eyebrow" }, "EVIDENCE, NOT ENDORSEMENT"),
+                React.createElement("h2", { id: "proof-heading" }, "Built by testing what could fail."),
+                React.createElement("p", null, "The project records its iterations and limitations. Technical review was used to find weak points—not to manufacture praise."),
+                React.createElement(Button, { variant: "secondary", onClick: () => pushRoute('how') }, "Read the research details", React.createElement(Icon, { name: "arrow-right" }))),
+            React.createElement("div", { className: "proof-record", "aria-label": "Project evidence" },
+                React.createElement("dl", { className: "proof-numbers" },
+                    React.createElement("div", null, React.createElement("dt", null, "Controlled tests"), React.createElement("dd", null, "32+")),
+                    React.createElement("div", null, React.createElement("dt", null, "Technical reviewers"), React.createElement("dd", null, "8+")),
+                    React.createElement("div", null, React.createElement("dt", null, "Documented builds"), React.createElement("dd", null, "V1–V3"))),
+                React.createElement("div", { className: "review-themes" }, reviewThemes.map(([title, copy]) => React.createElement("article", { key: title },
+                    React.createElement("h3", null, title),
+                    React.createElement("p", null, copy))))));
+    }
+    function TrustSection({ onPrivate }) {
+        return React.createElement("section", { id: "trust", className: "home-section trust-section", "aria-labelledby": "trust-heading" },
+            React.createElement("div", { className: "trust-statement" },
+                React.createElement("p", { className: "eyebrow" }, "CAREFUL BY DESIGN"),
+                React.createElement("h2", { id: "trust-heading" }, "Trust begins with saying “not enough.”"),
+                React.createElement("p", null, "A weak or incomplete recording is not forced into a confident result. MOM can abstain, explain why, and invite a better session.")),
+            React.createElement("div", { className: "trust-list" },
+                React.createElement("article", null,
+                    React.createElement("span", null, "QUALITY"),
+                    React.createElement("h3", null, "Check before interpretation"),
+                    React.createElement("p", null, "Clipping, movement, noise, contact, sample rate, and completion are reviewed first.")),
+                React.createElement("article", null,
+                    React.createElement("span", null, "PRIVACY"),
+                    React.createElement("h3", null, "Separate, controllable profiles"),
+                    React.createElement("p", null, "Signed-in records are account-scoped. Export and deletion controls stay visible.")),
+                React.createElement("article", null,
+                    React.createElement("span", null, "BOUNDARY"),
+                    React.createElement("h3", null, "Research, not diagnosis"),
+                    React.createElement("p", null, "MOM does not diagnose, read thoughts, measure objective hunger, prescribe nutrition, or order food."))),
+            React.createElement("div", { className: "trust-actions" },
+                React.createElement(Button, { variant: "primary", onClick: () => pushRoute('guest') }, "Explore with demo data"),
+                React.createElement(Button, { variant: "ghost", onClick: onPrivate }, "Open private dashboard")));
+    }
+    function ContactSection() {
+        const [name, setName] = useState('');
+        const [role, setRole] = useState('');
+        const [topic, setTopic] = useState('Technical review');
+        const [message, setMessage] = useState('');
+        const [status, setStatus] = useState('');
+        const submit = (event) => {
+            event.preventDefault();
+            const title = `[MOM SenseLoop] ${topic}`;
+            const body = [
+                '## Project inquiry',
+                '',
+                `**Name:** ${name.trim() || 'Not provided'}`,
+                `**Role / organization:** ${role.trim() || 'Not provided'}`,
+                `**Topic:** ${topic}`,
+                '',
+                '## Message',
+                message.trim(),
+                '',
+                '_Submitted from the MOM SenseLoop project website. No private health information was requested._'
+            ].join('\n');
+            const url = `https://github.com/neelesh-kotte/moms-device-v2-signal-processing/issues/new?title=${encodeURIComponent(title)}&body=${encodeURIComponent(body)}`;
+            window.open(url, '_blank', 'noopener,noreferrer');
+            setStatus('GitHub opened in a new tab. Review the message there before publishing it.');
+        };
+        return React.createElement("section", { id: "contact", className: "home-section contact-section", "aria-labelledby": "contact-heading" },
+            React.createElement("div", { className: "contact-intro" },
+                React.createElement("p", { className: "eyebrow" }, "CONTACT / COLLABORATION"),
+                React.createElement("h2", { id: "contact-heading" }, "Bring a useful question."),
+                React.createElement("p", null, "Share reviewer feedback, a reproducibility question, or a collaboration idea. This form prepares a public GitHub issue so the research conversation stays visible and traceable.")),
+            React.createElement("form", { className: "contact-form", onSubmit: submit },
+                React.createElement("div", { className: "contact-form__row" },
+                    React.createElement("label", null,
+                        React.createElement("span", null, "Name ", React.createElement("small", null, "optional")),
+                        React.createElement("input", { value: name, onChange: event => setName(event.target.value), autoComplete: "name", placeholder: "Your name" })),
+                    React.createElement("label", null,
+                        React.createElement("span", null, "Role or organization ", React.createElement("small", null, "optional")),
+                        React.createElement("input", { value: role, onChange: event => setRole(event.target.value), placeholder: "Student, engineer, lab…" }))),
+                React.createElement("label", null,
+                    React.createElement("span", null, "Topic"),
+                    React.createElement("select", { value: topic, onChange: event => setTopic(event.target.value) },
+                        ["Technical review", "Reproducibility question", "Collaboration idea", "Accessibility feedback", "Website feedback"].map(option => React.createElement("option", { key: option, value: option }, option)))),
+                React.createElement("label", null,
+                    React.createElement("span", null, "Message"),
+                    React.createElement("textarea", { required: true, minLength: 10, rows: 6, value: message, onChange: event => setMessage(event.target.value), placeholder: "What should the project team know?" })),
+                React.createElement("div", { className: "contact-form__footer" },
+                    React.createElement("p", null, "Public issue: do not include personal, medical, or private information."),
+                    React.createElement(Button, { variant: "primary", type: "submit" }, "Prepare inquiry")),
+                React.createElement("p", { className: "contact-status", role: "status", "aria-live": "polite" }, status)));
+    }
+    function EvidenceLedger() {
+        const items = [
+            ["~$19", "core prototype parts"],
+            ["32+", "controlled tests"],
+            ["8+", "technical reviewers"],
+            ["V1 → V3", "documented iterations"]
+        ];
+        return React.createElement("section", { className: "evidence-ledger", "aria-label": "Project evidence summary" },
+            items.map(([value, label]) => React.createElement("div", { key: label },
+                React.createElement("strong", null, value),
+                React.createElement("span", null, label))));
+    }
+    function HardwareEvolution() {
+        const versions = [
+            ["V1", "Capture feasibility", "Established that the low-cost ESP32 and MAX4466 chain could acquire abdominal-acoustic signals through a stethoscope-style interface."],
+            ["V2", "Controlled validation", "Added contiguous acquisition, measured sample-rate checks, duplicate rejection, clipping checks, and source-separated playback evaluation."],
+            ["V3", "SenseLoop platform", "Connects guided recording, quality gates, separated profiles, optional check-ins, privacy controls, and uncertainty-aware research summaries."]
+        ];
+        return React.createElement("section", { id: "hardware", className: "lab-section hardware-section" },
+            React.createElement("div", { className: "lab-section__intro" },
+                React.createElement("span", { className: "lab-kicker" }, "01 / HARDWARE EVOLUTION"),
+                React.createElement("h2", null, "Three iterations. Every failure becomes a design input."),
+                React.createElement("p", null, "The project is documented as an engineering research prototype: sensor placement, acoustic coupling, motion, noise, clipping, coverage, and reproducibility are treated as measurable constraints.")),
+            React.createElement("div", { className: "version-timeline" }, versions.map(([v, title, copy], i) =>
+                React.createElement("article", { key: v, className: "version-row" },
+                    React.createElement("div", { className: "version-code" }, v),
+                    React.createElement("div", { className: "version-index" }, `0${i + 1}`),
+                    React.createElement("div", null, React.createElement("h3", null, title), React.createElement("p", null, copy))))));
+    }
+    function SignalPipeline() {
+        const stages = [
+            ["INPUT", "Stethoscope coupling", "fixed placement + contact"],
+            ["ADC", "ESP32 / MAX4466", "8 kHz contiguous windows"],
+            ["GATE", "Signal quality", "rate · clipping · motion · noise"],
+            ["DSP", "Python analysis", "RMS · spectrum · entropy · bandwidth"],
+            ["VIEW", "SenseLoop", "profile-specific research summary"]
+        ];
+        return React.createElement("section", { id: "pipeline", className: "lab-section pipeline-section" },
+            React.createElement("div", { className: "lab-section__intro" },
+                React.createElement("span", { className: "lab-kicker" }, "02 / SIGNAL PROCESSING"),
+                React.createElement("h2", null, "A visible acquisition path, not a black box."),
+                React.createElement("p", null, "Each step exposes its inputs, quality checks, and limits. The interface can abstain with “Not enough information” instead of forcing a prediction.")),
+            React.createElement("div", { className: "pipeline-console" },
+                React.createElement("div", { className: "console-top" }, React.createElement("span", null, "PIPELINE / MOM-SL-V3"), React.createElement("span", null, "RESEARCH MODE")),
+                React.createElement("div", { className: "pipeline-stages" }, stages.map(([tag, title, meta], i) => React.createElement("div", { key: tag, className: "pipeline-stage" },
+                    React.createElement("span", { className: "pipeline-tag" }, tag),
+                    React.createElement("strong", null, title),
+                    React.createElement("small", null, meta),
+                    i < stages.length - 1 && React.createElement("i", { "aria-hidden": "true" }, "→"))))));
+    }
+    function ValidationProgram() {
+        const rows = [
+            ["Acquisition integrity", "sample rate / clipping / window coverage", "automatic rejection"],
+            ["Physical setup", "placement / coupling / gain / motion", "controlled protocol"],
+            ["Data integrity", "duplicates / corruption / split leakage", "hash + source checks"],
+            ["Model evaluation", "held-out sources / balanced metrics", "no test-phase tuning"],
+            ["Human review", "8+ technical reviewers", "feedback integrated"]
+        ];
+        return React.createElement("section", { id: "validation", className: "lab-section validation-section" },
+            React.createElement("div", { className: "validation-aside" },
+                React.createElement("span", { className: "lab-kicker" }, "03 / EMPIRICAL RIGOR"),
+                React.createElement("strong", null, "32+"),
+                React.createElement("p", null, "controlled engineering tests across the device, acquisition path, data preparation, and evaluation workflow.")),
+            React.createElement("div", { className: "validation-table" },
+                React.createElement("div", { className: "validation-head" }, React.createElement("span", null, "CONTROL"), React.createElement("span", null, "OBSERVED"), React.createElement("span", null, "RULE")),
+                rows.map(([a, b, c]) => React.createElement("div", { key: a, className: "validation-row" }, React.createElement("strong", null, a), React.createElement("span", null, b), React.createElement("code", null, c)))));
     }
     function PublicHome({ onPrivate }) {
         return React.createElement(React.Fragment, null,
             React.createElement(PublicNav, { onPrivate: onPrivate }),
-            React.createElement("main", { id: "main-content" },
+            React.createElement("main", { id: "main-content", className: "public-home" },
                 React.createElement("section", { className: "public-hero" },
-                    React.createElement("div", null,
-                        React.createElement(Badge, { tone: "neutral" }, "Public guest experience"),
-                        React.createElement("h1", { className: "mt-6 text-5xl font-black leading-[.96] tracking-[-0.06em] text-warm sm:text-6xl lg:text-7xl" },
-                            "Listen closer.",
-                            React.createElement("br", null),
-                            React.createElement("span", { className: "text-mint2" }, "Learn carefully.")),
-                        React.createElement("p", { className: "mt-6 max-w-2xl text-lg leading-8 text-slate2" }, "MOM SenseLoop is an experimental device that listens to abdominal sounds, checks whether a recording is clear enough to use, and helps each person explore their own recordings and optional check-ins over time."),
-                        React.createElement("div", { className: "mt-7 flex flex-wrap gap-3" },
-                            React.createElement(Button, { variant: "primary", onClick: () => pushRoute('how') },
-                                React.createElement(Icon, { name: "play-circle" }),
-                                " Explore the device"),
-                            React.createElement(Button, { onClick: () => pushRoute('guest') },
-                                React.createElement(Icon, { name: "sparkles" }),
-                                " Try Guest Mode"),
-                            React.createElement(Button, { variant: "ghost", onClick: onPrivate },
-                                React.createElement(Icon, { name: "lock-keyhole" }),
-                                " Private Dashboard")),
-                        React.createElement("div", { className: "mt-7 flex max-w-2xl gap-3 rounded-2xl border border-amber/30 bg-amber/10 p-4 text-sm leading-6 text-[#C4402F]" },
-                            React.createElement(Icon, { name: "shield-check" }),
-                            React.createElement("span", null,
-                                React.createElement("strong", null, "Research and personal exploration only."),
-                                " MOM SenseLoop is not a medical device and does not provide diagnoses."))),
+                    React.createElement("div", { className: "hero-copy" },
+                        React.createElement("p", { className: "hero-overline" }, "MOM SENSELOOP V3 · LOW-COST RESEARCH PROTOTYPE"),
+                        React.createElement("h1", null, "Turn abdominal sound into visible data."),
+                        React.createElement("p", { className: "hero-subhead" }, "MOM SenseLoop is a low-cost research prototype that records quiet abdominal sounds through a stethoscope-mounted microphone. It checks signal quality before showing patterns, keeps private profiles separate, and never presents a diagnosis."),
+                        React.createElement("div", { className: "hero-actions" },
+                            React.createElement(Button, { variant: "primary", onClick: () => pushRoute('guest') }, "Explore the safe demo", React.createElement(Icon, { name: "arrow-right" })),
+                            React.createElement(Button, { variant: "ghost", onClick: () => scrollPublicSection('how-it-works') }, "See how it works")),
+                        React.createElement("p", { className: "hero-boundary" },
+                            React.createElement("strong", null, "Exploratory only."),
+                            " Not a medical device, hunger meter, mind reader, or food-ordering system.")),
                     React.createElement(HeroVisual, null)),
-                React.createElement("section", { className: "editorial-section editorial-section--ruled" },
-                    React.createElement("div", { className: "editorial-inner" },
-                        React.createElement(SectionTitle, { kicker: "The product story", title: "Capture \u2192 Review \u2192 Learn carefully", copy: "You do not need to know anything about signal processing to understand the workflow." }),
-                        React.createElement("div", { className: "process-list" },
-                            React.createElement(Card, null,
-                                React.createElement("div", { className: "mb-4 grid h-12 w-12 place-items-center rounded-2xl bg-mint/10 text-mint2" },
-                                    React.createElement(Icon, { name: "mic-2" })),
-                                React.createElement("h3", { className: "text-xl font-black text-warm" }, "Capture"),
-                                React.createElement("p", { className: "mt-2 text-slate2" }, "Place the stethoscope-style sensor and record a short abdominal-acoustic session.")),
-                            React.createElement(Card, null,
-                                React.createElement("div", { className: "mb-4 grid h-12 w-12 place-items-center rounded-2xl bg-mint/10 text-mint2" },
-                                    React.createElement(Icon, { name: "scan-line" })),
-                                React.createElement("h3", { className: "text-xl font-black text-warm" }, "Review"),
-                                React.createElement("p", { className: "mt-2 text-slate2" }, "MOM checks whether the recording is clear, steady, complete, and usable for research analysis.")),
-                            React.createElement(Card, null,
-                                React.createElement("div", { className: "mb-4 grid h-12 w-12 place-items-center rounded-2xl bg-mint/10 text-mint2" },
-                                    React.createElement(Icon, { name: "layers-3" })),
-                                React.createElement("h3", { className: "text-xl font-black text-warm" }, "Learn carefully"),
-                                React.createElement("p", { className: "mt-2 text-slate2" }, "Over time, your own recordings and optional check-ins can support profile-specific research summaries. If support is weak, MOM says \u201CNot enough information.\u201D"))))),
-                React.createElement("section", { className: "mx-auto max-w-[1180px] px-4 py-16 sm:px-6" },
-                    React.createElement(SectionTitle, { kicker: "What MOM can do", title: "A simple experience on top of careful engineering" }),
-                    React.createElement("div", { className: "feature-index" }, [
-                        ['route', 'Guided recording', 'Capture a short session with step-by-step support.'],
-                        ['activity', 'Signal-quality review', 'See whether the recording is steady, clear, and usable.'],
-                        ['users-round', 'Profile-separated history', 'Each person’s recordings and optional check-ins remain separate.'],
-                        ['circle-help', 'Honest summaries', 'MOM only shows supported experimental views and abstains when information is insufficient.']
-                    ].map(([icon, title, copy]) => React.createElement(Card, { key: title },
-                        React.createElement("div", { className: "mb-4 text-mint2" },
-                            React.createElement(Icon, { name: icon })),
-                        React.createElement("h3", { className: "font-black text-warm" }, title),
-                        React.createElement("p", { className: "mt-2 text-sm leading-6 text-slate2" }, copy))))),
-                React.createElement("section", { className: "mx-auto max-w-[1180px] px-4 pb-20 sm:px-6" },
-                    React.createElement("div", { className: "principles-split" },
-                        React.createElement(Card, null,
-                            React.createElement("div", { className: "flex items-start gap-4" },
-                                React.createElement("div", { className: "grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-mint/10 text-mint2" },
-                                    React.createElement(Icon, { name: "lock-keyhole" })),
-                                React.createElement("div", null,
-                                    React.createElement("h3", { className: "text-xl font-black text-warm" }, "Privacy by design"),
-                                    React.createElement("p", { className: "mt-2 text-slate2" }, "Guest Mode never reads private profiles. Signed-in profiles, sessions, check-ins, preferences, devices, and device credentials are protected by account-scoped database rules."),
-                                    React.createElement(Button, { className: "mt-4", variant: "ghost", onClick: () => pushRoute('guest') },
-                                        "Explore Guest Mode ",
-                                        React.createElement(Icon, { name: "arrow-right" }))))),
-                        React.createElement(Card, null,
-                            React.createElement("div", { className: "flex items-start gap-4" },
-                                React.createElement("div", { className: "grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-amber/10 text-[#C4402F]" },
-                                    React.createElement(Icon, { name: "scale" })),
-                                React.createElement("div", null,
-                                    React.createElement("h3", { className: "text-xl font-black text-warm" }, "Experimental pattern summary, not a medical conclusion."),
-                                    React.createElement("p", { className: "mt-2 text-slate2" }, "MOM does not diagnose disease, determine medical safety, prescribe nutrition, or claim to know an objective \u201Ctrue hunger\u201D value."),
-                                    React.createElement(Button, { className: "mt-4", variant: "ghost", onClick: () => pushRoute('how') },
-                                        "Read the limits ",
-                                        React.createElement(Icon, { name: "arrow-right" })))))))),
+                React.createElement(FeatureGrid, null),
+                React.createElement(ReviewProof, null),
+                React.createElement(TrustSection, { onPrivate: onPrivate }),
+                React.createElement(ContactSection, null)),
             React.createElement(Footer, null));
     }
     function HowWorks({ onPrivate }) {
@@ -430,7 +569,7 @@ var MOM;
                 React.createElement("button", { onClick: () => pushRoute('home'), className: "mb-8 inline-flex items-center gap-2 rounded-xl text-sm font-bold text-slate2 hover:text-warm focus-visible:ring-2 focus-visible:ring-mint" },
                     React.createElement(Icon, { name: "arrow-left" }),
                     " Public home"),
-                React.createElement(SectionTitle, { kicker: "How MOM works", title: "How MOM SenseLoop turns a recording into a careful research view.", copy: "The engineering is real, but the first explanation stays simple." }),
+                React.createElement(SectionTitle, { kicker: "How MOM works / simple first, technical second", title: "A quiet sound becomes a checked recording—not a medical answer.", copy: "Start with the four plain-language steps below. The hardware specifications, processing path, and reproducibility controls follow for anyone who wants the deeper engineering view." }),
                 React.createElement("div", { className: "grid gap-4 lg:grid-cols-4" }, [
                     ['1', 'Capture sound', 'The ESP32 + MAX4466 sensor uses stethoscope-based acoustic coupling to capture a short abdominal recording.', 'mic-2'],
                     ['2', 'Check the signal', 'The system reviews clarity, movement, contact consistency, background noise, clipping, and completion.', 'scan-line'],
@@ -445,11 +584,33 @@ var MOM;
                     React.createElement("p", { className: "mt-2 text-sm leading-6 text-slate2" }, copy)))),
                 React.createElement(Card, { className: "mt-6 overflow-hidden" },
                     React.createElement("h3", { className: "text-xl font-black text-warm" }, "Device and data flow"),
-                    React.createElement("div", { className: "mt-5 flex flex-col items-stretch gap-2 md:flex-row md:items-center" }, ['Stethoscope coupling', 'MAX4466 microphone', 'ESP32', 'Cloud session', 'Quality review', 'Profile history', 'Experimental view'].map((x, i) => React.createElement(React.Fragment, { key: x },
+                    React.createElement("div", { className: "mt-5 flex flex-col items-stretch gap-2 md:flex-row md:items-center" }, ['Stethoscope coupling', 'MAX4466 microphone', 'ESP32', 'Quality gate', 'Python DSP', 'Profile history', 'Experimental view'].map((x, i) => React.createElement(React.Fragment, { key: x },
                         React.createElement("div", { className: "flex-1 rounded-xl border border-line bg-bg/60 px-3 py-3 text-center text-sm font-bold text-slate2" }, x),
                         i < 6 && React.createElement("div", { className: "grid place-items-center text-mint2" },
                             React.createElement(Icon, { name: window.innerWidth < 768 ? 'arrow-down' : 'arrow-right' })))))),
                 React.createElement("div", { className: "mt-6 grid gap-4 lg:grid-cols-2" },
+                    React.createElement(Card, null,
+                        React.createElement("h3", { className: "text-xl font-black text-warm" }, "Reference hardware and software"),
+                        React.createElement("div", { className: "mt-4 divide-y divide-line" }, [
+                            ['Sensor', 'MAX4466 electret microphone amplifier'],
+                            ['Controller', 'ESP32 acquisition and network transport'],
+                            ['Coupling', 'Stethoscope-style acoustic interface'],
+                            ['Acquisition', '8 kHz contiguous 4096-sample windows'],
+                            ['Analysis', 'Python quality checks and frequency-aware DSP'],
+                            ['Cost target', 'Approximately \$19 for the core research prototype']
+                        ].map(([term, copy]) => React.createElement("div", { key: term, className: "grid grid-cols-[120px_1fr] gap-4 py-3 text-sm" },
+                            React.createElement("strong", { className: "font-mono text-mint2" }, term),
+                            React.createElement("span", { className: "text-slate2" }, copy))))),
+                    React.createElement(Card, null,
+                        React.createElement("h3", { className: "text-xl font-black text-warm" }, "Reproducibility controls"),
+                        React.createElement("ul", { className: "mt-4 space-y-3 text-sm text-slate2" }, [
+                            'Measured sample-rate and clipping rejection',
+                            'Continuous-window coverage checks',
+                            'SHA-256 duplicate detection',
+                            'Source-separated calibration and evaluation',
+                            'Untouched test phase with no tuning',
+                            'Versioned logs, figures, metrics, and reports'
+                        ].map(x => React.createElement("li", { key: x, className: "flex gap-3" }, React.createElement(Icon, { name: "check", size: 16, className: "text-mint2" }), React.createElement("span", null, x))))),
                     React.createElement(Card, null,
                         React.createElement("h3", { className: "text-xl font-black text-warm" }, "Technical terms, translated"),
                         React.createElement("div", { className: "mt-4 divide-y divide-line" }, terms.map(([term, copy]) => React.createElement("details", { key: term, className: "py-3" },
@@ -462,11 +623,12 @@ var MOM;
                                 React.createElement("strong", { className: "text-mint2" }, "Can show"),
                                 React.createElement("p", { className: "mt-1 text-sm text-slate2" }, "Recording-quality observations, profile history, optional self-reports, acoustic research outputs, time-based baselines, and supported profile-specific model outputs.")),
                             React.createElement("div", { className: "rounded-xl border border-amber/25 bg-amber/5 p-4" },
-                                React.createElement("strong", { className: "text-[#C4402F]" }, "Does not claim"),
-                                React.createElement("p", { className: "mt-1 text-sm text-slate2" }, "Diagnosis, treatment, medical safety, disease detection, a digestive-health score, nutritional prescriptions, or mind-reading."))))),
+                                React.createElement("strong", { className: "text-[#62B5A6]" }, "Does not claim"),
+                                React.createElement("p", { className: "mt-1 text-sm text-slate2" }, "Diagnosis, treatment, medical safety, disease detection, a digestive-health score, objective hunger measurement, nutritional prescriptions, or mind-reading."))))),
                 React.createElement("div", { className: "mt-8 flex flex-wrap gap-3" },
                     React.createElement(Button, { variant: "primary", onClick: () => pushRoute('guest') }, "Explore Guest Mode"),
-                    React.createElement(Button, { onClick: onPrivate }, "Start a guided recording"))),
+                    React.createElement(Button, { onClick: onPrivate }, "Start a guided recording"),
+                    React.createElement("a", { href: "engineering-validation.html", className: "ui-button ui-button--secondary" }, "Open engineering evidence"))),
             React.createElement(Footer, null));
     }
     function GuestMode({ onPrivate }) {
@@ -591,12 +753,12 @@ var MOM;
                     React.createElement(Badge, { tone: "neutral" },
                         React.createElement("span", { className: "inline-flex items-center gap-2" },
                             React.createElement(Icon, { name: "shield-check", size: 14 }),
-                            " Private Dashboard")),
+                            " Open dashboard")),
                     React.createElement("h1", { className: "mt-5 text-4xl font-black tracking-[-.05em] text-warm" }, "Sign in with Google."),
                     React.createElement("p", { className: "mx-auto mt-3 max-w-lg text-slate2" }, "Your Google-authenticated MOM account keeps private profiles and research history separate from other users."),
                     React.createElement("div", { className: "mt-7" },
                         React.createElement(Button, { variant: "google", className: "w-full", disabled: checking, onClick: signIn },
-                            React.createElement("span", { className: "text-lg font-black text-[#C4402F]" }, "G"),
+                            React.createElement("span", { className: "text-lg font-black text-[#62B5A6]" }, "G"),
                             " ",
                             checking ? 'Checking Google sign-in…' : 'Continue with Google')),
                     React.createElement("div", { className: "mt-4 min-h-6 text-sm text-amber", "aria-live": "polite" }, message),
@@ -606,9 +768,11 @@ var MOM;
     }
     function DevicePill({ devices, demo = false }) {
         const online = demo || isOnline(devices);
-        return React.createElement("div", { className: `inline-flex min-h-10 items-center gap-2 rounded-full border px-3 py-2 text-xs font-extrabold ${online ? 'border-mint/30 bg-mint/10 text-mint2' : 'border-amber/30 bg-amber/10 text-[#C4402F]'}` },
-            React.createElement("span", { className: `h-2.5 w-2.5 rounded-full ${online ? 'bg-mint' : 'bg-amber'}` }),
-            demo ? 'Demo data' : online ? 'Device connected' : 'Device offline');
+        const ready = demo || Boolean(recordingReadyDevice(devices));
+        const label = demo ? 'Demo data' : ready ? 'Ready to record' : online ? 'Update required' : 'Device offline';
+        return React.createElement("div", { className: `inline-flex min-h-10 items-center gap-2 rounded-full border px-3 py-2 text-xs font-extrabold ${ready ? 'border-mint/30 bg-mint/10 text-mint2' : 'border-amber/30 bg-amber/10 text-[#62B5A6]'}` },
+            React.createElement("span", { className: `h-2.5 w-2.5 rounded-full ${ready ? 'bg-mint' : 'bg-amber'}` }),
+            label);
     }
     function DashboardNav({ tab, setTab, onPublic, onSignOut }) {
         const [mobile, setMobile] = useState(false);
@@ -673,7 +837,7 @@ var MOM;
                 React.createElement(Button, { variant: "ghost", onClick: onInsights }, "Why am I seeing this?")));
     }
     function DashboardHome({ profile, sessions, checkins, devices, preferences, setTab }) {
-        const online = isOnline(devices), usable = usableSessions(sessions), summary = summaryFor(sessions, checkins), recent = sessions.slice(0, 5), latest = latestSession(sessions);
+        const online = isOnline(devices), readyDevice = recordingReadyDevice(devices), ready = Boolean(readyDevice), usable = usableSessions(sessions), summary = summaryFor(sessions, checkins), recent = sessions.slice(0, 5), latest = latestSession(sessions);
         const prefEnabled = Boolean(preferences?.categories?.length || Object.values(preferences?.constraints ?? {}).some(Boolean));
         if (!profile)
             return React.createElement(EmptyState, { icon: "user-round-plus", title: "Choose or create a profile", copy: "A profile keeps recordings, optional check-ins, preferences, and research history separated from other people who may share the device." });
@@ -683,17 +847,17 @@ var MOM;
                     React.createElement("div", { className: "absolute -right-16 -top-16 h-48 w-48 rounded-full bg-mint/5 hidden" }),
                     React.createElement("div", { className: "relative" },
                         React.createElement("div", { className: "text-xs font-black uppercase tracking-[.16em] text-mint2" }, "Next step"),
-                        React.createElement("h1", { className: "mt-3 text-4xl font-black tracking-[-.05em] text-warm" }, online ? 'Ready to capture a new session?' : 'Connect the MOM device to begin'),
-                        React.createElement("p", { className: "mt-3 max-w-2xl text-slate2" }, online ? React.createElement(React.Fragment, null,
-                            "Record a short abdominal-acoustic session, review the signal quality, and build ",
+                        React.createElement("h1", { className: "mt-3 text-4xl font-black tracking-[-.05em] text-warm" }, ready ? 'Ready to capture a new session?' : online ? 'Update the MOM device to record' : 'Connect the MOM device to begin'),
+                        React.createElement("p", { className: "mt-3 max-w-2xl text-slate2" }, ready ? React.createElement(React.Fragment, null,
+                            "Record a short abdominal-sound session, review whether it was clear enough to use, and build ",
                             profile.display_name,
-                            "\u2019s profile-separated research history.") : React.createElement(React.Fragment, null, "Not enough information for a current recording while the device is offline. Once your ESP32-based sensor reconnects, you can begin a guided recording. Your saved history remains available.")),
+                            "\u2019s profile-separated research history.") : online ? React.createElement(React.Fragment, null, "Your ESP32 can reach MOM cloud, but its firmware is not verified for physical recording yet. Update it once from Device, then return here to record.") : React.createElement(React.Fragment, null, "The device is offline. Once your ESP32-based sensor reconnects, you can begin a guided recording. Your saved history remains available.")),
                         React.createElement("div", { className: "mt-5 flex flex-wrap gap-3" },
-                            online ? React.createElement(Button, { variant: "primary", onClick: () => setTab('record') },
+                            ready ? React.createElement(Button, { variant: "primary", onClick: () => setTab('record') },
                                 React.createElement(Icon, { name: "mic-2" }),
                                 " Start guided recording") : React.createElement(Button, { variant: "primary", onClick: () => setTab('device') },
                                 React.createElement(Icon, { name: "radio-tower" }),
-                                " Connect MOM device"),
+                                online ? " Update MOM firmware" : " Connect MOM device"),
                             React.createElement(Button, { variant: "ghost", onClick: () => pushRoute('how') }, "How MOM works"),
                             !online && React.createElement(Button, { variant: "ghost", onClick: () => pushRoute('guest') }, "Explore demo")),
                         React.createElement("div", { className: "mt-5 grid grid-cols-[auto_1fr_auto_1fr_auto] items-center gap-2 rounded-2xl border border-line bg-bg/45 p-4 text-xs font-extrabold text-slate2", "aria-label": "MOM signal flow: sensor capture, quality review, profile history" },
@@ -722,19 +886,19 @@ var MOM;
                         checkins.length,
                         " optional check-in",
                         checkins.length === 1 ? '' : 's'))),
-            React.createElement("div", { className: "grid gap-4 sm:grid-cols-2 lg:grid-cols-4" }, [
+            React.createElement("div", { className: "dashboard-action-index" }, [
                 ['route', 'Guided recording', 'Step-by-step capture and review.', 'record'],
                 ['activity', 'Signal-quality review', 'Plain-language recording checks.', 'sessions'],
                 ['users-round', 'Profile separation', 'Other profiles are not used here.', 'privacy'],
                 ['circle-help', 'Honest summaries', 'MOM abstains when support is weak.', 'insights']
-            ].map(([icon, title, copy, tab]) => React.createElement("button", { key: title, onClick: () => setTab(tab), className: "text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mint rounded-[22px]" },
+            ].map(([icon, title, copy, tab]) => React.createElement("button", { key: title, onClick: () => setTab(tab === 'record' && !ready ? 'device' : tab), className: "text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mint rounded-[22px]" },
                 React.createElement(Card, { className: "h-full transition hover:border-mint/35" },
                     React.createElement("div", { className: "text-mint2" },
                         React.createElement(Icon, { name: icon })),
                     React.createElement("h3", { className: "mt-4 font-black text-warm" }, title),
                     React.createElement("p", { className: "mt-2 text-sm leading-6 text-slate2" }, copy))))),
             React.createElement("div", { className: "grid gap-5 lg:grid-cols-2" },
-                React.createElement(SummaryCard, { summary: summary, onRecord: () => setTab('record'), onInsights: () => setTab('insights') }),
+                React.createElement(SummaryCard, { summary: summary, onRecord: () => setTab(ready ? 'record' : 'device'), onInsights: () => setTab('insights') }),
                 React.createElement(Card, null,
                     React.createElement("div", { className: "flex items-center justify-between gap-4" },
                         React.createElement("h3", { className: "text-xl font-black text-warm" }, "Your recent activity"),
@@ -783,12 +947,14 @@ var MOM;
                         React.createElement("div", { className: "mt-3 flex flex-wrap gap-2" }, [...(preferences?.categories ?? []), String(preferences?.constraints?.availableTime ?? ''), String(preferences?.constraints?.budgetRange ?? ''), String(preferences?.constraints?.deliveryPreference ?? '')].filter(Boolean).slice(0, 6).map(x => React.createElement(Badge, { key: x, tone: "neutral" }, x)))),
                     React.createElement(Button, { variant: "primary", onClick: () => setTab('preferences') }, "Explore suggestions"))));
     }
-    function RecordingFlow({ user, profile, sessions, devices, refresh, saveCheckin, updateSession }) {
+    function RecordingFlow({ cloud, user, profile, sessions, devices, refresh, saveCheckin, updateSession }) {
         const [step, setStep] = useState(0);
         const [seconds, setSeconds] = useState(60);
         const [started, setStarted] = useState(null);
         const [matched, setMatched] = useState(null);
         const [saving, setSaving] = useState(false);
+        const [starting, setStarting] = useState(false);
+        const [commandId, setCommandId] = useState(null);
         const [message, setMessage] = useState('');
         const [state, setState] = useState('Neutral');
         const [rating, setRating] = useState(5);
@@ -800,6 +966,7 @@ var MOM;
         const [noisy, setNoisy] = useState(false);
         const [preferLess, setPreferLess] = useState(false);
         const online = isOnline(devices);
+        const readyDevice = recordingReadyDevice(devices);
         useEffect(() => {
             if (step !== 2)
                 return;
@@ -810,18 +977,44 @@ var MOM;
             const t = setInterval(() => setSeconds((s) => s - 1), 1000);
             return () => clearInterval(t);
         }, [step, seconds]);
-        const begin = () => { if (!profile || !online)
-            return; setStarted(new Date().toISOString()); setMatched(null); setSeconds(60); setStep(2); };
+        const begin = async () => {
+            if (!profile || !readyDevice || starting)
+                return;
+            setStarting(true);
+            setMessage('Starting the physical MOM device…');
+            try {
+                const command = await cloud.queueRecording(profile.id, 60);
+                await cloud.waitForCommandClaim(command.id, 15000);
+                setCommandId(command.id);
+                setStarted(new Date().toISOString());
+                setMatched(null);
+                setSeconds(60);
+                setMessage('Physical recording started. Keep the sensor steady.');
+                setStep(2);
+            }
+            catch (e) {
+                setMessage(e instanceof Error ? e.message : 'The physical MOM recording could not be started.');
+            }
+            finally {
+                setStarting(false);
+            }
+        };
         const finish = () => { setStep(3); };
         const findUploaded = async () => {
-            if (!started)
+            if (!commandId)
                 return;
-            setMessage('Checking for the uploaded device session…');
-            const fresh = await refresh();
-            const threshold = new Date(started).getTime() - 5000;
-            const candidate = (fresh?.sessions ?? sessions).find(s => new Date(s.started_at).getTime() >= threshold) ?? null;
-            setMatched(candidate);
-            setMessage(candidate ? 'Uploaded device session matched to this recording window.' : 'No uploaded session has arrived yet. Nothing was silently saved.');
+            setMessage('Uploading your recording…');
+            try {
+                await cloud.waitForCommandCompletion(commandId, 45000);
+                const candidate = await cloud.getSessionForCommand(commandId);
+                setMatched(candidate);
+                setMessage(candidate ? 'Recording received from the physical MOM device.' : 'The device completed the command, but the matching session could not be found.');
+                await refresh();
+            }
+            catch (e) {
+                setMatched(null);
+                setMessage(e instanceof Error ? e.message : 'The recording upload could not be confirmed.');
+            }
         };
         useEffect(() => { if (step === 3 && started) {
             const t = setTimeout(findUploaded, 500);
@@ -836,7 +1029,7 @@ var MOM;
                 await saveCheckin({ owner_id: user.id, profile_id: profile.id, session_id: matched?.id ?? null, hunger_rating: shareRating ? rating : null, minutes_since_eating: meal ? Math.max(0, Math.min(10080, Math.round(Number(meal)))) : null, optional_context: { state, prefer_not_to_share_more: preferLess, active_recently: preferLess ? undefined : active, noisy_environment: preferLess ? undefined : noisy, sensor_position: preferLess ? undefined : (sensorPosition || undefined), note: preferLess ? undefined : (note || undefined) } });
                 setMessage('Check-in saved to this profile’s history.');
                 await refresh();
-                setTimeout(() => { setStep(0); setStarted(null); setMatched(null); setMessage(''); }, 700);
+                setTimeout(() => { setStep(0); setStarted(null); setMatched(null); setCommandId(null); setMessage(''); }, 700);
             }
             catch (e) {
                 setMessage(e instanceof Error ? e.message : 'Could not save the check-in.');
@@ -890,9 +1083,10 @@ var MOM;
                     React.createElement("div", { className: "text-sm text-slate2" }, x),
                     React.createElement("strong", { className: "mt-1 block text-sm text-warm" }, online ? 'Live metric not reported yet' : 'Waiting for device')))),
                 React.createElement("div", { className: "mt-5 flex flex-wrap gap-3" },
-                    React.createElement(Button, { variant: "primary", disabled: !online, onClick: begin }, "Begin 60-second recording"),
+                    React.createElement(Button, { variant: "primary", disabled: !readyDevice || starting, onClick: begin }, starting ? "Starting device…" : "Begin 60-second recording"),
                     React.createElement(Button, { variant: "ghost", onClick: () => setStep(0) }, "Back")),
-                !online && React.createElement("p", { className: "mt-3 text-sm text-amber" }, "Start becomes available after a paired device checks in.")),
+                !online && React.createElement("p", { className: "mt-3 text-sm text-amber" }, "Start becomes available after a paired device checks in."),
+                online && !readyDevice && React.createElement("p", { className: "mt-3 text-sm text-amber" }, "This device is online, but its firmware does not support physical recording commands yet. Open Device and install the current MOM firmware once.")),
             step === 2 && React.createElement(Card, { className: "text-center" },
                 React.createElement(Badge, { tone: "coral" }, "\u25CF Recording"),
                 React.createElement("div", { className: "mt-6 text-7xl font-black tracking-[-.06em] text-warm sm:text-8xl" },
@@ -903,18 +1097,19 @@ var MOM;
                 React.createElement("div", { className: "mx-auto mt-6 max-w-2xl" },
                     React.createElement(Waveform, { values: MOM.demoWaveform.map((v, i) => v * (1 + ((i + seconds) % 7) / 9)), label: "Animated recording-state visualization, not stored raw audio" })),
                 React.createElement("div", { className: "mt-6 flex justify-center gap-3" },
-                    React.createElement(Button, { onClick: finish }, "Finish recording"),
+                    React.createElement(Button, { disabled: true }, "Recording ends automatically"),
                     React.createElement(Button, { variant: "ghost", onClick: () => { if (confirm('Cancel this guided timer? No browser-created session will be saved.')) {
                             setStep(0);
                             setStarted(null);
+                            setCommandId(null);
                         } } }, "Cancel and discard"))),
             step === 3 && React.createElement(Card, null,
                 React.createElement(SectionTitle, { kicker: "Step 4 \u00B7 Review", title: "Review recording quality." }),
                 React.createElement("div", { className: `rounded-2xl border-l-4 p-4 ${matched ? (matched.quality_label === 'good' ? 'border-mint bg-mint/5' : 'border-amber bg-amber/5') : 'border-amber bg-amber/5'}` }, matched ? React.createElement(React.Fragment, null,
                     React.createElement("strong", { className: "text-lg text-warm" }, matched.quality_label === 'good' ? 'This uploaded recording looks usable for research analysis.' : 'This session was saved, but its signal quality was limited'),
                     React.createElement("p", { className: "mt-2 text-slate2" }, String(matched.quality_summary?.guidance ?? 'The session was received from the paired device. Review the quality details below.'))) : React.createElement(React.Fragment, null,
-                    React.createElement("strong", { className: "text-lg text-warm" }, "Waiting for the device upload."),
-                    React.createElement("p", { className: "mt-2 text-slate2" }, "The browser timer completed, but MOM has not matched a newly uploaded physical-device session yet. Nothing is silently invented or saved by the browser."))),
+                    React.createElement("strong", { className: "text-lg text-warm" }, "Uploading your recording…"),
+                    React.createElement("p", { className: "mt-2 text-slate2" }, "Keep the MOM device powered on while the physical session is transferred. MOM only shows measurements received from the device."))),
                 matched && React.createElement("div", { className: "mt-4" },
                     qualityMetricRows(matched).map(r => React.createElement("div", { key: r.label, className: "border-b border-line py-3" },
                         React.createElement("div", { className: "flex justify-between gap-4" },
@@ -924,13 +1119,13 @@ var MOM;
                     React.createElement("div", { className: "mt-4" },
                         React.createElement(Badge, { tone: matched.learning_eligible ? 'good' : 'warn' }, matched.learning_eligible ? 'Eligible for research-model learning' : 'Saved for reference; not used for learning'))),
                 matched && React.createElement("p", { className: "mt-4 text-sm text-slate2" },
-                    React.createElement("strong", { className: "text-warm" }, "Would you like to keep this uploaded session?"),
-                    " The physical device has already saved it to your private cloud history, so these controls decide whether it remains learning-eligible or reference-only."),
+                    React.createElement("strong", { className: "text-warm" }, "How should MOM use this recording?"),
+                    " The recording is already in your private history. Choose whether it can contribute to this profile’s research history or remain reference-only."),
                 React.createElement("div", { className: "mt-5 flex flex-wrap gap-3" },
-                    matched && React.createElement(Button, { variant: "primary", onClick: () => { setMessage('Session kept with its current learning status.'); setStep(4); } }, "Save session"),
+                    matched && React.createElement(Button, { variant: "primary", onClick: () => { setMessage('Session kept with its current learning status.'); setStep(4); } }, "Use in my research history"),
                     matched && React.createElement(Button, { onClick: async () => { await updateSession(matched.id, { learning_eligible: false }); setMatched({ ...matched, learning_eligible: false }); setMessage('Session saved for reference only and excluded from model learning.'); await refresh(); } }, "Save for reference only"),
-                    React.createElement(Button, { onClick: findUploaded }, "Refresh uploaded session"),
-                    React.createElement(Button, { variant: "ghost", onClick: () => { setStep(0); setMatched(null); setStarted(null); } }, "Try again")),
+                    React.createElement(Button, { onClick: findUploaded }, "Check upload again"),
+                    React.createElement(Button, { variant: "ghost", onClick: () => { setStep(0); setMatched(null); setStarted(null); setCommandId(null); } }, "Start a new recording")),
                 React.createElement("div", { className: "mt-3 text-sm text-slate2", "aria-live": "polite" }, message)),
             step === 4 && React.createElement(Card, null,
                 React.createElement(SectionTitle, { kicker: "Step 5 \u00B7 Optional check-in", title: "How would you describe your current state?", copy: "Check-ins are optional and are not a medical assessment." }),
@@ -940,9 +1135,9 @@ var MOM;
                     React.createElement("label", { className: "flex items-center justify-between gap-4 font-bold text-warm" },
                         React.createElement("span", null, "Optional 0\u201310 self-rating"),
                         React.createElement("span", null, shareRating ? `${rating.toFixed(1)} / 10` : 'Not shared')),
-                    React.createElement("input", { disabled: !shareRating, value: rating, onChange: e => setRating(Number(e.target.value)), className: "mt-4 w-full accent-[#C4402F]", type: "range", min: "0", max: "10", step: "0.5" }),
+                    React.createElement("input", { disabled: !shareRating, value: rating, onChange: e => setRating(Number(e.target.value)), className: "mt-4 w-full accent-[#62B5A6]", type: "range", min: "0", max: "10", step: "0.5" }),
                     React.createElement("label", { className: "mt-3 flex items-center gap-2 text-sm text-slate2" },
-                        React.createElement("input", { type: "checkbox", checked: shareRating, onChange: e => setShareRating(e.target.checked), className: "h-5 w-5 accent-[#C4402F]" }),
+                        React.createElement("input", { type: "checkbox", checked: shareRating, onChange: e => setShareRating(e.target.checked), className: "h-5 w-5 accent-[#62B5A6]" }),
                         " Share this optional self-rating")),
                 React.createElement("label", { className: "mt-5 flex items-center gap-2 rounded-xl border border-line bg-bg/45 p-3 text-sm text-slate2" },
                     React.createElement("input", { type: "checkbox", checked: preferLess, onChange: e => { setPreferLess(e.target.checked); if (e.target.checked) {
@@ -951,7 +1146,7 @@ var MOM;
                             setActive(false);
                             setNoisy(false);
                             setNote('');
-                        } }, className: "h-5 w-5 accent-[#C4402F]" }),
+                        } }, className: "h-5 w-5 accent-[#62B5A6]" }),
                     " I would rather not share more context"),
                 !preferLess && React.createElement(React.Fragment, null,
                     React.createElement("div", { className: "mt-5 grid gap-4 md:grid-cols-2" },
@@ -963,10 +1158,10 @@ var MOM;
                             React.createElement("input", { value: sensorPosition, onChange: e => setSensorPosition(e.target.value), placeholder: "Optional", className: "min-h-11 rounded-xl border border-line bg-bg px-3 text-warm placeholder:text-slate" }))),
                     React.createElement("div", { className: "mt-4 flex flex-wrap gap-4" },
                         React.createElement("label", { className: "flex items-center gap-2 text-sm text-slate2" },
-                            React.createElement("input", { type: "checkbox", checked: active, onChange: e => setActive(e.target.checked), className: "h-5 w-5 accent-[#C4402F]" }),
+                            React.createElement("input", { type: "checkbox", checked: active, onChange: e => setActive(e.target.checked), className: "h-5 w-5 accent-[#62B5A6]" }),
                             " I was active recently"),
                         React.createElement("label", { className: "flex items-center gap-2 text-sm text-slate2" },
-                            React.createElement("input", { type: "checkbox", checked: noisy, onChange: e => setNoisy(e.target.checked), className: "h-5 w-5 accent-[#C4402F]" }),
+                            React.createElement("input", { type: "checkbox", checked: noisy, onChange: e => setNoisy(e.target.checked), className: "h-5 w-5 accent-[#62B5A6]" }),
                             " The environment was noisy")),
                     React.createElement("label", { className: "mt-4 grid gap-2 text-sm font-bold text-warm" },
                         "Optional notes",
@@ -1058,8 +1253,8 @@ var MOM;
             chart.current?.destroy?.();
             chart.current = new window.Chart(ref.current, {
                 type: 'line',
-                data: { labels: points.map(c => fmtShort(c.created_at)), datasets: [{ label: 'Optional self-reported rating', data: points.map(c => Number(c.hunger_rating)), borderColor: '#C4402F', backgroundColor: 'rgba(142,228,190,.12)', pointBackgroundColor: '#C4402F', tension: .25, fill: true }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#121714' } } }, scales: { x: { ticks: { color: '#A9AA9F' }, grid: { color: 'rgba(36,72,61,.35)' } }, y: { min: 0, max: 10, ticks: { color: '#A9AA9F' }, grid: { color: 'rgba(36,72,61,.35)' } } } }
+                data: { labels: points.map(c => fmtShort(c.created_at)), datasets: [{ label: 'Optional self-reported rating', data: points.map(c => Number(c.hunger_rating)), borderColor: '#62B5A6', backgroundColor: 'rgba(142,228,190,.12)', pointBackgroundColor: '#62B5A6', tension: .25, fill: true }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#EAF0EF' } } }, scales: { x: { ticks: { color: '#283A42' }, grid: { color: 'rgba(36,72,61,.35)' } }, y: { min: 0, max: 10, ticks: { color: '#283A42' }, grid: { color: 'rgba(36,72,61,.35)' } } } }
             });
             return () => chart.current?.destroy?.();
         }, [checkins.length]);
@@ -1141,7 +1336,7 @@ var MOM;
                                 React.createElement("strong", { className: "text-mint2" }, "Can compare"),
                                 React.createElement("p", { className: "mt-1" }, "Patterns within this profile\u2019s usable recordings, optional self-reports, meal timing, and uploaded research-model outputs.")),
                             React.createElement("div", { className: "rounded-xl border border-amber/25 bg-amber/5 p-4 text-slate2" },
-                                React.createElement("strong", { className: "text-[#C4402F]" }, "Cannot conclude"),
+                                React.createElement("strong", { className: "text-[#62B5A6]" }, "Cannot conclude"),
                                 React.createElement("p", { className: "mt-1" }, "Disease, physiology, objective hunger, nutritional need, medical safety, or causation.")))))));
     }
     function PreferencesView({ user, profile, preferences, save, remove, onOpenDoorDash }) {
@@ -1287,48 +1482,40 @@ var MOM;
                     React.createElement("p", { className: "mt-2 text-sm text-slate2" }, "Storage configuration: private profile records are stored in the MOM Supabase cloud project and protected by Row Level Security tied to the authenticated account. Guest Mode does not query those tables."))));
     }
     function DeviceView({ user, profile, devices, sessions, refresh, cloud }) {
-        const [checking, setChecking] = useState(false), [msg, setMsg] = useState(''), [pair, setPair] = useState(null);
-        const d = devices[0] ?? null, online = isOnline(devices), latest = latestSession(sessions), acoustic = latest?.acoustic_summary ?? {};
-        const connectionCheck = async () => { setChecking(true); setMsg('Refreshing device status…'); const fresh = await refresh(); setChecking(false); setMsg(isOnline(fresh?.devices ?? devices) ? 'A recent device heartbeat is available.' : 'No recent device heartbeat was found.'); };
-        const pairDevice = async () => { if (!profile)
-            return; setMsg('Creating a one-time device credential…'); try {
-            const out = await cloud.pairDevice(user.id, profile.id);
-            setPair(out);
-            setMsg('Device credential created. Copy it once into firmware configuration; MOM stores only its hash.');
-            await refresh();
-        }
-        catch (e) {
-            setMsg(e instanceof Error ? e.message : 'Could not create device credential.');
-        } };
+        const [checking, setChecking] = useState(false), [msg, setMsg] = useState('');
+        const d = devices[0] ?? null, online = isOnline(devices), readyDevice = recordingReadyDevice(devices), ready = Boolean(readyDevice), latest = latestSession(sessions), acoustic = latest?.acoustic_summary ?? {};
+        const connectionCheck = async () => { setChecking(true); setMsg('Checking device status…'); const fresh = await refresh(); const freshDevices = fresh?.devices ?? devices; setChecking(false); setMsg(recordingReadyDevice(freshDevices) ? 'Ready to record. The device is online and supports physical recording commands.' : isOnline(freshDevices) ? 'Device is online, but a firmware update is required before physical recording.' : 'Device is offline. Check power and Wi-Fi, then try again.'); };
+        const openSetup = () => {
+            if (window.MOMDeviceProvisioning?.open)
+                window.MOMDeviceProvisioning.open();
+            else
+                setMsg('Device setup is still loading. Refresh the page and try again.');
+        };
         if (!profile)
             return React.createElement(EmptyState, { title: "Choose a profile first", copy: "A paired physical device is attached to one profile so uploaded sessions do not mix between wearers." });
-        const issue = !online ? ['No device found', 'The dashboard is cloud-hosted, but the paired ESP32 has not checked in recently.', 'Power the ESP32 and make sure it can reach a saved Wi-Fi network or phone hotspot.'] : latest?.quality_label === 'poor' ? ['Recording quality needs attention', String(latest.quality_summary?.guidance ?? 'Movement, noise, or inconsistent contact may have limited the latest recording.'), 'Keep the sensor steady, reduce background noise, and review gain if clipping is reported.'] : ['Device ready', 'A paired device checked in recently.', 'Use the guided recording flow when you are ready.'];
+        const issue = !online ? ['Device offline', 'The paired ESP32 has not checked in recently.', 'Check power and Wi-Fi, then run Check device status.'] : !ready ? ['Firmware update required', 'The device is online, but it cannot accept physical recording commands yet.', 'Open Connect MOM Device and install the current MOM firmware once.'] : latest?.quality_label === 'poor' ? ['Recording quality needs attention', String(latest.quality_summary?.guidance ?? 'Movement, noise, or inconsistent contact may have limited the latest recording.'), 'Keep the sensor steady and review the latest quality details.'] : ['Ready to record', 'The device is online and recording-capable.', 'Use the guided recording flow when you are ready.'];
         return React.createElement("div", null,
-            React.createElement(SectionTitle, { kicker: "Device settings", title: "Connection first. Technical detail only when you want it.", copy: "Normal use does not require Arduino after firmware is flashed once. The ESP32 still needs electricity and an internet path for cloud upload." }),
+            React.createElement(SectionTitle, { kicker: "Device settings", title: "Connect, verify, then record.", copy: "Set up the device once over USB, then normal recordings run over Wi-Fi. MOM distinguishes a simple heartbeat from a device that is actually ready to record." }),
             React.createElement("div", { className: "grid gap-5 lg:grid-cols-[1.1fr_.9fr]" },
                 React.createElement(Card, null,
                     React.createElement("div", { className: "flex flex-wrap items-start justify-between gap-3" },
                         React.createElement("div", null,
-                            React.createElement("h3", { className: "text-2xl font-black text-warm" }, online ? 'MOM device connected' : 'MOM device offline'),
-                            React.createElement("p", { className: "mt-2 text-slate2" }, online ? 'A paired device checked in recently and can upload sessions to the cloud.' : 'No paired device has checked in recently.')),
+                            React.createElement("h3", { className: "text-2xl font-black text-warm" }, ready ? 'Ready to record' : online ? 'MOM device online · update required' : 'MOM device offline'),
+                            React.createElement("p", { className: "mt-2 text-slate2" }, ready ? 'The paired device is online and supports physical recording commands.' : online ? 'The device can reach MOM cloud, but its firmware must be updated before recording.' : 'No paired device has checked in recently.')),
                         React.createElement(DevicePill, { devices: devices })),
                     React.createElement("div", { className: "mt-5 grid gap-3 sm:grid-cols-2" }, [
-                        ['ESP32', online ? 'Connected' : 'Offline'], ['Wi-Fi / hotspot', online ? 'Connection inferred from cloud heartbeat' : 'Unknown'], ['Last successful sync', fmt(d?.last_seen_at)], ['Firmware', d?.firmware_version ?? 'Not reported'], ['Microphone gain', metricLabel(latest?.quality_summary?.gainLevel)], ['Calibration / signal check', online ? 'Connection check available' : 'Connect device first']
+                        ['ESP32', ready ? 'Ready to record' : online ? 'Online · update required' : 'Offline'], ['Wi-Fi / hotspot', online ? 'Connection inferred from cloud heartbeat' : 'Unknown'], ['Last successful sync', fmt(d?.last_seen_at)], ['Firmware', d?.firmware_version ?? 'Not reported'], ['Microphone gain', metricLabel(latest?.quality_summary?.gainLevel)], ['Recording capability', ready ? 'Available' : online ? 'Firmware update required' : 'Connect device first']
                     ].map(([l, v]) => React.createElement("div", { key: l, className: "rounded-xl border border-line bg-bg/45 p-3" },
                         React.createElement("div", { className: "text-xs text-slate" }, l),
                         React.createElement("strong", { className: "mt-1 block text-sm text-warm" }, v)))),
                     React.createElement("div", { className: "mt-5 flex flex-wrap gap-3" },
-                        React.createElement(Button, { onClick: connectionCheck, disabled: checking }, checking ? 'Checking…' : 'Run connection check'),
-                        React.createElement(Button, { variant: "primary", onClick: pairDevice }, "Create device credential")),
+                        React.createElement(Button, { onClick: connectionCheck, disabled: checking }, checking ? 'Checking…' : 'Check device status'),
+                        React.createElement(Button, { variant: "primary", onClick: openSetup }, "Connect MOM Device")),
                     React.createElement("div", { className: "mt-3 text-sm text-slate2", "aria-live": "polite" }, msg),
-                    pair && React.createElement("div", { className: "mt-4 rounded-2xl border border-amber/30 bg-amber/5 p-4" },
-                        React.createElement("strong", { className: "text-warm" }, "Copy this credential once"),
-                        React.createElement("div", { className: "mt-2 overflow-x-auto rounded-xl bg-[#F1EEE5] p-3 font-mono text-xs text-mint2" }, pair.token),
-                        React.createElement("p", { className: "mt-3 text-xs text-slate2" }, "Cloud endpoint"),
-                        React.createElement("div", { className: "mt-1 overflow-x-auto rounded-xl bg-[#F1EEE5] p-3 font-mono text-xs text-slate2" }, pair.endpoint))),
+                ),
                 React.createElement(Card, null,
                     React.createElement("h3", { className: "text-xl font-black text-warm" }, "Recommended next step"),
-                    React.createElement("div", { className: `mt-4 rounded-2xl border-l-4 p-4 ${online ? 'border-mint bg-mint/5' : 'border-amber bg-amber/5'}` },
+                    React.createElement("div", { className: `mt-4 rounded-2xl border-l-4 p-4 ${ready ? 'border-mint bg-mint/5' : 'border-amber bg-amber/5'}` },
                         React.createElement("strong", { className: "text-warm" }, issue[0]),
                         React.createElement("p", { className: "mt-2 text-sm text-slate2" }, issue[1]),
                         React.createElement("p", { className: "mt-2 text-sm font-bold text-warm" }, issue[2])),
@@ -1474,10 +1661,10 @@ var MOM;
                             React.createElement("p", { className: "mt-2 text-slate2" }, "Record, review, and explore profile-separated research history.")),
                         React.createElement(DevicePill, { devices: devices }))),
                 React.createElement(ProfileBar, { profiles: profiles, current: profile, onSwitch: requestSwitch, newName: newName, setNewName: setNewName, createProfile: () => setCreateProfileOpen(true), devices: devices }),
-                error && React.createElement("div", { className: "mb-5 rounded-2xl border-l-4 border-coral bg-coral/10 p-4 text-sm text-[#C4402F]", role: "alert" }, error),
+                error && React.createElement("div", { className: "mb-5 rounded-2xl border-l-4 border-coral bg-coral/10 p-4 text-sm text-[#62B5A6]", role: "alert" }, error),
                 loading ? React.createElement(LoadingState, { label: "Loading your private MOM data\u2026" }) : React.createElement(React.Fragment, null,
                     tab === 'home' && React.createElement(DashboardHome, { profile: profile, sessions: sessions, checkins: checkins, devices: devices, preferences: preferences, setTab: setTab }),
-                    tab === 'record' && React.createElement(RecordingFlow, { user: user, profile: profile, sessions: sessions, devices: devices, refresh: refresh, saveCheckin: saveCheckin, updateSession: updateSession }),
+                    tab === 'record' && React.createElement(RecordingFlow, { cloud: cloud, user: user, profile: profile, sessions: sessions, devices: devices, refresh: refresh, saveCheckin: saveCheckin, updateSession: updateSession }),
                     tab === 'sessions' && (profile ? React.createElement(SessionsView, { sessions: sessions, checkins: checkins, profileName: profile.display_name, onDelete: deleteSession, onAddCheckin: startCheckinForSession }) : React.createElement(EmptyState, { title: "Choose a profile", copy: "Sessions belong to one profile at a time." })),
                     tab === 'insights' && (profile ? React.createElement(InsightsView, { sessions: sessions, checkins: checkins }) : React.createElement(EmptyState, { title: "Choose a profile", copy: "Insights are built only from the selected profile\u2019s own history." })),
                     tab === 'preferences' && React.createElement(PreferencesView, { user: user, profile: profile, preferences: preferences, save: savePrefs, remove: removePrefs, onOpenDoorDash: setDoorDashIdea }),
@@ -1524,10 +1711,10 @@ var MOM;
                 fmt(session.started_at),
                 ". This self-report is optional and is not a medical assessment."),
             React.createElement("label", { className: "mt-5 flex items-center gap-2 text-sm text-slate2" },
-                React.createElement("input", { type: "checkbox", checked: share, onChange: e => setShare(e.target.checked), className: "h-5 w-5 accent-[#C4402F]" }),
+                React.createElement("input", { type: "checkbox", checked: share, onChange: e => setShare(e.target.checked), className: "h-5 w-5 accent-[#62B5A6]" }),
                 " Share an optional 0\u201310 self-rating"),
             share && React.createElement(React.Fragment, null,
-                React.createElement("input", { type: "range", min: "0", max: "10", step: ".5", value: rating, onChange: e => setRating(Number(e.target.value)), className: "mt-4 w-full accent-[#C4402F]" }),
+                React.createElement("input", { type: "range", min: "0", max: "10", step: ".5", value: rating, onChange: e => setRating(Number(e.target.value)), className: "mt-4 w-full accent-[#62B5A6]" }),
                 React.createElement("div", { className: "text-right text-sm font-bold text-warm" },
                     rating.toFixed(1),
                     " / 10")),
@@ -1589,4 +1776,3 @@ var MOM;
     if (mount)
         ReactDOM.createRoot(mount).render(React.createElement(App, null));
 })(MOM || (MOM = {}));
-

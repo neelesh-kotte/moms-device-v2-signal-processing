@@ -3,11 +3,19 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#F1EEE5">
-    <meta name="description" content="MOM SenseLoop is an experimental abdominal-acoustic research prototype for guided recording, signal-quality review, and careful personal pattern exploration.">
-    <title>MOM SenseLoop — Research Prototype</title>
-    <link rel="stylesheet" href="assets/base.css">
-    <link rel="stylesheet" href="assets/editorial.css">
+    <meta name="theme-color" content="#F4F1E8">
+    <meta name="color-scheme" content="light">
+    <meta name="mom-build" content="warm-minimal-v3-native-20260907">
+    <meta name="description" content="MOM SenseLoop is a low-cost research prototype for collecting abdominal sounds, checking recording quality, and organizing private research sessions with visible uncertainty.">
+    <meta property="og:title" content="MOM SenseLoop V3">
+    <meta property="og:description" content="A low-cost abdominal-sound research prototype with physical recording, visible quality checks, private profiles, and honest uncertainty.">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary">
+    <title>MOM SenseLoop V3 — Abdominal Sound Research</title>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="preconnect" href="https://unpkg.com" crossorigin>
+    <link rel="stylesheet" href="assets/base.css?v=audit-20260907">
+    <link rel="stylesheet" href="assets/scientific.css?v=audit-20260907">
   </head>
   <body>
     <div id="root">
@@ -16,14 +24,15 @@
       </main>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/react@18.3.1/umd/react.production.min.js" crossorigin></script>
-    <script src="https://cdn.jsdelivr.net/npm/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js" crossorigin></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js" crossorigin></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/react@18.3.1/umd/react.production.min.js" crossorigin></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js" crossorigin></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js" crossorigin></script>
     <script type="module" src="https://unpkg.com/esp-web-tools@10/dist/web/install-button.js?module"></script>
-    <script src="assets/data.js"></script>
-    <script src="assets/cloud-service.js"></script>
-    <script src="assets/app.js"></script>
-    <script src="assets/device-provisioning.js?v=20260906-usb-fix-2"></script>
+    <script defer src="assets/data.js?v=audit-20260907"></script>
+    <script defer src="assets/cloud-service.js?v=native-20260907-2"></script>
+    <script defer src="assets/app.js?v=native-20260907-2"></script>
+    <script defer src="assets/device-provisioning.js?v=native-20260907-2"></script>
+    <script defer src="assets/site-hardening.js?v=native-20260907-1"></script>
   </body>
 </html>
