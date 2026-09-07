@@ -6,12 +6,14 @@
   <meta name="theme-color" content="#F4F1E8">
   <meta name="color-scheme" content="light">
   <meta name="description" content="MOM SenseLoop public engineering evidence: hardware iteration, independent operators, external reviewers, and external-corpus validation.">
+  <meta name="robots" content="index,follow">
   <title>MOM SenseLoop — Engineering Evidence</title>
-  <link rel="stylesheet" href="assets/base.css?v=evidence-fix-20260906">
-  <link rel="stylesheet" href="assets/scientific.css?v=evidence-fix-20260906">
+  <link rel="stylesheet" href="assets/base.css?v=audit-20260907">
+  <link rel="stylesheet" href="assets/scientific.css?v=audit-20260907">
   <style>
     :root{--paper:#F4F1E8;--ink:#121714;--rule:#A9AA9F;--accent:#C4402F}
     body{background:var(--paper);color:var(--ink)}
+    .ev-mobile-nav{display:none}
     .ev-hero{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(300px,.55fr);gap:clamp(3rem,7vw,8rem);align-items:end;width:min(100%,1320px);min-height:calc(100vh - 84px);margin:0 auto;padding:clamp(5rem,9vw,9rem) 2rem clamp(6rem,10vw,10rem)}
     .ev-eyebrow{margin:0 0 1.25rem;color:var(--accent);font-size:.68rem;font-weight:850;letter-spacing:.16em;text-transform:uppercase}
     .ev-hero h1{max-width:8.6ch;margin:0;font-family:Georgia,"Times New Roman",serif;font-size:clamp(4rem,8vw,8.6rem);font-weight:400;letter-spacing:-.07em;line-height:.84}
@@ -27,18 +29,21 @@
     .ev-list{margin-top:3.5rem;border-top:1px solid var(--rule)}.ev-item{display:grid;grid-template-columns:160px 1fr;gap:2rem;padding:1.5rem 0;border-bottom:1px solid var(--rule)}.ev-item strong{color:var(--accent);font-size:.7rem;letter-spacing:.11em;text-transform:uppercase}.ev-item p{margin:0;line-height:1.7}
     .ev-package{margin-top:3.5rem;border:1px solid var(--ink)}.ev-package-head{display:flex;justify-content:space-between;gap:1rem;padding:1rem 1.2rem;border-bottom:1px solid var(--rule);font-size:.66rem;font-weight:850;letter-spacing:.13em;text-transform:uppercase}.ev-package pre{margin:0;overflow:auto;padding:1.4rem;background:#121714;color:#F4F1E8;font:12px/1.8 ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace}.ev-links{display:flex;flex-wrap:wrap;gap:.7rem;margin-top:1.3rem}.ev-limit{margin-top:3rem;padding-top:1.3rem;border-top:1px solid var(--rule);line-height:1.75}.ev-footer{border-top:1px solid var(--rule)}.ev-footer-inner{display:flex;width:min(100%,1320px);margin:0 auto;padding:2rem;justify-content:space-between;gap:2rem;font-size:.78rem;line-height:1.6}
     @media(max-width:900px){.ev-hero{grid-template-columns:1fr}.ev-graphic{max-width:620px}.ev-ledger{grid-template-columns:1fr 1fr}.ev-ledger div:nth-child(2){border-right:0}.ev-ledger div:nth-child(-n+2){border-bottom:1px solid var(--rule)}.ev-grid{grid-template-columns:1fr}.ev-versions{grid-template-columns:1fr}.ev-card,.ev-card+.ev-card{padding:1.7rem 0;border-right:0;border-bottom:1px solid var(--rule)}.ev-card:last-child{border-bottom:0}.ev-results{grid-template-columns:1fr}}
+    @media(max-width:760px){.ev-mobile-nav{display:flex;position:sticky;top:66px;z-index:45;gap:.4rem;overflow-x:auto;padding:.55rem 1rem;border-bottom:1px solid var(--rule);background:rgba(244,241,232,.97);backdrop-filter:blur(8px);scrollbar-width:none}.ev-mobile-nav::-webkit-scrollbar{display:none}.ev-mobile-nav a{flex:0 0 auto;min-height:40px;padding:.55rem .75rem;font-size:.72rem}.ev-hero{min-height:0;padding-top:4rem}}
     @media(max-width:680px){.ev-hero,.ev-section{padding-inline:1.2rem}.ev-ledger{grid-template-columns:1fr}.ev-ledger div{border-right:0;border-bottom:1px solid var(--rule)}.ev-ledger div:last-child{border-bottom:0}.ev-row{grid-template-columns:1fr;gap:.35rem}.ev-row.head{display:none}.ev-item{grid-template-columns:1fr;gap:.5rem}.ev-footer-inner{flex-direction:column}}
   </style>
 </head>
 <body>
+  <a class="skip-link" href="#main-content">Skip to content</a>
   <header class="site-header">
     <div class="site-header__inner">
       <a href="./" aria-label="MOM SenseLoop home"><div class="mom-logo"><div class="mom-logo__mark"><svg class="mom-icon" viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.65"><path d="M2 12h3l2-6 4 12 3-9 3 6h5"></path></svg></div><div><div class="mom-logo__name">MOM SenseLoop</div><div class="mom-logo__meta">Research prototype</div></div></div></a>
-      <nav class="site-header__nav" aria-label="Public navigation"><a class="ui-button ui-button--ghost" href="./#how-it-works">How it works</a><a class="ui-button ui-button--ghost" href="./#proof">Why trust it</a><a class="ui-button ui-button--ghost" href="./?view=how">Research details</a><a class="ui-button ui-button--ghost" href="#builds" aria-current="page">Engineering evidence</a><a class="ui-button ui-button--primary" href="./?view=signin">Private Dashboard</a></nav>
+      <nav class="site-header__nav" aria-label="Public navigation"><a class="ui-button ui-button--ghost" href="./#how-it-works">How it works</a><a class="ui-button ui-button--ghost" href="./#proof">Evidence &amp; limitations</a><a class="ui-button ui-button--ghost" href="./?view=how">Research details</a><a class="ui-button ui-button--ghost" href="#builds" aria-current="page">Engineering evidence</a><a class="ui-button ui-button--primary" href="./?view=signin">Open dashboard</a></nav>
     </div>
   </header>
+  <nav class="ev-mobile-nav" aria-label="Engineering evidence navigation"><a class="ui-button ui-button--ghost" href="./">Home</a><a class="ui-button ui-button--ghost" href="#builds">Builds</a><a class="ui-button ui-button--ghost" href="#measurements">Measurements</a><a class="ui-button ui-button--ghost" href="#external">External validation</a><a class="ui-button ui-button--primary" href="./?view=signin">Dashboard</a></nav>
 
-  <main>
+  <main id="main-content">
     <section class="ev-hero">
       <div><p class="ev-eyebrow">MOM SENSELOOP V3 · PUBLIC ENGINEERING EVIDENCE</p><h1>Build history you can inspect.</h1><p class="ev-lede">This page connects the physical recording problem, measured engineering changes, independent workflow reproductions, external technical critique, and a separate external-corpus validation track.</p><div class="ev-actions"><a class="ui-button ui-button--primary" href="#builds">Read the build history</a><a class="ui-button ui-button--secondary" href="#external">See external validation</a></div><p class="ev-boundary"><strong>Evidence boundary.</strong> These are engineering and reproducibility claims. MOM is an abdominal-acoustic research prototype, not a diagnostic device, medical device, or objective hunger meter.</p></div>
       <aside class="ev-graphic"><div class="ev-graphic-top"><span>Public record</span><span>Limits shown</span></div><svg viewBox="0 0 420 260" role="img" aria-label="Sensor waveform and verification mark"><circle cx="68" cy="66" r="30" fill="none" stroke="#C4402F" stroke-width="2"></circle><circle cx="68" cy="66" r="8" fill="#C4402F"></circle><path d="M68 97v48c0 32 24 50 55 50h24" fill="none" stroke="#121714" stroke-width="2"></path><path d="M146 195h25l13-28 16 57 22-83 19 54h21l15-19 16 19h24l19-40 18 65 17-25h35" fill="none" stroke="#C4402F" stroke-width="3"></path><path d="M320 72l18 18 38-47" fill="none" stroke="#121714" stroke-width="3"></path></svg><p><strong>Sensor → workflow → evidence.</strong><br>The device captures a physical signal. The workflow checks quality. The public record documents what changed and what remains uncertain.</p></aside>
