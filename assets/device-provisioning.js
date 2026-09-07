@@ -2,274 +2,141 @@
   'use strict';
 
   const PROTOCOL = 'mom-provisioning-v1';
-  const MANIFEST_URL = 'firmware/web/manifest.json';
+  const MANIFEST_URL = new URL('firmware/web/manifest.json', document.baseURI).href;
   const HEARTBEAT_WINDOW_MS = 120000;
-  const POLL_INTERVAL_MS = 1800;
-  const POLL_ATTEMPTS = 28;
+  const POLL_INTERVAL_MS = 1500;
+  const POLL_ATTEMPTS = 24;
 
   let activePort = null;
   let serialReader = null;
   let serialBuffer = '';
   let serialLoop = null;
+  let enhanceQueued = false;
   const serialWaiters = new Set();
 
   const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+  function escapeHtml(value) {
+    return String(value ?? '').replace(/[&<>'\"]/g, (ch) => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '\"': '&quot;'
+    })[ch]);
+  }
+
+  function friendlySerialError(error) {
+    const name = error?.name || '';
+    const message = String(error?.message || '');
+    if (name === 'NotFoundError') return 'No device was selected. Click Continue and choose the ESP32 / USB serial device.';
+    if (name === 'SecurityError' || /user gesture|permission/i.test(message)) return 'Chrome blocked the USB chooser. Click the button again, then choose the ESP32 when Chrome asks.';
+    if (name === 'InvalidStateError' || /already open|open.*port/i.test(message)) return 'The serial port is already in use. Close Arduino Serial Monitor or any other app using the ESP32, then try again.';
+    if (name === 'NetworkError') return 'Chrome could not open the ESP32 serial port. Unplug it, reconnect it with a USB data cable, and try again.';
+    return message || 'The ESP32 could not be opened over USB.';
+  }
 
   function injectStyles() {
     if (document.getElementById('mom-provisioning-styles')) return;
     const style = document.createElement('style');
     style.id = 'mom-provisioning-styles';
     style.textContent = `
-      button[data-mom-provisioning="true"] {
-        min-height: 48px !important;
-        padding-left: 20px !important;
-        padding-right: 20px !important;
-        flex: 1 1 240px;
-      }
-      .mom-provision-note {
-        margin-top: 10px;
-        width: 100%;
-        font-size: 12px;
-        line-height: 1.6;
-        color: var(--color-slate2, #6f746f);
-      }
-      .mom-setup-backdrop {
-        position: fixed;
-        inset: 0;
-        z-index: 9999;
-        display: grid;
-        place-items: center;
-        padding: 18px;
-        background: rgba(18, 23, 20, .58);
-        backdrop-filter: blur(10px);
-      }
-      .mom-setup-dialog {
-        width: min(720px, 100%);
-        max-height: min(820px, calc(100vh - 36px));
-        overflow: auto;
-        border: 1px solid var(--color-line, #A9AA9F);
-        border-radius: 24px;
-        background: var(--color-bg, #F1EEE5);
-        color: var(--color-warm, #121714);
-        box-shadow: 0 28px 80px rgba(18, 23, 20, .24);
-      }
-      .mom-setup-head {
-        display: flex;
-        align-items: flex-start;
-        justify-content: space-between;
-        gap: 18px;
-        padding: 24px 24px 18px;
-        border-bottom: 1px solid var(--color-line, #A9AA9F);
-      }
-      .mom-setup-kicker {
-        margin-bottom: 6px;
-        font-size: 11px;
-        font-weight: 900;
-        letter-spacing: .16em;
-        text-transform: uppercase;
-        color: var(--color-mint2, #C4402F);
-      }
-      .mom-setup-title {
-        font-size: clamp(24px, 4vw, 34px);
-        line-height: 1.05;
-        font-weight: 900;
-        letter-spacing: -.035em;
-      }
-      .mom-setup-subtitle {
-        margin-top: 9px;
-        max-width: 560px;
-        color: var(--color-slate2, #6f746f);
-        line-height: 1.65;
-      }
-      .mom-setup-close {
-        width: 42px;
-        height: 42px;
-        flex: 0 0 auto;
-        border: 1px solid var(--color-line, #A9AA9F);
-        border-radius: 13px;
-        background: transparent;
-        color: inherit;
-        font-size: 22px;
-        cursor: pointer;
-      }
-      .mom-setup-body { padding: 24px; }
-      .mom-setup-progress {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 8px;
-        margin-bottom: 22px;
-      }
-      .mom-setup-progress span {
-        height: 5px;
-        border-radius: 999px;
-        background: rgba(169,170,159,.42);
-      }
-      .mom-setup-progress span.is-active { background: var(--color-mint, #C4402F); }
-      .mom-setup-card {
-        border: 1px solid var(--color-line, #A9AA9F);
-        border-radius: 18px;
-        background: rgba(241,238,229,.62);
-        padding: 18px;
-      }
-      .mom-setup-card + .mom-setup-card { margin-top: 12px; }
-      .mom-setup-row {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 14px;
-      }
-      .mom-setup-check {
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
-        display: grid;
-        place-items: center;
-        flex: 0 0 auto;
-        background: rgba(196,64,47,.10);
-        color: var(--color-mint2, #C4402F);
-        font-weight: 900;
-      }
-      .mom-setup-label {
-        display: grid;
-        gap: 7px;
-        margin-top: 15px;
-        font-size: 13px;
-        font-weight: 800;
-      }
-      .mom-setup-input, .mom-setup-select {
-        width: 100%;
-        min-height: 46px;
-        border: 1px solid var(--color-line, #A9AA9F);
-        border-radius: 12px;
-        background: var(--color-bg, #F1EEE5);
-        color: var(--color-warm, #121714);
-        padding: 0 13px;
-        font: inherit;
-      }
-      .mom-setup-actions {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        margin-top: 20px;
-      }
-      .mom-setup-button {
-        min-height: 46px;
-        border: 1px solid var(--color-line, #A9AA9F);
-        border-radius: 12px;
-        padding: 0 17px;
-        background: transparent;
-        color: var(--color-warm, #121714);
-        font-weight: 850;
-        cursor: pointer;
-      }
-      .mom-setup-button.primary {
-        border-color: var(--color-mint, #C4402F);
-        background: var(--color-mint, #C4402F);
-        color: var(--color-bg, #F1EEE5);
-      }
-      .mom-setup-button:disabled { opacity: .55; cursor: not-allowed; }
-      .mom-setup-status {
-        margin-top: 15px;
-        border-left: 4px solid var(--color-mint, #C4402F);
-        border-radius: 12px;
-        background: rgba(196,64,47,.06);
-        padding: 13px 14px;
-        font-size: 13px;
-        line-height: 1.65;
-      }
-      .mom-setup-status.error { border-left-color: #C4402F; }
-      .mom-setup-muted {
-        color: var(--color-slate2, #6f746f);
-        font-size: 13px;
-        line-height: 1.65;
-      }
-      .mom-setup-success {
-        text-align: center;
-        padding: 20px 6px 8px;
-      }
-      .mom-setup-success-dot {
-        width: 64px;
-        height: 64px;
-        margin: 0 auto 15px;
-        border-radius: 50%;
-        display: grid;
-        place-items: center;
-        background: rgba(196,64,47,.10);
-        color: var(--color-mint2, #C4402F);
-        font-size: 30px;
-        font-weight: 900;
-      }
-      .mom-setup-networks { margin-top: 10px; }
-      .mom-setup-install {
-        margin-top: 16px;
-        padding: 16px;
-        border: 1px dashed var(--color-line, #A9AA9F);
-        border-radius: 16px;
-      }
-      esp-web-install-button {
-        --esp-tools-button-color: var(--color-mint, #C4402F);
-        --esp-tools-button-text-color: var(--color-bg, #F1EEE5);
-        --esp-tools-button-border-radius: 12px;
-      }
-      @media (max-width: 560px) {
-        .mom-setup-head, .mom-setup-body { padding: 18px; }
-        .mom-setup-actions > * { width: 100%; }
-      }
+      button[data-mom-provisioning="true"] { min-height:48px!important; padding-left:20px!important; padding-right:20px!important; flex:1 1 240px; }
+      .mom-provision-note { margin-top:10px; width:100%; font-size:12px; line-height:1.6; color:var(--color-slate2,#6f746f); }
+      .mom-setup-backdrop { position:fixed; inset:0; z-index:9999; display:grid; place-items:center; padding:18px; background:rgba(18,23,20,.58); backdrop-filter:blur(10px); }
+      .mom-setup-dialog { width:min(720px,100%); max-height:min(820px,calc(100vh - 36px)); overflow:auto; border:1px solid var(--color-line,#A9AA9F); border-radius:24px; background:var(--color-bg,#F1EEE5); color:var(--color-warm,#121714); box-shadow:0 28px 80px rgba(18,23,20,.24); }
+      .mom-setup-head { display:flex; align-items:flex-start; justify-content:space-between; gap:18px; padding:24px 24px 18px; border-bottom:1px solid var(--color-line,#A9AA9F); }
+      .mom-setup-kicker { margin-bottom:6px; font-size:11px; font-weight:900; letter-spacing:.16em; text-transform:uppercase; color:var(--color-mint2,#C4402F); }
+      .mom-setup-title { margin:0; font-size:clamp(24px,4vw,34px); line-height:1.05; font-weight:900; letter-spacing:-.035em; }
+      .mom-setup-subtitle { margin-top:9px; max-width:580px; color:var(--color-slate2,#6f746f); line-height:1.65; }
+      .mom-setup-close { width:42px; height:42px; flex:0 0 auto; border:1px solid var(--color-line,#A9AA9F); border-radius:13px; background:transparent; color:inherit; font-size:22px; cursor:pointer; }
+      .mom-setup-body { padding:24px; }
+      .mom-setup-progress { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-bottom:22px; }
+      .mom-setup-progress span { height:5px; border-radius:999px; background:rgba(169,170,159,.42); }
+      .mom-setup-progress span.is-active { background:var(--color-mint,#C4402F); }
+      .mom-setup-card { border:1px solid var(--color-line,#A9AA9F); border-radius:18px; background:rgba(241,238,229,.62); padding:18px; }
+      .mom-setup-card + .mom-setup-card { margin-top:12px; }
+      .mom-setup-row { display:flex; align-items:center; justify-content:space-between; gap:14px; }
+      .mom-setup-check { width:32px; height:32px; border-radius:50%; display:grid; place-items:center; flex:0 0 auto; background:rgba(196,64,47,.10); color:var(--color-mint2,#C4402F); font-weight:900; }
+      .mom-setup-label { display:grid; gap:7px; margin-top:15px; font-size:13px; font-weight:800; }
+      .mom-setup-input,.mom-setup-select { width:100%; min-height:46px; border:1px solid var(--color-line,#A9AA9F); border-radius:12px; background:var(--color-bg,#F1EEE5); color:var(--color-warm,#121714); padding:0 13px; font:inherit; }
+      .mom-setup-actions { display:flex; flex-wrap:wrap; gap:10px; margin-top:20px; }
+      .mom-setup-button { min-height:46px; border:1px solid var(--color-line,#A9AA9F); border-radius:12px; padding:0 17px; background:transparent; color:var(--color-warm,#121714); font-weight:850; cursor:pointer; }
+      .mom-setup-button.primary { border-color:var(--color-mint,#C4402F); background:var(--color-mint,#C4402F); color:var(--color-bg,#F1EEE5); }
+      .mom-setup-button:disabled { opacity:.55; cursor:not-allowed; }
+      .mom-setup-status { margin-top:15px; border-left:4px solid var(--color-mint,#C4402F); border-radius:12px; background:rgba(196,64,47,.06); padding:13px 14px; font-size:13px; line-height:1.65; }
+      .mom-setup-status.error { border-left-color:#C4402F; }
+      .mom-setup-muted { color:var(--color-slate2,#6f746f); font-size:13px; line-height:1.65; }
+      .mom-setup-success { text-align:center; padding:20px 6px 8px; }
+      .mom-setup-success-dot { width:64px; height:64px; margin:0 auto 15px; border-radius:50%; display:grid; place-items:center; background:rgba(196,64,47,.10); color:var(--color-mint2,#C4402F); font-size:30px; font-weight:900; }
+      .mom-setup-install { margin-top:16px; padding:16px; border:1px dashed var(--color-line,#A9AA9F); border-radius:16px; }
+      esp-web-install-button { --esp-tools-button-color:var(--color-mint,#C4402F); --esp-tools-button-text-color:var(--color-bg,#F1EEE5); --esp-tools-button-border-radius:12px; }
+      @media (max-width:560px) { .mom-setup-head,.mom-setup-body { padding:18px; } .mom-setup-actions>* { width:100%; } }
     `;
     document.head.appendChild(style);
   }
 
   function selectedProfileId() {
-    const selects = [...document.querySelectorAll('select')];
-    const profileSelect = selects.find((select) =>
-      [...select.options].some((option) => option.textContent.trim() === 'Choose a profile')
+    const select = [...document.querySelectorAll('select')].find((node) =>
+      [...node.options].some((option) => option.textContent.trim() === 'Choose a profile')
     );
-    return profileSelect?.value || '';
+    return select?.value || '';
   }
 
   function currentProfileName() {
-    const selects = [...document.querySelectorAll('select')];
-    const profileSelect = selects.find((select) =>
-      [...select.options].some((option) => option.textContent.trim() === 'Choose a profile')
+    const select = [...document.querySelectorAll('select')].find((node) =>
+      [...node.options].some((option) => option.textContent.trim() === 'Choose a profile')
     );
-    return profileSelect?.selectedOptions?.[0]?.textContent?.trim() || 'Current profile';
+    return select?.selectedOptions?.[0]?.textContent?.trim() || 'Current profile';
   }
 
   function enhanceDevicePage() {
     if (!location.search.includes('view=dashboard') || !location.search.includes('tab=device')) return;
 
-    const buttons = [...document.querySelectorAll('button')];
-    for (const button of buttons) {
-      const text = button.textContent.trim();
-      if (text === 'Create device credential' || text === 'Connect MOM Device') {
-        button.textContent = 'Connect MOM Device';
+    const button = [...document.querySelectorAll('button')].find((node) => {
+      const text = node.textContent.trim();
+      return text === 'Create device credential' || text === 'Connect MOM Device';
+    });
+
+    if (button) {
+      if (button.textContent.trim() !== 'Connect MOM Device') button.textContent = 'Connect MOM Device';
+      if (button.dataset.momProvisioning !== 'true') {
         button.dataset.momProvisioning = 'true';
         button.setAttribute('aria-label', 'Connect MOM Device through USB');
-
-        const row = button.parentElement;
-        if (row && !row.querySelector('.mom-provision-note')) {
-          const note = document.createElement('p');
-          note.className = 'mom-provision-note';
-          note.textContent = 'Plug in with USB, choose the device, and connect it to Wi-Fi. No code, tokens, or cloud settings are shown.';
-          row.appendChild(note);
-        }
+      }
+      const row = button.parentElement;
+      if (row && !row.querySelector('.mom-provision-note')) {
+        const note = document.createElement('p');
+        note.className = 'mom-provision-note';
+        note.textContent = 'Plug in with USB, choose the ESP32, then connect it to Wi-Fi. MOM handles the device credential automatically.';
+        row.appendChild(note);
       }
     }
 
-    const headings = [...document.querySelectorAll('h2')];
-    const deviceHeading = headings.find((node) => node.textContent.includes('Connection first. Technical detail'));
-    if (deviceHeading) {
-      deviceHeading.textContent = 'Connect your MOM device in a few clicks.';
-      const copy = deviceHeading.parentElement?.querySelector('p');
-      if (copy) copy.textContent = 'Plug in the device, choose Wi-Fi, and MOM handles registration and cloud verification automatically.';
+    const heading = [...document.querySelectorAll('h2')].find((node) =>
+      node.textContent.includes('Connection first. Technical detail') || node.textContent.includes('Connect your MOM device in a few clicks.')
+    );
+    if (heading) {
+      if (heading.textContent !== 'Connect your MOM device in a few clicks.') heading.textContent = 'Connect your MOM device in a few clicks.';
+      const copy = heading.parentElement?.querySelector('p');
+      const nextCopy = 'Plug in the device, choose Wi-Fi, and MOM handles registration and cloud verification automatically.';
+      if (copy && copy.textContent !== nextCopy) copy.textContent = nextCopy;
     }
 
     for (const strong of [...document.querySelectorAll('strong')]) {
       if (strong.textContent.trim() === 'Copy this credential once') {
         const box = strong.closest('.rounded-2xl') || strong.parentElement;
-        if (box) box.style.display = 'none';
+        if (box && box.dataset.momHiddenCredential !== 'true') {
+          box.dataset.momHiddenCredential = 'true';
+          box.style.display = 'none';
+        }
       }
     }
+  }
+
+  function scheduleEnhance() {
+    if (enhanceQueued) return;
+    enhanceQueued = true;
+    requestAnimationFrame(() => {
+      enhanceQueued = false;
+      enhanceDevicePage();
+    });
   }
 
   function createDialog() {
@@ -277,64 +144,46 @@
     const backdrop = document.createElement('div');
     backdrop.id = 'mom-device-setup';
     backdrop.className = 'mom-setup-backdrop';
-    backdrop.setAttribute('role', 'presentation');
     backdrop.innerHTML = `
       <section class="mom-setup-dialog" role="dialog" aria-modal="true" aria-labelledby="mom-setup-title">
         <header class="mom-setup-head">
           <div>
             <div class="mom-setup-kicker">MOM DEVICE SETUP</div>
             <h2 id="mom-setup-title" class="mom-setup-title">Connect MOM Device</h2>
-            <p class="mom-setup-subtitle">USB is used only for setup. Your device credential stays hidden and your Wi-Fi password is sent directly to the ESP32 over the cable.</p>
+            <p class="mom-setup-subtitle">USB is used for setup. Your device credential is generated by MOM and sent directly to the ESP32 instead of being displayed.</p>
           </div>
           <button class="mom-setup-close" type="button" aria-label="Close setup">×</button>
         </header>
         <div class="mom-setup-body">
-          <div class="mom-setup-progress" aria-label="Setup progress">
-            <span class="is-active"></span><span></span><span></span><span></span>
-          </div>
+          <div class="mom-setup-progress"><span class="is-active"></span><span></span><span></span><span></span></div>
           <div class="mom-setup-content"></div>
         </div>
-      </section>
-    `;
+      </section>`;
     document.body.appendChild(backdrop);
     backdrop.querySelector('.mom-setup-close').addEventListener('click', closeDialog);
-    backdrop.addEventListener('click', (event) => {
-      if (event.target === backdrop) closeDialog();
-    });
+    backdrop.addEventListener('click', (event) => { if (event.target === backdrop) closeDialog(); });
     return backdrop;
   }
 
   function setProgress(step) {
-    const bars = [...document.querySelectorAll('#mom-device-setup .mom-setup-progress span')];
-    bars.forEach((bar, index) => bar.classList.toggle('is-active', index < step));
+    [...document.querySelectorAll('#mom-device-setup .mom-setup-progress span')]
+      .forEach((bar, index) => bar.classList.toggle('is-active', index < step));
   }
 
-  function contentNode() {
-    return document.querySelector('#mom-device-setup .mom-setup-content');
-  }
-
-  function statusBox(text, error = false) {
-    return `<div class="mom-setup-status${error ? ' error' : ''}" role="status">${escapeHtml(text)}</div>`;
-  }
-
-  function escapeHtml(value) {
-    return String(value ?? '').replace(/[&<>'"]/g, (ch) => ({
-      '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
-    })[ch]);
-  }
+  function contentNode() { return document.querySelector('#mom-device-setup .mom-setup-content'); }
+  function statusBox(text, error = false) { return `<div class="mom-setup-status${error ? ' error' : ''}" role="status">${escapeHtml(text)}</div>`; }
 
   async function closeSerial() {
-    try {
-      if (serialReader) await serialReader.cancel();
-    } catch (_) {}
+    try { if (serialReader) await serialReader.cancel(); } catch (_) {}
     serialReader = null;
     serialLoop = null;
     serialBuffer = '';
-    serialWaiters.forEach((waiter) => waiter.reject(new Error('Serial connection closed.')));
-    serialWaiters.clear();
-    try {
-      if (activePort?.readable || activePort?.writable) await activePort.close();
-    } catch (_) {}
+    for (const waiter of [...serialWaiters]) {
+      clearTimeout(waiter.timer);
+      waiter.reject(new Error('Serial connection closed.'));
+      serialWaiters.delete(waiter);
+    }
+    try { if (activePort?.readable || activePort?.writable) await activePort.close(); } catch (_) {}
     activePort = null;
   }
 
@@ -347,11 +196,10 @@
     for (const waiter of [...serialWaiters]) {
       let matched = false;
       try { matched = waiter.predicate(message); } catch (_) {}
-      if (matched) {
-        clearTimeout(waiter.timer);
-        serialWaiters.delete(waiter);
-        waiter.resolve(message);
-      }
+      if (!matched) continue;
+      clearTimeout(waiter.timer);
+      serialWaiters.delete(waiter);
+      waiter.resolve(message);
     }
   }
 
@@ -385,7 +233,6 @@
           }
         }
       } catch (_) {
-        // Closing a port cancels the reader and lands here on some browsers.
       } finally {
         try { serialReader?.releaseLock(); } catch (_) {}
         serialReader = null;
@@ -397,27 +244,27 @@
   async function writeSerial(payload) {
     if (!activePort?.writable) throw new Error('The MOM device is not connected over USB.');
     const writer = activePort.writable.getWriter();
-    try {
-      await writer.write(new TextEncoder().encode(`${JSON.stringify(payload)}\n`));
-    } finally {
-      writer.releaseLock();
-    }
+    try { await writer.write(new TextEncoder().encode(`${JSON.stringify(payload)}\n`)); }
+    finally { writer.releaseLock(); }
   }
 
   async function openAndIdentify() {
     if (!('serial' in navigator)) {
-      throw new Error('This browser does not provide USB serial access. Open this page in a desktop browser that supports Web Serial.');
+      throw new Error('USB setup needs desktop Chrome or another browser with Web Serial support. Safari and mobile browsers cannot run this setup flow.');
     }
+    if (activePort) throw new Error('A serial connection is already open. Close this setup window and try again.');
 
-    await closeSerial();
-    activePort = await navigator.serial.requestPort();
+    // requestPort() is intentionally the first permission-sensitive action in this
+    // click path so Chrome still has the user's transient activation.
+    const port = await navigator.serial.requestPort();
+    activePort = port;
     await activePort.open({ baudRate: 115200, bufferSize: 4096 });
     await startReadLoop();
-    await sleep(750);
+    await sleep(500);
 
     const responsePromise = waitForSerial(
       (message) => message?.type === 'mom-device' && message?.protocol === PROTOCOL,
-      6500
+      7000
     );
     await writeSerial({ command: 'identify', protocol: PROTOCOL });
     return responsePromise;
@@ -426,41 +273,29 @@
   async function scanWifi() {
     const responsePromise = waitForSerial(
       (message) => message?.type === 'wifi_scan' && message?.protocol === PROTOCOL,
-      12000
+      15000
     );
     await writeSerial({ command: 'scan_wifi', protocol: PROTOCOL });
     const response = await responsePromise;
     return Array.isArray(response.networks) ? response.networks : [];
   }
 
-  function showStart() {
+  function showStart(extraMessage = '') {
     setProgress(1);
+    const supported = 'serial' in navigator;
     const content = contentNode();
     content.innerHTML = `
       <div class="mom-setup-card">
-        <div class="mom-setup-row">
-          <div>
-            <strong>1. Plug the MOM device into this computer</strong>
-            <p class="mom-setup-muted" style="margin-top:6px">Use a USB data cable. Leave the device connected until setup finishes.</p>
-          </div>
-          <div class="mom-setup-check">1</div>
-        </div>
+        <div class="mom-setup-row"><div><strong>1. Plug the MOM device into this computer</strong><p class="mom-setup-muted" style="margin-top:6px">Use a USB data cable. Close Arduino Serial Monitor first if it is open.</p></div><div class="mom-setup-check">1</div></div>
       </div>
       <div class="mom-setup-card">
-        <div class="mom-setup-row">
-          <div>
-            <strong>2. Let the browser find the ESP32</strong>
-            <p class="mom-setup-muted" style="margin-top:6px">Your browser will show its normal serial-port chooser. Pick the ESP32 / USB serial device.</p>
-          </div>
-          <div class="mom-setup-check">2</div>
-        </div>
+        <div class="mom-setup-row"><div><strong>2. Let Chrome find the ESP32</strong><p class="mom-setup-muted" style="margin-top:6px">When Chrome opens the port chooser, select the ESP32 / USB serial device.</p></div><div class="mom-setup-check">2</div></div>
       </div>
       <div class="mom-setup-actions">
-        <button type="button" class="mom-setup-button primary" data-action="detect">Continue</button>
+        <button type="button" class="mom-setup-button primary" data-action="detect" ${supported ? '' : 'disabled'}>Continue</button>
         <button type="button" class="mom-setup-button" data-action="installer">Install / repair MOM firmware</button>
       </div>
-      <div data-status></div>
-    `;
+      <div data-status>${extraMessage ? statusBox(extraMessage, true) : (!supported ? statusBox('This browser does not support Web Serial. Open the MOM site in desktop Chrome.', true) : '')}</div>`;
     content.querySelector('[data-action="detect"]').addEventListener('click', detectDevice);
     content.querySelector('[data-action="installer"]').addEventListener('click', showInstaller);
   }
@@ -471,16 +306,15 @@
     const button = content.querySelector('[data-action="detect"]');
     button.disabled = true;
     button.textContent = 'Finding device…';
-    status.innerHTML = statusBox('Choose your MOM device in the browser window.');
+    status.innerHTML = statusBox('Choose the ESP32 / USB serial device in Chrome.');
 
     try {
       const device = await openAndIdentify();
       showWifi(device);
     } catch (error) {
+      const message = friendlySerialError(error);
       await closeSerial();
-      status.innerHTML = statusBox(error?.message || 'MOM firmware was not detected on that device.', true);
-      const installerButton = content.querySelector('[data-action="installer"]');
-      if (installerButton) installerButton.textContent = 'Install / repair firmware';
+      status.innerHTML = statusBox(`${message} If this ESP32 does not already have MOM firmware, use “Install / repair MOM firmware” below.`, true);
       button.disabled = false;
       button.textContent = 'Try another device';
     }
@@ -490,43 +324,22 @@
     setProgress(2);
     const content = contentNode();
     content.innerHTML = `
-      <div class="mom-setup-card">
-        <div class="mom-setup-row">
-          <div>
-            <strong>Device found ✓</strong>
-            <p class="mom-setup-muted" style="margin-top:6px">${escapeHtml(device.firmware_version || 'MOM firmware detected')} · USB connection ready</p>
-          </div>
-          <div class="mom-setup-check">✓</div>
-        </div>
-      </div>
+      <div class="mom-setup-card"><div class="mom-setup-row"><div><strong>Device found ✓</strong><p class="mom-setup-muted" style="margin-top:6px">${escapeHtml(device.firmware_version || 'MOM firmware detected')} · USB ready</p></div><div class="mom-setup-check">✓</div></div></div>
       <div class="mom-setup-card">
         <strong>Connect MOM to Wi-Fi</strong>
-        <p class="mom-setup-muted" style="margin-top:6px">The password goes directly to the ESP32 over USB. It is not saved by this webpage or written to your MOM cloud profile.</p>
-        <div class="mom-setup-networks" data-networks>${statusBox('Scanning for nearby Wi-Fi networks…')}</div>
-        <label class="mom-setup-label">Wi-Fi network
-          <input class="mom-setup-input" data-ssid autocomplete="off" placeholder="Network name">
-        </label>
-        <label class="mom-setup-label">Wi-Fi password
-          <input class="mom-setup-input" data-password type="password" autocomplete="new-password" placeholder="Password (leave blank for an open network)">
-        </label>
+        <p class="mom-setup-muted" style="margin-top:6px">Your Wi-Fi password goes directly to the ESP32 over USB. MOM does not display or store the device credential in this page.</p>
+        <div data-networks style="margin-top:10px">${statusBox('Scanning for nearby Wi-Fi networks…')}</div>
+        <label class="mom-setup-label">Wi-Fi network<input class="mom-setup-input" data-ssid autocomplete="off" placeholder="Network name"></label>
+        <label class="mom-setup-label">Wi-Fi password<input class="mom-setup-input" data-password type="password" autocomplete="new-password" placeholder="Password"></label>
       </div>
-      <div class="mom-setup-actions">
-        <button type="button" class="mom-setup-button" data-action="back">Back</button>
-        <button type="button" class="mom-setup-button primary" data-action="finish">Finish Setup</button>
-      </div>
-      <div data-status></div>
-    `;
+      <div class="mom-setup-actions"><button type="button" class="mom-setup-button" data-action="back">Back</button><button type="button" class="mom-setup-button primary" data-action="finish">Finish Setup</button></div>
+      <div data-status></div>`;
 
-    content.querySelector('[data-action="back"]').addEventListener('click', async () => {
-      await closeSerial();
-      showStart();
-    });
+    content.querySelector('[data-action="back"]').addEventListener('click', async () => { await closeSerial(); showStart(); });
     content.querySelector('[data-action="finish"]').addEventListener('click', finishProvisioning);
 
-    try {
-      const networks = await scanWifi();
-      renderNetworks(networks);
-    } catch (_) {
+    try { renderNetworks(await scanWifi()); }
+    catch (_) {
       const target = content.querySelector('[data-networks]');
       if (target) target.innerHTML = '<p class="mom-setup-muted">Nearby networks could not be listed automatically. Type the network name below.</p>';
     }
@@ -536,31 +349,19 @@
     const target = contentNode()?.querySelector('[data-networks]');
     const ssidInput = contentNode()?.querySelector('[data-ssid]');
     if (!target || !ssidInput) return;
-
     const clean = networks
       .filter((network) => network && typeof network.ssid === 'string' && network.ssid.trim())
       .sort((a, b) => Number(b.rssi || -999) - Number(a.rssi || -999));
-
     if (!clean.length) {
-      target.innerHTML = '<p class="mom-setup-muted">No named Wi-Fi networks were returned. You can type the network name manually.</p>';
+      target.innerHTML = '<p class="mom-setup-muted">No named networks were returned. Type the Wi-Fi name manually.</p>';
       return;
     }
-
-    target.innerHTML = `
-      <label class="mom-setup-label" style="margin-top:0">Nearby networks
-        <select class="mom-setup-select" data-network-select>
-          <option value="">Choose a network or type one below</option>
-          ${clean.map((network) => `<option value="${escapeHtml(network.ssid)}">${escapeHtml(network.ssid)}${network.secure ? ' · secured' : ' · open'}</option>`).join('')}
-        </select>
-      </label>
-    `;
-    target.querySelector('[data-network-select]').addEventListener('change', (event) => {
-      if (event.target.value) ssidInput.value = event.target.value;
-    });
+    target.innerHTML = `<label class="mom-setup-label" style="margin-top:0">Nearby networks<select class="mom-setup-select" data-network-select><option value="">Choose a network or type one below</option>${clean.map((network) => `<option value="${escapeHtml(network.ssid)}">${escapeHtml(network.ssid)}${network.secure ? ' · secured' : ' · open'}</option>`).join('')}</select></label>`;
+    target.querySelector('[data-network-select]').addEventListener('change', (event) => { if (event.target.value) ssidInput.value = event.target.value; });
   }
 
   async function cloudContext() {
-    if (!window.MOM?.CloudService) throw new Error('MOM cloud services are still loading.');
+    if (!window.MOM?.CloudService) throw new Error('MOM cloud services are still loading. Refresh the page and try again.');
     const cloud = new MOM.CloudService();
     const session = await cloud.getSession();
     if (!session?.user?.id) throw new Error('Please sign in again before connecting a device.');
@@ -576,46 +377,38 @@
     const status = content.querySelector('[data-status]');
     const button = content.querySelector('[data-action="finish"]');
 
-    if (!ssid) {
-      status.innerHTML = statusBox('Choose or type a Wi-Fi network first.', true);
-      return;
-    }
-    if (!activePort?.writable) {
-      status.innerHTML = statusBox('The USB connection was lost. Go back and reconnect the device.', true);
-      return;
-    }
+    if (!ssid) { status.innerHTML = statusBox('Choose or type a Wi-Fi network first.', true); return; }
+    if (!activePort?.writable) { status.innerHTML = statusBox('The USB connection was lost. Go back and reconnect the device.', true); return; }
 
     button.disabled = true;
     button.textContent = 'Setting up…';
     setProgress(3);
-    status.innerHTML = statusBox('Registering this MOM device securely with your selected profile…');
+    status.innerHTML = statusBox('Creating the device registration and sending Wi-Fi settings to the ESP32…');
 
     try {
       const { cloud, userId, profileId } = await cloudContext();
       const pairedAt = Date.now();
       const pairing = await cloud.pairDevice(userId, profileId);
 
-      const savedPromise = waitForSerial(
-        (message) => message?.type === 'provisioning' && ['saved', 'wifi_error', 'cloud_error'].includes(message?.status),
-        10000
+      const outcomePromise = waitForSerial(
+        (message) => message?.type === 'provisioning' && ['online', 'wifi_error', 'cloud_error', 'error'].includes(message?.status),
+        45000
       );
 
       await writeSerial({
-        command: 'provision',
-        protocol: PROTOCOL,
-        wifi_ssid: ssid,
-        wifi_password: password,
-        device_token: pairing.token,
-        endpoint: pairing.endpoint
+        command: 'provision', protocol: PROTOCOL, wifi_ssid: ssid, wifi_password: password,
+        device_token: pairing.token, endpoint: pairing.endpoint
       });
 
-      const saved = await savedPromise;
-      if (saved.status === 'wifi_error') throw new Error('The ESP32 could not join that Wi-Fi network. Check the network name and password.');
-      if (saved.status === 'cloud_error') throw new Error('Wi-Fi connected, but the MOM cloud did not accept the first check-in.');
+      status.innerHTML = statusBox('ESP32 received the setup. Connecting to Wi-Fi and checking the MOM cloud…');
+      const outcome = await outcomePromise;
+      if (outcome.status === 'wifi_error') throw new Error('The ESP32 could not join that Wi-Fi network. Check the Wi-Fi name/password, then try again.');
+      if (outcome.status === 'cloud_error') throw new Error('The ESP32 joined Wi-Fi, but its authenticated MOM cloud check-in failed.');
+      if (outcome.status === 'error') throw new Error(outcome.message || 'The ESP32 rejected the setup data.');
 
-      status.innerHTML = statusBox('Wi-Fi settings saved. Verifying the first authenticated cloud check-in…');
+      status.innerHTML = statusBox('Cloud check-in received from the ESP32. Verifying the dashboard record…');
       const device = await waitForCloudHeartbeat(cloud, profileId, pairedAt);
-      showSuccess(device);
+      await showSuccess(device);
     } catch (error) {
       status.innerHTML = statusBox(error?.message || 'Setup could not be completed.', true);
       button.disabled = false;
@@ -628,13 +421,13 @@
     for (let attempt = 0; attempt < POLL_ATTEMPTS; attempt++) {
       const data = await cloud.loadProfileData(profileId);
       const devices = data?.devices || [];
-      lastDevice = devices[0] || lastDevice;
-      const timestamp = lastDevice?.last_seen_at ? new Date(lastDevice.last_seen_at).getTime() : 0;
-      const recentEnough = timestamp >= pairedAt - 5000 && Date.now() - timestamp < HEARTBEAT_WINDOW_MS;
-      if (recentEnough) return lastDevice;
+      const candidate = [...devices].sort((a, b) => +new Date(b.last_seen_at || 0) - +new Date(a.last_seen_at || 0))[0];
+      lastDevice = candidate || lastDevice;
+      const timestamp = candidate?.last_seen_at ? new Date(candidate.last_seen_at).getTime() : 0;
+      if (timestamp >= pairedAt - 5000 && Date.now() - timestamp < HEARTBEAT_WINDOW_MS) return candidate;
       await sleep(POLL_INTERVAL_MS);
     }
-    throw new Error('The device saved its setup, but no fresh cloud heartbeat appeared. Keep it powered and verify that this Wi-Fi network has internet access.');
+    throw new Error('The ESP32 reported that it was online, but the dashboard did not receive a fresh heartbeat. Refresh the page and run “Run connection check.”');
   }
 
   async function showSuccess(device) {
@@ -643,27 +436,11 @@
     const profileName = currentProfileName();
     const lastSeen = device?.last_seen_at ? new Date(device.last_seen_at).toLocaleString([], { hour: 'numeric', minute: '2-digit' }) : 'Just now';
     content.innerHTML = `
-      <div class="mom-setup-success">
-        <div class="mom-setup-success-dot">✓</div>
-        <div class="mom-setup-kicker">CONNECTED</div>
-        <h3 class="mom-setup-title" style="font-size:30px">MOM Device Connected</h3>
-        <p class="mom-setup-subtitle" style="margin-left:auto;margin-right:auto">The cloud received a fresh authenticated heartbeat from the physical ESP32. The device credential never appeared on screen.</p>
-      </div>
-      <div class="mom-setup-card">
-        <div class="mom-setup-row"><span class="mom-setup-muted">Profile</span><strong>${escapeHtml(profileName)}</strong></div>
-        <div class="mom-setup-row" style="margin-top:10px"><span class="mom-setup-muted">Last seen</span><strong>${escapeHtml(lastSeen)}</strong></div>
-        <div class="mom-setup-row" style="margin-top:10px"><span class="mom-setup-muted">Firmware</span><strong>${escapeHtml(device?.firmware_version || 'MOM SenseLoop 1.0')}</strong></div>
-        <div class="mom-setup-row" style="margin-top:10px"><span class="mom-setup-muted">Cloud status</span><strong>Verified online</strong></div>
-      </div>
-      <div class="mom-setup-actions">
-        <button type="button" class="mom-setup-button primary" data-action="done">Done</button>
-      </div>
-    `;
+      <div class="mom-setup-success"><div class="mom-setup-success-dot">✓</div><div class="mom-setup-kicker">CONNECTED</div><h3 class="mom-setup-title" style="font-size:30px">MOM Device Connected</h3><p class="mom-setup-subtitle" style="margin-left:auto;margin-right:auto">The cloud received a fresh authenticated heartbeat from the physical ESP32.</p></div>
+      <div class="mom-setup-card"><div class="mom-setup-row"><span class="mom-setup-muted">Profile</span><strong>${escapeHtml(profileName)}</strong></div><div class="mom-setup-row" style="margin-top:10px"><span class="mom-setup-muted">Last seen</span><strong>${escapeHtml(lastSeen)}</strong></div><div class="mom-setup-row" style="margin-top:10px"><span class="mom-setup-muted">Firmware</span><strong>${escapeHtml(device?.firmware_version || 'MOM SenseLoop 1.0')}</strong></div><div class="mom-setup-row" style="margin-top:10px"><span class="mom-setup-muted">Cloud status</span><strong>Verified online</strong></div></div>
+      <div class="mom-setup-actions"><button type="button" class="mom-setup-button primary" data-action="done">Done</button></div>`;
     await closeSerial();
-    content.querySelector('[data-action="done"]').addEventListener('click', async () => {
-      await closeDialog();
-      location.reload();
-    });
+    content.querySelector('[data-action="done"]').addEventListener('click', async () => { await closeDialog(); location.reload(); });
   }
 
   async function showInstaller() {
@@ -673,21 +450,11 @@
     content.innerHTML = `
       <div class="mom-setup-card">
         <strong>Install or repair MOM firmware</strong>
-        <p class="mom-setup-muted" style="margin-top:7px">Use this only when a blank ESP32 or damaged install is not detected by the normal Connect flow. Installation may erase the device's current firmware and saved settings.</p>
-        <div class="mom-setup-install">
-          <esp-web-install-button manifest="${MANIFEST_URL}">
-            <button slot="activate" type="button" class="mom-setup-button primary">Install MOM firmware</button>
-            <span slot="unsupported" class="mom-setup-muted">Firmware installation is not supported by this browser.</span>
-            <span slot="not-allowed" class="mom-setup-muted">Firmware installation requires this HTTPS page to have permission to use USB serial.</span>
-          </esp-web-install-button>
-        </div>
+        <p class="mom-setup-muted" style="margin-top:7px">Use this when the ESP32 is blank or the normal Detect step says MOM firmware was not found. Flashing can erase the ESP32's current firmware and saved settings.</p>
+        <div class="mom-setup-install"><esp-web-install-button manifest="${escapeHtml(MANIFEST_URL)}"><button slot="activate" type="button" class="mom-setup-button primary">Install MOM firmware</button><span slot="unsupported" class="mom-setup-muted">Firmware installation needs desktop Chrome or another browser with Web Serial.</span><span slot="not-allowed" class="mom-setup-muted">Chrome needs permission to access the ESP32 USB serial port.</span></esp-web-install-button></div>
       </div>
-      <div class="mom-setup-actions">
-        <button type="button" class="mom-setup-button" data-action="back">Back</button>
-        <button type="button" class="mom-setup-button primary" data-action="detect">I installed it · Detect MOM Device</button>
-      </div>
-      <div data-status></div>
-    `;
+      <div class="mom-setup-card"><strong>After the installer says it finished</strong><p class="mom-setup-muted" style="margin-top:7px">Close the installer window, wait a few seconds for the ESP32 to restart, then click Detect MOM Device below and select the ESP32 again.</p></div>
+      <div class="mom-setup-actions"><button type="button" class="mom-setup-button" data-action="back">Back</button><button type="button" class="mom-setup-button primary" data-action="detect">Detect MOM Device</button></div><div data-status></div>`;
     content.querySelector('[data-action="back"]').addEventListener('click', showStart);
     content.querySelector('[data-action="detect"]').addEventListener('click', detectDevice);
   }
@@ -708,7 +475,8 @@
   }, true);
 
   injectStyles();
-  enhanceDevicePage();
-  new MutationObserver(enhanceDevicePage).observe(document.body, { childList: true, subtree: true });
-  window.addEventListener('popstate', () => setTimeout(enhanceDevicePage, 0));
+  scheduleEnhance();
+  new MutationObserver(scheduleEnhance).observe(document.body, { childList: true, subtree: true });
+  window.addEventListener('popstate', scheduleEnhance);
+  window.MOMDeviceProvisioning = { open: openWizard };
 })();
