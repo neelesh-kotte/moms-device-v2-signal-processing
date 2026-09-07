@@ -9,6 +9,27 @@
 .editorial-panel > :last-child { margin-bottom: 0; }
 .hero-actions,.trust-actions,.ev-actions { align-items: stretch; }
 
+/* Engineering Evidence uses a static header rather than the React hamburger.
+   Keep its compact navigation available for the full tablet range where the
+   desktop header is intentionally hidden. */
+@media (max-width: 1099px) and (min-width: 761px) {
+  .ev-mobile-nav {
+    display: flex;
+    position: sticky;
+    top: 72px;
+    z-index: 45;
+    gap: .4rem;
+    overflow-x: auto;
+    padding: .55rem 1.25rem;
+    border-bottom: 1px solid var(--rule);
+    background: rgba(244, 241, 232, .97);
+    backdrop-filter: blur(8px);
+    scrollbar-width: none;
+  }
+  .ev-mobile-nav::-webkit-scrollbar { display: none; }
+  .ev-mobile-nav a { flex: 0 0 auto; min-height: 40px; padding: .55rem .75rem; font-size: .72rem; }
+}
+
 @media (max-width: 1000px) {
   .process-list > *:nth-child(2),.process-list > *:nth-child(3) { margin-top: 0 !important; }
 }
