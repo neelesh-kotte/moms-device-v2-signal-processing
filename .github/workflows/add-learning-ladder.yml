@@ -1,0 +1,47 @@
+name: Add MOM learning ladder
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/scripts/add_learning_ladder.py'
+      - '.github/workflows/add-learning-ladder.yml'
+permissions:
+  contents: write
+jobs:
+  patch-live:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out live site
+        uses: actions/checkout@v4
+        with:
+          ref: project-portfolio-site
+          fetch-depth: 0
+      - name: Load patch from main
+        run: git show origin/main:.github/scripts/add_learning_ladder.py > /tmp/add_learning_ladder.py
+      - name: Apply learning ladder
+        run: python /tmp/add_learning_ladder.py
+      - name: Verify JavaScript syntax
+        run: node --check docs/assets/app.js
+      - name: Verify learning route and links
+        run: |
+          grep -q "function LearnPage" docs/assets/app.js
+          grep -q "function LearningPath" docs/assets/app.js
+          grep -q "route.view === 'learn'" docs/assets/app.js
+          grep -q "engineering-validation.html" docs/assets/app.js
+      - name: Bump app cache key
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('docs/index.html')
+          s=p.read_text()
+          s=s.replace('assets/app.js?v=native-20260907-2','assets/app.js?v=learn-20260907-1')
+          p.write_text(s)
+          PY
+      - name: Commit live learning ladder
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/assets/app.js docs/index.html
+          git diff --cached --quiet && exit 0
+          git commit -m "Add beginner-to-expert MOM learning ladder [skip ci]"
+          git push origin project-portfolio-site
