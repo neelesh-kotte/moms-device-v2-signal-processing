@@ -12,7 +12,6 @@ def replace_once(source, old, new, label):
     return source.replace(old, new, 1)
 
 
-# Add capability-aware device readiness.
 old = """    function isOnline(devices) {
         return devices.some(d => d.last_seen_at && Date.now() - new Date(d.last_seen_at).getTime() < 120000);
     }
@@ -29,7 +28,6 @@ new = """    function isOnline(devices) {
 """
 text = replace_once(text, old, new, 'recording readiness helper')
 
-# Make the global device pill truthful.
 old = """    function DevicePill({ devices, demo = false }) {
         const online = demo || isOnline(devices);
         return React.createElement(\"div\", { className: `inline-flex min-h-10 items-center gap-2 rounded-full border px-3 py-2 text-xs font-extrabold ${online ? 'border-mint/30 bg-mint/10 text-mint2' : 'border-amber/30 bg-amber/10 text-[#62B5A6]'}` },
@@ -48,7 +46,6 @@ new = """    function DevicePill({ devices, demo = false }) {
 """
 text = replace_once(text, old, new, 'device pill')
 
-# Replace recording orchestration inside React itself.
 start = text.index('    function RecordingFlow(')
 end = text.index('    function SessionDetail(', start)
 rec = text[start:end]
@@ -146,7 +143,6 @@ rec = rec.replace("setStep(0); setStarted(null); setMatched(null); setMessage(''
 rec = rec.replace("setStep(0);\n                            setStarted(null);", "setStep(0);\n                            setStarted(null);\n                            setCommandId(null);")
 text = text[:start] + rec + text[end:]
 
-# Remove developer credential rendering from DeviceView and make setup native-facing.
 start = text.index('    function DeviceView(')
 end = text.index('    function AdvancedView(', start)
 dev = text[start:end]
@@ -200,24 +196,20 @@ credential = """                    pair && React.createElement(\"div\", { class
                         React.createElement(\"p\", { className: \"mt-3 text-xs text-slate2\" }, \"Cloud endpoint\"),
                         React.createElement(\"div\", { className: \"mt-1 overflow-x-auto rounded-xl bg-[#071014] p-3 font-mono text-xs text-slate2\" }, pair.endpoint))),
 """
-dev = replace_once(dev, credential, '', 'DeviceView credential box')
+dev = replace_once(dev, credential, '                ),\n', 'DeviceView credential box')
 dev = dev.replace("${online ? 'border-mint bg-mint/5' : 'border-amber bg-amber/5'}", "${ready ? 'border-mint bg-mint/5' : 'border-amber bg-amber/5'}")
 text = text[:start] + dev + text[end:]
 
-# Pass the existing CloudService into RecordingFlow.
 text = replace_once(text,
     "tab === 'record' && React.createElement(RecordingFlow, { user: user, profile: profile, sessions: sessions, devices: devices, refresh: refresh, saveCheckin: saveCheckin, updateSession: updateSession })",
     "tab === 'record' && React.createElement(RecordingFlow, { cloud: cloud, user: user, profile: profile, sessions: sessions, devices: devices, refresh: refresh, saveCheckin: saveCheckin, updateSession: updateSession })",
     'RecordingFlow invocation')
 
-# Light copy cleanup without changing layout/theme.
 text = text.replace('"Why trust it"', '"Evidence & limitations"')
 text = text.replace('" Private Dashboard"', '" Open dashboard"')
 text = text.replace('"Private Dashboard"', '"Open dashboard"')
-
 app_path.write_text(text)
 
-# Remove the now-obsolete recording DOM bridge and force cache-safe assets.
 index = index_path.read_text()
 index = index.replace('content="warm-minimal-v3-recording-fix"', 'content="warm-minimal-v3-native-recording"')
 index = index.replace('assets/cloud-service.js?v=warm-minimal-v3', 'assets/cloud-service.js?v=recording-native-20260907-2')
