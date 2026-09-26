@@ -254,10 +254,10 @@ var MOM;
         const Tag = as;
         return React.createElement(Tag, { className: `editorial-panel ${className}` }, children);
     }
-    function SectionTitle({ kicker, title, copy }) {
+    function SectionTitle({ kicker, title, copy, level = 2 }) {
         return React.createElement("div", { className: "section-title" },
             React.createElement("div", { className: "section-title__kicker" }, kicker),
-            React.createElement("h2", { className: "section-title__heading" }, title),
+            React.createElement("h" + level, { className: "section-title__heading" }, title),
             copy && React.createElement("p", { className: "section-title__copy" }, copy));
     }
     function Waveform({ values = MOM.demoWaveform, label = 'Illustrative waveform', demo = false, compact = false }) {
@@ -681,7 +681,7 @@ var MOM;
                 React.createElement("button", { onClick: () => pushRoute('home'), className: "mb-8 inline-flex items-center gap-2 rounded-xl text-sm font-bold text-slate2 hover:text-warm focus-visible:ring-2 focus-visible:ring-mint" },
                     React.createElement(Icon, { name: "arrow-left" }),
                     " Public home"),
-                React.createElement(SectionTitle, { kicker: "How MOM works / simple first, technical second", title: "A quiet sound becomes a checked recording—not a medical answer.", copy: "Start with the four plain-language steps below. The hardware specifications, processing path, and reproducibility controls follow for anyone who wants the deeper engineering view." }),
+                React.createElement(SectionTitle, { level: 1, kicker: "How MOM works / simple first, technical second", title: "A quiet sound becomes a checked recording—not a medical answer.", copy: "Start with the four plain-language steps below. The hardware specifications, processing path, and reproducibility controls follow for anyone who wants the deeper engineering view." }),
                 React.createElement("div", { className: "grid gap-4 lg:grid-cols-4" }, [
                     ['1', 'Capture sound', 'The ESP32 + MAX4466 sensor uses stethoscope-based acoustic coupling to capture a short abdominal recording.', 'mic-2'],
                     ['2', 'Check the signal', 'The system reviews the quality measures actually supplied by the device, including clipping and completion, and marks unavailable measures as not independently measured.', 'scan-line'],
