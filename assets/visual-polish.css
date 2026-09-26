@@ -70,3 +70,70 @@
   .ev-copy h2 { font-size: clamp(2.55rem, 12vw, 4rem); line-height: .97; }
   .ev-results,.ev-versions,.ev-table,.ev-list,.ev-package { margin-top: 2.5rem; }
 }
+
+/* ---------- 2026-09-24 pass: one type system, overflow fixes, focus states ---------- */
+
+:root {
+  /* Display serif is a system stack, so there is no font download and no layout shift.
+     It matches the Georgia headings already used on the Engineering Evidence page. */
+  --font-display: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif;
+}
+
+/* Headlines: quieter and more like a lab notebook than a launch page. */
+.public-home .public-hero h1,
+.public-home .home-section h2,
+.section-title__heading,
+.ev-hero h1,
+.ev-copy h2 {
+  font-family: var(--font-display);
+  font-weight: 400 !important;
+}
+.public-home .public-hero h1 {
+  max-width: 14ch;
+  font-size: clamp(2.75rem, 5.2vw, 4.6rem) !important;
+  letter-spacing: -0.035em !important;
+  line-height: 1.02 !important;
+}
+.public-home .home-section h2,
+.section-title__heading {
+  letter-spacing: -0.03em;
+  line-height: 1.06;
+}
+.public-home .home-section h2 { font-size: clamp(2.1rem, 3.6vw, 3.25rem); }
+.section-title__heading { font-size: clamp(2rem, 3.6vw, 3.25rem); }
+.ev-hero h1 { font-size: clamp(3rem, 6vw, 5.5rem); letter-spacing: -0.04em; line-height: .96; max-width: 11ch; }
+.ev-copy h2 { font-size: clamp(2rem, 3.8vw, 3.5rem); letter-spacing: -0.03em; line-height: 1.04; }
+.ev-result strong { font-size: clamp(2rem, 3.2vw, 3.25rem); }
+
+/* Engineering Evidence: a `1fr` track cannot shrink below its content, so the code
+   block was forcing the page to 624px wide on phones. minmax(0, 1fr) lets it scroll instead. */
+.ev-grid,
+.ev-results,
+.ev-versions { min-width: 0; }
+@media (max-width: 900px) {
+  .ev-grid,
+  .ev-results,
+  .ev-versions { grid-template-columns: minmax(0, 1fr); }
+}
+.ev-package { min-width: 0; max-width: 100%; }
+.ev-package pre { max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.ev-row > * { min-width: 0; overflow-wrap: anywhere; }
+.ev-copy, .ev-item, .ev-card, .ev-result { min-width: 0; overflow-wrap: break-word; }
+
+/* Keyboard focus, which the static Evidence page did not define at all. */
+.ev-hero a:focus-visible,
+.ev-section a:focus-visible,
+.ev-mobile-nav a:focus-visible,
+.ev-actions a:focus-visible,
+.ev-package pre:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+.ev-package pre:focus-visible { outline-offset: -2px; }
+a.ui-button:hover, button.ui-button:hover { text-decoration: none; }
+
+/* Evidence table: the three tracks had fixed minimums that added up to more than the
+   content column at ~1024px. Let them share the space instead. */
+@media (min-width: 761px) {
+  .ev-table .ev-row { grid-template-columns: minmax(0, .9fr) minmax(0, 1.05fr) minmax(0, 1.15fr); gap: 1.25rem; }
+}
