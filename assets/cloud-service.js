@@ -76,13 +76,20 @@ var MOM;
         }
         onAuthChange(callback) {
             let first = true;
+            let hadUser = Boolean(this.firebaseAuth.currentUser);
             return this.firebaseAuth.onIdTokenChanged((user) => {
-                const event = first
-                    ? 'INITIAL_SESSION'
-                    : user
-                        ? 'TOKEN_REFRESHED'
-                        : 'SIGNED_OUT';
+                let event;
+                if (first) {
+                    event = 'INITIAL_SESSION';
+                } else if (user && !hadUser) {
+                    event = 'SIGNED_IN';
+                } else if (user) {
+                    event = 'TOKEN_REFRESHED';
+                } else {
+                    event = 'SIGNED_OUT';
+                }
                 callback(event, user ? { user: this.normalizeUser(user) } : null);
+                hadUser = Boolean(user);
                 first = false;
             });
         }
