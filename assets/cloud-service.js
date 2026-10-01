@@ -26,6 +26,12 @@ var MOM;
             this.firebaseAuth = this.firebaseApp.auth();
             this.firebaseAuth.useDeviceLanguage();
 
+            // Finish a redirect-based Google sign-in if popup fallback was used.
+            this.redirectSignInResult = this.firebaseAuth.getRedirectResult().catch((error) => {
+                this.redirectSignInError = error;
+                return null;
+            });
+
             this.client = window.supabase.createClient(MOM.SUPABASE_URL, MOM.SUPABASE_KEY, {
                 accessToken: async () => {
                     const user = this.firebaseAuth.currentUser;
@@ -46,18 +52,37 @@ var MOM;
                 uid: user.uid,
                 email: user.email ?? null,
                 displayName: user.displayName ?? null,
-                photoURL: user.photoURL ?? null
+                photoURL: user.photoURL ?? null,
+                user_metadata: {
+                    full_name: user.displayName ?? null,
+                    avatar_url: user.photoURL ?? null
+                },
+                app_metadata: {}
             };
         }
         async getSession() {
+            await this.redirectSignInResult;
             const user = this.firebaseAuth.currentUser;
+            if (this.redirectSignInError) {
+                const error = this.redirectSignInError;
+                this.redirectSignInError = null;
+                if (error?.code === 'auth/popup-blocked')
+                    throw new Error('Your browser blocked Google sign-in. Please allow popups for MOM and try again.');
+                if (error?.code === 'auth/unauthorized-domain')
+                    throw new Error('MOM is not authorized for Google sign-in on this domain. Add neelesh-kotte.github.io to Firebase Authentication → Settings → Authorized domains.');
+                throw new Error(error?.message || 'Google sign-in could not be completed.');
+            }
             return user ? { user: this.normalizeUser(user) } : null;
         }
         onAuthChange(callback) {
             let first = true;
-            return this.firebaseAuth.onAuthStateChanged((user) => {
-                callback(first ? 'INITIAL_SESSION' : user ? 'SIGNED_IN' : 'SIGNED_OUT',
-                    user ? { user: this.normalizeUser(user) } : null);
+            return this.firebaseAuth.onIdTokenChanged((user) => {
+                const event = first
+                    ? 'INITIAL_SESSION'
+                    : user
+                        ? 'TOKEN_REFRESHED'
+                        : 'SIGNED_OUT';
+                callback(event, user ? { user: this.normalizeUser(user) } : null);
                 first = false;
             });
         }
@@ -70,8 +95,14 @@ var MOM;
             } catch (error) {
                 if (error?.code === 'auth/popup-closed-by-user')
                     return { error: 'Google sign-in was cancelled.' };
-                if (error?.code === 'auth/popup-blocked')
-                    return { error: 'Your browser blocked the Google sign-in popup. Allow popups for this MOM site and try again.' };
+                if (error?.code === 'auth/popup-blocked') {
+                    try {
+                        await this.firebaseAuth.signInWithRedirect(provider);
+                        return { error: null };
+                    } catch (redirectError) {
+                        return { error: redirectError?.message || 'Google sign-in could not start. Please allow popups for MOM and try again.' };
+                    }
+                }
                 return { error: error?.message || 'Google sign-in failed. Please try again.' };
             }
         }
