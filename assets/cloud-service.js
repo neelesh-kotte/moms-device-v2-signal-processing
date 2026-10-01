@@ -6,37 +6,78 @@ var MOM;
     class CloudService {
         constructor() {
             if (!window.supabase)
-                throw new Error('Supabase client library did not load.');
+                throw new Error('Supabase client did not load.');
+            if (!window.firebase)
+                throw new Error('Firebase Authentication did not load.');
+
+            const firebaseConfig = {
+                apiKey: 'AIzaSyD9PqFxbRCXEDhTzHdbqgWD6hDc_IQph7A',
+                authDomain: 'momprojec.firebaseapp.com',
+                projectId: 'momprojec',
+                storageBucket: 'momprojec.firebasestorage.app',
+                messagingSenderId: '699393071442',
+                appId: '1:699393071442:web:759dc5af973ced136a428b',
+                measurementId: 'G-G903DY43SH'
+            };
+
+            this.firebaseApp = window.firebase.apps.length
+                ? window.firebase.app()
+                : window.firebase.initializeApp(firebaseConfig);
+            this.firebaseAuth = this.firebaseApp.auth();
+            this.firebaseAuth.useDeviceLanguage();
+
             this.client = window.supabase.createClient(MOM.SUPABASE_URL, MOM.SUPABASE_KEY, {
-                auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
+                accessToken: async () => {
+                    const user = this.firebaseAuth.currentUser;
+                    return user ? user.getIdToken(false) : null;
+                },
+                auth: {
+                    persistSession: false,
+                    autoRefreshToken: false,
+                    detectSessionInUrl: false
+                }
             });
             MOM.cloud = this;
         }
-        async googleProviderEnabled() {
-            try {
-                const r = await fetch(`${MOM.SUPABASE_URL}/auth/v1/settings`, { headers: { apikey: MOM.SUPABASE_KEY }, cache: 'no-store' });
-                if (!r.ok) return false;
-                const body = await r.json();
-                return Boolean(body?.external?.google);
-            } catch { return false; }
+        normalizeUser(user) {
+            if (!user) return null;
+            return {
+                id: user.uid,
+                uid: user.uid,
+                email: user.email ?? null,
+                displayName: user.displayName ?? null,
+                photoURL: user.photoURL ?? null
+            };
         }
         async getSession() {
-            const { data, error } = await this.client.auth.getSession();
-            if (error) throw new Error(error.message);
-            return data?.session ?? null;
+            const user = this.firebaseAuth.currentUser;
+            return user ? { user: this.normalizeUser(user) } : null;
         }
         onAuthChange(callback) {
-            const { data } = this.client.auth.onAuthStateChange(callback);
-            return () => data.subscription.unsubscribe();
+            let first = true;
+            return this.firebaseAuth.onAuthStateChanged((user) => {
+                callback(first ? 'INITIAL_SESSION' : user ? 'SIGNED_IN' : 'SIGNED_OUT',
+                    user ? { user: this.normalizeUser(user) } : null);
+                first = false;
+            });
         }
         async signInWithGoogle() {
-            const enabled = await this.googleProviderEnabled();
-            if (!enabled) return { error: 'Google sign-in is not enabled in the MOM cloud project yet.' };
-            const redirectTo = `${location.origin}${location.pathname}`;
-            const { error } = await this.client.auth.signInWithOAuth({ provider: 'google', options: { redirectTo } });
-            return { error: error?.message ?? null };
+            try {
+                const provider = new window.firebase.auth.GoogleAuthProvider();
+                provider.setCustomParameters({ prompt: 'select_account' });
+                await this.firebaseAuth.signInWithPopup(provider);
+                return { error: null };
+            } catch (error) {
+                if (error?.code === 'auth/popup-closed-by-user')
+                    return { error: 'Google sign-in was cancelled.' };
+                if (error?.code === 'auth/popup-blocked')
+                    return { error: 'Your browser blocked the Google sign-in popup. Allow popups for this MOM site and try again.' };
+                return { error: error?.message || 'Google sign-in failed. Please try again.' };
+            }
         }
-        async signOut() { await this.client.auth.signOut(); }
+        async signOut() {
+            await this.firebaseAuth.signOut();
+        }
         async loadProfiles() {
             const { data, error } = await this.client.from('mom_profiles').select('*').order('created_at');
             if (error) throw new Error(error.message);
