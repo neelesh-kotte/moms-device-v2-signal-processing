@@ -7,6 +7,13 @@
 
 // MOM SenseLoop browser-provisioning + physical recording firmware.
 // Hardware target: ESP32 DevKit + MAX4466 microphone amplifier on GPIO32.
+//
+// ARCHITECTURE NOTES:
+// - Recording is blocking: captureSamples() occupies the main loop for the entire recording duration.
+// - This is acceptable for research prototype use but means heartbeat/polling stop during capture.
+// - TLS certificate validation is disabled (setInsecure) for research prototype transport only.
+// - No watchdog prevents 120-second recordings from appearing as hangs.
+// - Command de-duplication relies on command_id tracking and backend state management.
 
 static const char *MOM_PROTOCOL = "mom-provisioning-v1";
 static const char *MOM_FIRMWARE_VERSION = "MOM SenseLoop 1.1";
@@ -26,6 +33,7 @@ String cloudEndpoint;
 unsigned long lastHeartbeatAt = 0;
 unsigned long lastCommandPollAt = 0;
 bool recordingNow = false;
+String lastProcessedCommandId = ""; // Track last command to prevent accidental re-execution
 
 struct CaptureStats {
   uint32_t sampleCount = 0;
@@ -47,6 +55,16 @@ void emitSimpleStatus(const char *type, const char *status) {
   JsonDocument doc;
   doc["type"] = type;
   doc["status"] = status;
+  doc["protocol"] = MOM_PROTOCOL;
+  doc["firmware_version"] = MOM_FIRMWARE_VERSION;
+  writeJson(doc);
+}
+
+void emitError(const char *type, const char *message) {
+  JsonDocument doc;
+  doc["type"] = type;
+  doc["status"] = "error";
+  doc["error_message"] = message;
   doc["protocol"] = MOM_PROTOCOL;
   doc["firmware_version"] = MOM_FIRMWARE_VERSION;
   writeJson(doc);
@@ -251,8 +269,19 @@ bool uploadRecordedSession(const String &commandId, uint32_t durationSeconds,
 }
 
 void performRecordingCommand(const String &commandId, uint32_t requestedSeconds) {
-  if (recordingNow) return;
+  if (recordingNow) {
+    reportCommandFailure(commandId, "A recording is already in progress. Wait for completion.");
+    return;
+  }
+
+  // Guard against duplicate command execution.
+  if (commandId == lastProcessedCommandId) {
+    reportCommandFailure(commandId, "This command has already been processed.");
+    return;
+  }
+
   recordingNow = true;
+  lastProcessedCommandId = commandId;
 
   uint32_t durationSeconds = requestedSeconds;
   if (durationSeconds < 1) durationSeconds = 60;
@@ -288,9 +317,28 @@ void pollForCommands() {
 
   const String commandId = commandNode["id"] | "";
   const String command = commandNode["command"] | "";
-  if (command != "record_session" || commandId.length() == 0) return;
+
+  if (commandId.length() == 0) {
+    emitError("poll", "Command missing required 'id' field.");
+    return;
+  }
+
+  if (command.length() == 0) {
+    emitError("poll", "Command missing required 'command' field.");
+    return;
+  }
+
+  if (command != "record_session") {
+    emitError("poll", "Unknown command type: " + command);
+    return;
+  }
 
   uint32_t durationSeconds = commandNode["payload"]["duration_seconds"] | 60;
+  if (durationSeconds < 1 || durationSeconds > 600) {
+    reportCommandFailure(commandId, "Invalid duration_seconds: must be 1-600.");
+    return;
+  }
+
   performRecordingCommand(commandId, durationSeconds);
 }
 
@@ -345,12 +393,18 @@ void provisionDevice(JsonDocument &request) {
   const String token = request["device_token"] | "";
   const String endpoint = request["endpoint"] | "";
 
-  if (ssid.length() == 0 || token.length() < 24 || !endpoint.startsWith("https://")) {
-    JsonDocument error;
-    error["type"] = "provisioning";
-    error["status"] = "error";
-    error["message"] = "Missing or invalid provisioning data";
-    writeJson(error);
+  if (ssid.length() == 0) {
+    emitError("provisioning", "Missing 'wifi_ssid'.");
+    return;
+  }
+
+  if (token.length() < 24) {
+    emitError("provisioning", "Invalid 'device_token': too short.");
+    return;
+  }
+
+  if (!endpoint.startsWith("https://")) {
+    emitError("provisioning", "Invalid 'endpoint': must start with https://");
     return;
   }
 
@@ -358,11 +412,7 @@ void provisionDevice(JsonDocument &request) {
   emitSimpleStatus("provisioning", "saved");
 
   if (!connectWiFi()) {
-    JsonDocument error;
-    error["type"] = "provisioning";
-    error["status"] = "wifi_error";
-    error["message"] = "Could not connect to the selected Wi-Fi network";
-    writeJson(error);
+    emitError("provisioning", "Could not connect to the selected Wi-Fi network");
     return;
   }
 
@@ -371,22 +421,31 @@ void provisionDevice(JsonDocument &request) {
   if (sendHeartbeat()) {
     emitSimpleStatus("provisioning", "online");
   } else {
-    JsonDocument error;
-    error["type"] = "provisioning";
-    error["status"] = "cloud_error";
-    error["message"] = "Wi-Fi connected, but the MOM cloud check-in failed";
-    writeJson(error);
+    emitError("provisioning", "Wi-Fi connected, but the MOM cloud check-in failed");
   }
 }
 
 void handleSerialLine(const String &line) {
   JsonDocument request;
   DeserializationError parseError = deserializeJson(request, line);
-  if (parseError) return;
+
+  if (parseError) {
+    emitError("parse", "Invalid JSON input.");
+    return;
+  }
 
   const String command = request["command"] | "";
   const String protocol = request["protocol"] | "";
-  if (protocol.length() > 0 && protocol != MOM_PROTOCOL) return;
+
+  if (protocol.length() > 0 && protocol != MOM_PROTOCOL) {
+    emitError("protocol", "Unsupported protocol version.");
+    return;
+  }
+
+  if (command.length() == 0) {
+    emitError("command", "Missing required 'command' field.");
+    return;
+  }
 
   if (command == "identify") {
     identifyDevice();
@@ -404,6 +463,8 @@ void handleSerialLine(const String &line) {
     emitSimpleStatus("heartbeat", sendHeartbeat() ? "online" : "error");
     return;
   }
+
+  emitError("command", "Unknown command: " + command);
 }
 
 void serviceSerial() {
