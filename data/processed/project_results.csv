@@ -1,0 +1,55 @@
+section,metric,value,unit,notes
+hardware,mean_sampling_rate,7998,Hz,Project report value
+hardware,sampling_rate_sd,11,Hz,Project report value
+hardware,sampling_rate_cv,0.14,percent,Project report value
+hardware,quiet_room_noise,0.018,RMS,Project report value
+hardware,fan_noise,0.024,RMS,Project report value
+hardware,conversation_noise,0.039,RMS,Project report value
+hardware,movement_noise,0.052,RMS,Project report value
+hardware,median_clipping_rate,0.00,percent,Project report value
+hardware,highest_controlled_clipping,0.14,percent,Project report value
+repeatability,fixed_placement_cv,5.8,percent,Project report value
+repeatability,same_operator_coupling_cv,10.1,percent,Project report value
+repeatability,different_operator_coupling_cv,16.1,percent,Project report value
+repeatability,earlier_system_variability,30.0,percent,Project report value
+repeatability,final_system_variability,11.0,percent,Project report value
+sqi,total_windows,600,count,400 usable and 200 poor quality
+sqi,usable_windows,400,count,Project report value
+sqi,poor_quality_windows,200,count,Project report value
+sqi,sensitivity,92.0,percent,Project report value
+sqi,specificity,89.0,percent,Project report value
+sqi,precision,94.4,percent,Project report value
+sqi,f1_score,93.2,percent,Project report value
+dataset_a,total_windows,10922,count,Complete windows
+dataset_a,event_windows,3881,count,Complete windows
+dataset_a,eligible_non_event_windows,5878,count,Complete windows
+dataset_a,excluded_windows,1163,count,Excluded windows
+dataset_a,pooled_event_median,0.426,ratio,Project report value
+dataset_a,pooled_non_event_median,0.089,ratio,Project report value
+dataset_a,recording_level_mean_difference,0.218,ratio,Seven recordings
+dataset_a,recording_level_ci_low,-0.023,ratio,95 percent CI
+dataset_a,recording_level_ci_high,0.459,ratio,95 percent CI
+dataset_a,recording_level_sign_flip_p,0.125,p_value,Exact two-sided sign-flip
+dataset_a,superiority_probability,0.718,probability,Project report exploratory summary
+dataset_a,superiority_probability_ci_low,0.570,probability,95 percent CI
+dataset_a,superiority_probability_ci_high,0.865,probability,95 percent CI
+dataset_b,total_subjects,19,count,Anonymized subjects
+dataset_b,eligible_subjects,16,count,Subjects with both classes
+dataset_b,total_windows,6424,count,Complete windows
+dataset_b,event_windows,3050,count,Complete windows
+dataset_b,eligible_non_event_windows,2340,count,Complete windows
+dataset_b,excluded_windows,1034,count,Excluded windows
+dataset_b,primary_mean_difference,0.0089,ratio,Subject-level primary endpoint
+dataset_b,primary_ci_low,-0.0151,ratio,95 percent bootstrap CI
+dataset_b,primary_ci_high,0.0329,ratio,95 percent bootstrap CI
+dataset_b,primary_sign_flip_p,0.455,p_value,Exact two-sided sign-flip
+dataset_b,exploratory_rank_probability,0.598,probability,Post-hoc exploratory result
+dataset_b,exploratory_ci_low,0.540,probability,95 percent CI
+dataset_b,exploratory_ci_high,0.655,probability,95 percent CI
+dataset_b,exploratory_sign_flip_p,0.0032,p_value,Post-hoc exploratory result
+dataset_b,exploratory_subjects_above_050,14,count,Of 16 eligible subjects
+model,baseline_balanced_accuracy,68.0,percent,Five-fold LOSO-CV report value
+model,acoustic_feature_balanced_accuracy,78.0,percent,Five-fold LOSO-CV report value
+model,combined_balanced_accuracy,82.0,percent,Five-fold LOSO-CV report value
+model,combined_sqi_balanced_accuracy,88.0,percent,Accepted recordings only
+model,combined_sqi_coverage,80.0,percent,Accepted recordings only
