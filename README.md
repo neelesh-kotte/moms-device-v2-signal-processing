@@ -159,3 +159,22 @@ GitHub: https://github.com/neelesh-kotte/moms-device-v2-signal-processing
 ## License
 
 MIT License. See LICENSE.
+
+
+## Research report and analysis files
+
+The longer project report is in docs/full_research_report.md.
+
+The reported summary values are also stored in data/processed/project_results.csv. The four notebooks in notebooks/ organize the hardware, SQI, unit-of-analysis, and LOSO-CV work.
+
+The notebooks are meant to make the analysis easier to follow. A full independent re-run still needs the original raw recordings, session-level data, and measurement logs.
+
+## Firmware source
+
+The main firmware source remains firmware/mom_senseloop/mom_senseloop.ino. A C++ source mirror is also in firmware/src/main.cpp.
+
+## Data boundary
+
+The repository does not contain private MOM recordings or redistributed raw audio from the public datasets. The processed CSV contains project-level summary values rather than raw recordings.
+
+I did not add a CAD STL file because the exact dimensions of the physical acoustic coupler are not established in the project files. A made-up STL would not be a useful record of the actual hardware.
