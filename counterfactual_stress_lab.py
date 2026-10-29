@@ -141,7 +141,7 @@ def run(path: Path, output_dir: Path) -> dict:
     rows[0]["absolute_change_from_baseline"] = 0.0
     rows[0]["relative_change_percent"] = 0.0
     nonbaseline = [r for r in rows if r["condition"] != "baseline"]
-    valid_deltas = [r["relative_change_percent"] for r in nonbaseline if np.isfinite(r["relative_change_percent"])]
+    valid_deltas = [r["relative_change_percent"] for r in nonbaseline if r["relative_change_percent"] is not None and np.isfinite(r["relative_change_percent"])]
     report = {
         "tool": "MOM Counterfactual Stress Lab",
         "version": "1.0.0",
