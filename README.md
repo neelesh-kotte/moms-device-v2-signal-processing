@@ -120,6 +120,18 @@ Open the browser-based [MOM Sonic Atlas](sonic-atlas.html) to explore a WAV reco
 - This visualization is a research tool, not a diagnostic or clinical interpretation system.
 
 
+## Counterfactual Stress Lab
+
+The new `counterfactual_stress_lab.py` tool probes the existing 120–480 Hz band-power ratio under six controlled recording changes: global gain −6 dB, global gain +6 dB, added noise at 20 dB SNR, added noise at 10 dB SNR, a 25 ms time shift, and hard clipping. It writes a per-recording JSON and CSV report with feature drift, RMS level, and clipped-sample fraction.
+
+```bash
+python counterfactual_stress_lab.py --wav path/to/recording.wav --out mom_stress_report
+```
+
+Read [COUNTERFACTUAL_STRESS_LAB.md](COUNTERFACTUAL_STRESS_LAB.md) before interpreting results. This is a reproducible **feature-sensitivity audit**, not a bowel-event classifier. The perturbations are probes and are not guaranteed to preserve biological labels. It does not diagnose conditions or establish clinical reliability.
+
+Sonic Atlas also includes an in-browser Counterfactual Stress Lab for quick exploration. It runs locally and does not upload the selected recording.
+
 ## Running the analysis
 
 ```bash
