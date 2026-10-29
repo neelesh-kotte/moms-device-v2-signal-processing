@@ -212,3 +212,11 @@ python mom_redteam_bench.py --manifest path/to/manifest.csv --out mom_redteam_re
 ```
 
 The tool does not define bowel-sound labels, diagnose disease, or establish clinical performance. Its scientific value depends on independent recordings, transparent annotation, pre-specified evaluation, and external validation. The included software test fixtures are synthetic and are not research results.
+
+## Health-audio research suite
+
+The GitHub Pages homepage now presents the project as a broader acoustic-research suite while keeping the original MOM abdominal-acoustic work distinct from proposed respiratory, sleep, and heart-sound studies. The new browser lab offers transparent signal-processing baselines for exploring short local audio clips; it does not include a trained medical classifier or make diagnoses.
+
+See [HEALTH_AUDIO_RESEARCH.md](HEALTH_AUDIO_RESEARCH.md) for what the browser lab computes, the current limitations, and the validation gates required before clinical claims. The existing [Sonic Atlas](sonic-atlas.html), [Counterfactual Stress Lab](COUNTERFACTUAL_STRESS_LAB.md), and [Red-Team Bench](red-team-bench.html) remain available as separate research tools.
+
+The public homepage uses a premium, responsive design with a restrained light palette, layered glass panels, accessible focus states, mobile navigation, and reduced-motion support. The existing application dashboard is available at [dashboard.html](dashboard.html).
