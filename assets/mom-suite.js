@@ -56,9 +56,9 @@
     for(let start=0;start<samples.length;start+=hop){
       const real=new Float64Array(n),imag=new Float64Array(n);let sum=0,cross=0,prev=0;
       for(let i=0;i<n;i++){const x=samples[start+i]||0;sum+=x*x;if(i&&((x>=0)!==(prev>=0)))cross++;prev=x;real[i]=x*(.5-.5*Math.cos(2*Math.PI*i/(n-1)))}
-      const rms=Math.sqrt(sum/n);fft(real,imag);let total=0,inBand=0,high=0,cent=0,flux=0;const spec=new Float32Array(n/2);
-      for(let k=1;k<n/2;k++){const p=real[k]*real[k]+imag[k]*imag[k],hz=k*sr/n;spec[k]=p;total+=p;cent+=hz*p;if(hz>=band[0]&&hz<=band[1])inBand+=p;if(hz>=500&&hz<=3000)high+=p;if(prevSpec&&p>prevSpec[k])flux+=p-prevSpec[k]}
-      frames.push({t:start/sr,rms,zc:cross/n,ratio:total?inBand/total:0,high:total?high/total:0,centroid:total?cent/total:0,flux:total?flux/total:0});
+      const rms=Math.sqrt(sum/n);fft(real,imag);let total=0,rangeTotal=0,inBand=0,high=0,cent=0,flux=0;const spec=new Float32Array(n/2);
+      for(let k=1;k<n/2;k++){const p=real[k]*real[k]+imag[k]*imag[k],hz=k*sr/n;spec[k]=p;total+=p;if(hz>=20&&hz<=2000)rangeTotal+=p;cent+=hz*p;if(hz>=band[0]&&hz<=band[1])inBand+=p;if(hz>=500&&hz<=3000)high+=p;if(prevSpec&&p>prevSpec[k])flux+=p-prevSpec[k]}
+      frames.push({t:start/sr,rms,zc:cross/n,ratio:(mode==='abdomen'?rangeTotal:total)?inBand/(mode==='abdomen'?rangeTotal:total):0,high:total?high/total:0,centroid:total?cent/total:0,flux:total?flux/total:0});
       prevSpec=spec;
     }
     return frames;
