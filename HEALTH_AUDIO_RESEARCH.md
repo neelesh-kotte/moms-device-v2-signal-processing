@@ -19,7 +19,7 @@ These directions are not interchangeable. They involve different sensors, record
 - BreathGuard profile: highlights frames with elevated relative energy in a broad high-frequency band.
 - SleepSignal profile: highlights consecutive low-energy frames.
 - MurmurMap profile: highlights sustained frames with a relatively elevated selected-band energy ratio.
-- MOM profile: highlights relatively elevated 120–480 Hz band-energy ratios.
+- MOM profile: highlights relatively elevated 120–480 Hz band-energy ratios, using 20–2,000 Hz as the denominator to match the documented research feature.
 
 These are **heuristic signal-processing baselines**, not machine-learning classifiers. Thresholds are exploratory and have not been clinically calibrated. The segment names describe how the baseline selected a region; they do not confirm the presence of a wheeze, crackle, apnea, murmur, bowel event, or disease. No health diagnosis, disease probability, or clinical screening score is generated.
 
