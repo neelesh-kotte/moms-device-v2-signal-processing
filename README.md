@@ -200,3 +200,15 @@ The main firmware source remains firmware/mom_senseloop/mom_senseloop.ino. A C++
 The repository does not contain private MOM recordings or redistributed raw audio from the public datasets. The processed CSV contains project-level summary values rather than raw recordings.
 
 I did not add a CAD STL file because the exact dimensions of the physical acoustic coupler are not established in the project files. A made-up STL would not be a useful record of the actual hardware.
+
+## MOM Red-Team Bench
+
+The [MOM Red-Team Bench](red-team-bench.html) is a research tool for auditing binary audio classifiers on held-out recordings and controlled recording challenges. It trains logistic-regression and random-forest baselines from labeled clips, uses a grouped train/test split by recording ID, and reports event sensitivity, false positives, F1, AUROC, probability shifts, and prediction flips under six probes.
+
+Read [MOM_REDTEAM_BENCH.md](MOM_REDTEAM_BENCH.md) for the input-manifest format, command-line usage, interpretation, and limitations.
+
+```bash
+python mom_redteam_bench.py --manifest path/to/manifest.csv --out mom_redteam_report
+```
+
+The tool does not define bowel-sound labels, diagnose disease, or establish clinical performance. Its scientific value depends on independent recordings, transparent annotation, pre-specified evaluation, and external validation. The included software test fixtures are synthetic and are not research results.
