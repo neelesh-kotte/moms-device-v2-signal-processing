@@ -78,6 +78,12 @@ An additional within-subject rank analysis was added after the primary result an
 
 The exploratory result does not replace the primary result.
 
+## SOUNDTRUTH: counterfactual acoustic shortcut audit
+
+SOUNDTRUTH tests whether an existing frozen acoustic model changes its prediction when the same labeled recording is exposed to realistic, label-preserving recording nuisances. It reports paired prediction flips, clean-versus-perturbed accuracy changes, and per-recording results. See `SOUNDTRUTH.md` for the proposed protocol and `counterfactual_acoustic_audit.py` for the analysis utility.
+
+This targets a specific failure mode: a model may learn recording conditions rather than generalizable acoustic evidence. The utility analyzes predictions exported from real experiments; it does not create perturbations, train a model, or claim clinical validation. No result should be claimed until the model is actually tested on held-out paired examples.
+
 ## Risk-aware acoustic AI audit
 
 The optional `risk_aware_audit.py` utility evaluates predictions from an existing model with confidence and signal-quality abstention gates. It reports coverage alongside error metrics and breaks results down by recording, helping expose cases hidden by one aggregate score. The accompanying `RISK_AWARE_ACOUSTIC_AUDIT.md` documents the protocol, limitations, and example commands; unit tests are in `tests/test_risk_aware_audit.py`.
