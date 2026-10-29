@@ -78,6 +78,12 @@ An additional within-subject rank analysis was added after the primary result an
 
 The exploratory result does not replace the primary result.
 
+## MOM PulseCheck: “silence is not proof”
+
+A proposed active acoustic-path integrity check: apply a repeatable calibration pulse to a bench-mounted coupler and compare the recorded response with a known-good reference. It reports pulse-shape correlation, amplitude ratio, pulse-to-baseline SNR, and clipping, then asks for a retest if the configured engineering checks fail.
+
+See `MOM_PULSECHECK.md` and `pulsecheck.py`. The current prototype has no calibrated actuator, so this is an offline bench-analysis engine—not an on-device capability yet. Thresholds are provisional and must be learned and tested on repeated, held-out bench sessions. It does not diagnose a person or prove that a bowel-sound recording is medically meaningful.
+
 ## SOUNDTRUTH: counterfactual acoustic shortcut audit
 
 SOUNDTRUTH tests whether an existing frozen acoustic model changes its prediction when the same labeled recording is exposed to realistic, label-preserving recording nuisances. It reports paired prediction flips, clean-versus-perturbed accuracy changes, and per-recording results. See `SOUNDTRUTH.md` for the proposed protocol and `counterfactual_acoustic_audit.py` for the analysis utility.
