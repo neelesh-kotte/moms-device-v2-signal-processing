@@ -2,7 +2,7 @@
   'use strict';
   const $ = (s, root=document) => root.querySelector(s);
   const $$ = (s, root=document) => [...root.querySelectorAll(s)];
-  const state = { mode:'breath', report:null, fileName:'' };
+  const state = { mode:'breath', report:null, fileName:'', file:null, frames:[] };
   const modes = {
     breath:{title:'BreathGuard · Respiratory acoustics',desc:'Candidate high-frequency bursts and spectral changes for expert review.',band:[500,3000],kind:'High-frequency candidate',method:'A transparent signal-processing baseline. It does not identify wheeze, crackles, asthma, infection, or any disease.'},
     sleep:{title:'SleepSignal · Overnight audio',desc:'Low-energy intervals and changes in sound intensity across the recording.',band:[80,1200],kind:'Low-energy interval',method:'Quiet intervals are not proof of an apnea or breathing interruption. This baseline cannot score sleep or diagnose sleep apnea.'},
@@ -27,7 +27,7 @@
     $('#profileTitle').textContent=modes[mode].title;
     $('#profileDesc').textContent=modes[mode].desc;
     $('#runModeLabel').textContent=mode==='breath'?'Respiratory profile':mode==='sleep'?'Sleep-audio profile':mode==='heart'?'Heart-sound profile':'Abdominal-acoustic profile';
-    if(state.report)renderReport(state.report);
+    if(state.file)processFile(state.file); else $('#reportMethod').textContent=modes[state.mode].method;
   }
   $$('.mode-switch button').forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.mode)));
   $('#mobileToggle').addEventListener('click',()=>{const m=$('#mobileMenu');const open=m.classList.toggle('open');$('#mobileToggle').setAttribute('aria-expanded',String(open))});
@@ -79,7 +79,7 @@
     return segments.sort((a,b)=>b.end-b.start).slice(0,8).sort((a,b)=>a.start-b.start);
   }
   async function processFile(file){
-    state.fileName=file.name;$('#fileName').textContent=file.name;$('#reportError').textContent='';
+    state.file=file;state.fileName=file.name;$('#fileName').textContent=file.name;$('#reportError').textContent='';
     if(file.size>80*1024*1024){$('#reportError').textContent='Please choose a file smaller than 80 MB.';return}
     if(!/\.(wav|mp3|m4a|aac|ogg|webm|flac)$/i.test(file.name)){ $('#reportError').textContent='Choose an audio file (WAV is recommended).';return}
     $('#reportEmpty').classList.add('hidden');$('#reportLive').classList.remove('active');$('#reportLoading').classList.remove('hidden');$('#statusMessage').textContent='Decoding audio locally in this browser…';
@@ -93,7 +93,7 @@
       for(let i=0;i<total;i++){const at=i*ratio,j=Math.floor(at),f=at-j;let sum=0;for(const ch of channels){const a=ch[j]||0,b=ch[j+1]||0;sum+=a+(b-a)*f}mono[i]=sum/channels.length}
       $('#statusMessage').textContent='Extracting transparent signal features…';
       await new Promise(r=>setTimeout(r,30));
-      const frames=processFrames(mono,sr,state.mode),rms=Math.sqrt(mono.reduce((s,x)=>s+x*x,0)/Math.max(1,mono.length)),peak=mono.reduce((m,x)=>Math.max(m,Math.abs(x)),0);
+      const frames=processFrames(mono,sr,state.mode);state.frames=frames;const rms=Math.sqrt(mono.reduce((s,x)=>s+x*x,0)/Math.max(1,mono.length)),peak=mono.reduce((m,x)=>Math.max(m,Math.abs(x)),0);
       const segments=getSegments(frames,state.mode);
       state.report={tool:'MOM Local Audio Research Baseline',version:'0.1.0',createdAt:new Date().toISOString(),fileName:file.name,profile:state.mode,durationSeconds:Number(buf.duration.toFixed(3)),originalSampleRate:buf.sampleRate,analysisSampleRateHz:sr,channels:buf.numberOfChannels,globalRms:Number(rms.toFixed(6)),peakAmplitude:Number(peak.toFixed(6)),frames:frames.length,segments:segments.map(s=>({...s,start:Number(s.start.toFixed(3)),end:Number(s.end.toFixed(3)),meanRms:Number(s.meanRms.toFixed(6)),meanRatio:Number(s.meanRatio.toFixed(5))})),interpretation:modes[state.mode].method,privacy:'Audio is decoded and analyzed in this browser tab. This page does not upload the selected audio.'};
       renderReport(state.report,frames);$('#reportLoading').classList.add('hidden');$('#reportLive').classList.add('active');$('#reportEmpty').classList.add('hidden');$('#statusMessage').textContent='Analysis complete · local browser processing';$('#downloadReport').classList.remove('hidden');
@@ -107,7 +107,7 @@
     if(!report.segments.length){const p=document.createElement('p');p.className='report-foot';p.textContent='No segments passed this simple threshold in this clip. That does not establish that the recording is normal.';list.append(p)}
     else report.segments.forEach(s=>{const row=document.createElement('div');row.className='segment-row';const time=document.createElement('strong');time.textContent=fmt(s.start)+'–'+fmt(s.end);const track=document.createElement('div');track.className='segment-track';const span=document.createElement('span');span.style.width=Math.max(4,Math.min(100,(s.end-s.start)/Math.max(.25,report.durationSeconds)*100))+'%';track.append(span);const dur=document.createElement('span');dur.textContent=(s.end-s.start).toFixed(1)+' s';row.append(time,track,dur);list.append(row)});
     $('#reportMethod').textContent=mode.method;
-    if(frames)drawWave(frames);
+    if(state.frames)drawWave(state.frames);
   }
   function fmt(t){return t.toFixed(1)+'s'}
   function drawWave(frames){
@@ -116,15 +116,9 @@
     ctx.beginPath();ctx.moveTo(0,h/2);values.forEach((v,i)=>{const x=i/(values.length-1||1)*w,y=h/2-(v/max)*h*.42;if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)});ctx.strokeStyle='#c9f0df';ctx.lineWidth=1.5*dpr;ctx.stroke();
     if(state.report){ctx.fillStyle='rgba(151,211,185,.20)';state.report.segments.forEach(s=>{const x=s.start/state.report.durationSeconds*w,ww=(s.end-s.start)/state.report.durationSeconds*w;ctx.fillRect(x,0,ww,h)})}
   }
-  const observer=new ResizeObserver(()=>{if(state.report)drawWave(state.report.framesCache||[])});
+  const observer=new ResizeObserver(()=>{if(state.report&&state.frames.length)drawWave(state.frames)});
   if(canvas)observer.observe(canvas);
-  function renderReportWithoutFrames(){if(state.report)renderReport(state.report)}
-  // Recompute from the retained feature report when the user changes the analysis profile.
-  const originalSetMode=setMode;
-  function unused(){}
-  // Keep the last frame series private to the tab for a responsive redraw.
-  const oldProcessFile=processFile;
-  // Override report renderer's frame cache after analysis through a lightweight wrapper.
   window.MOMResearchSuite={setMode,analyzeFile:processFile,getReport:()=>state.report};
+  $('.mode-link').forEach(button=>button.addEventListener('click',()=>{setMode(button.dataset.openMode);$('#audio-lab').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});$('#audioFile').focus({preventScroll:true})}));
   $('#reportMethod').textContent=modes[state.mode].method;
 })();
