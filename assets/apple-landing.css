@@ -1,0 +1,287 @@
+/* MOM SenseLoop — Apple-inspired editorial landing system.
+   Additive overrides only: research tools, app behavior, and other routes remain intact. */
+
+:root {
+  --apple-paper: #f7f8f7;
+  --apple-white: #ffffff;
+  --apple-ink: #111715;
+  --apple-muted: #59635f;
+  --apple-line: rgba(23, 38, 32, .12);
+  --apple-accent: #176b59;
+  --apple-accent-bright: #2a8d76;
+  --apple-glass: rgba(255, 255, 255, .62);
+  --apple-glass-border: rgba(255, 255, 255, .82);
+  --apple-shadow: 0 28px 80px rgba(20, 39, 32, .09), 0 2px 10px rgba(20, 39, 32, .035);
+  --apple-radius: 28px;
+}
+
+html { scroll-behavior: smooth; scroll-padding-top: 90px; }
+body {
+  background: var(--apple-paper);
+  color: var(--apple-ink);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+::selection { background: rgba(42, 141, 118, .18); color: var(--apple-ink); }
+:focus-visible { outline: 3px solid #287f6c; outline-offset: 4px; }
+
+.site-header {
+  background: rgba(248, 249, 248, .78);
+  border-bottom: 1px solid rgba(25, 43, 35, .08);
+  -webkit-backdrop-filter: saturate(180%) blur(22px);
+  backdrop-filter: saturate(180%) blur(22px);
+}
+.site-header__inner { max-width: 1440px; min-height: 76px; padding-inline: clamp(22px, 5vw, 76px); }
+.site-header__nav { gap: 4px; }
+.site-header__nav a, .site-header__nav button {
+  border-radius: 999px;
+  transition: background-color .2s ease, color .2s ease, transform .2s ease;
+}
+.site-header__nav a:hover, .site-header__nav button:hover { background: rgba(23, 107, 89, .08); }
+.mom-logo__mark { border-radius: 13px; box-shadow: 0 5px 16px rgba(23, 107, 89, .16); }
+
+.public-home {
+  overflow: clip;
+  background:
+    radial-gradient(ellipse at 77% 7%, rgba(186, 224, 211, .32), transparent 33rem),
+    radial-gradient(ellipse at 4% 27%, rgba(225, 235, 230, .44), transparent 30rem),
+    var(--apple-paper);
+}
+.public-home .public-hero,
+.public-home .home-section {
+  width: min(100%, 1440px);
+  max-width: 1440px;
+  padding-inline: clamp(24px, 7.2vw, 112px);
+}
+.public-home .public-hero {
+  min-height: min(850px, calc(100svh - 76px));
+  grid-template-columns: minmax(0, 1.02fr) minmax(360px, .9fr);
+  gap: clamp(42px, 6vw, 92px);
+  padding-top: clamp(74px, 9vw, 124px);
+  padding-bottom: clamp(90px, 10vw, 138px);
+  position: relative;
+  isolation: isolate;
+}
+.public-home .public-hero::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  width: min(58vw, 760px);
+  aspect-ratio: 1;
+  right: -12%;
+  top: 4%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(196, 230, 217, .36), rgba(226, 239, 233, .13) 43%, transparent 70%);
+  pointer-events: none;
+}
+.public-home .hero-copy { max-width: 720px; }
+.public-home .hero-overline, .public-home .eyebrow {
+  color: var(--apple-accent);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .13em;
+  line-height: 1.6;
+}
+.public-home .public-hero h1 {
+  max-width: 11ch;
+  margin-top: 25px;
+  color: var(--apple-ink);
+  font-size: clamp(3.7rem, 6.3vw, 6.35rem) !important;
+  font-weight: 650 !important;
+  letter-spacing: -.075em !important;
+  line-height: .97 !important;
+  text-wrap: balance;
+}
+.public-home .hero-subhead, .public-home .public-hero h1 + p {
+  max-width: 570px;
+  margin-top: 27px;
+  color: var(--apple-muted);
+  font-size: clamp(16px, 1.35vw, 19px);
+  line-height: 1.72;
+  letter-spacing: -.015em;
+}
+.public-home .hero-actions { align-items: center; gap: 11px; margin-top: 31px; }
+.public-home .hero-actions .ui-button {
+  min-height: 49px;
+  border-radius: 999px;
+  padding: 13px 20px;
+  font-size: 14px;
+  font-weight: 650;
+  transition: transform .22s ease, box-shadow .22s ease, background-color .22s ease;
+}
+.public-home .hero-actions .ui-button:hover { transform: translateY(-2px); }
+.public-home .hero-actions .ui-button--primary {
+  background: var(--apple-ink);
+  border-color: var(--apple-ink);
+  box-shadow: 0 8px 22px rgba(17, 23, 21, .14);
+}
+.public-home .hero-actions .ui-button--primary:hover {
+  background: #26332e;
+  box-shadow: 0 12px 26px rgba(17, 23, 21, .18);
+}
+.public-home .hero-boundary {
+  margin-top: 27px;
+  border-left: 2px solid #6f9e8d;
+  padding-left: 14px;
+  color: #5b6661;
+  font-size: 12px;
+  line-height: 1.65;
+}
+.public-home .hero-boundary strong { color: #253b32; }
+
+/* The hero instrument becomes a layered, translucent glass object. */
+.public-home .hero-object {
+  border: 1px solid var(--apple-glass-border);
+  border-radius: var(--apple-radius);
+  background: linear-gradient(145deg, rgba(255,255,255,.82), rgba(242,248,245,.55));
+  box-shadow: var(--apple-shadow), inset 0 1px 0 rgba(255,255,255,.9);
+  -webkit-backdrop-filter: blur(24px) saturate(145%);
+  backdrop-filter: blur(24px) saturate(145%);
+  overflow: hidden;
+  transform: translateZ(0);
+}
+.public-home .hero-object::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.98), transparent);
+  pointer-events: none;
+}
+.public-home .hero-object::after {
+  right: 0; bottom: 0;
+  width: 38%; height: 38%;
+  border-color: rgba(42, 141, 118, .36);
+  border-radius: 0 0 var(--apple-radius) 0;
+}
+.public-home .instrument-readout { padding: clamp(22px, 3vw, 34px); }
+.public-home .instrument-id {
+  color: var(--apple-ink);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+  font-size: clamp(28px, 3vw, 42px);
+  font-weight: 620;
+  letter-spacing: -.065em;
+}
+.public-home .instrument-caption { color: var(--apple-muted); }
+.public-home .instrument-ledger {
+  border-color: var(--apple-line);
+  border-radius: 16px;
+  overflow: hidden;
+}
+.public-home .instrument-ledger > div {
+  border-color: var(--apple-line);
+  background: rgba(255,255,255,.34);
+}
+.public-home .instrument-wave > div {
+  border-radius: 16px;
+  border-color: rgba(23, 107, 89, .15) !important;
+  background: linear-gradient(180deg, #f5faf7, #eaf4ef) !important;
+}
+.public-home .instrument-live { color: var(--apple-accent); }
+
+/* Section rhythm: broad breathing room, restrained dividers, and soft card depth. */
+.public-home .home-section {
+  padding-top: clamp(88px, 10vw, 144px);
+  padding-bottom: clamp(88px, 10vw, 144px);
+}
+.public-home .home-section h2,
+.public-home .section-title__heading {
+  color: var(--apple-ink);
+  font-size: clamp(2.45rem, 4.5vw, 4.5rem);
+  font-weight: 620;
+  letter-spacing: -.065em;
+  line-height: 1.02;
+}
+.public-home .home-section p { color: var(--apple-muted); }
+.public-home .feature-grid {
+  border-color: var(--apple-line);
+  border-radius: 22px;
+  overflow: hidden;
+  background: rgba(255,255,255,.42);
+}
+.public-home .feature-item {
+  min-height: 300px;
+  border-color: var(--apple-line);
+  padding: clamp(22px, 2.7vw, 36px);
+  transition: background-color .25s ease;
+}
+.public-home .feature-item:hover { background: rgba(255,255,255,.68); }
+.public-home .feature-item h3 {
+  margin-top: 64px;
+  color: var(--apple-ink);
+  font-size: clamp(23px, 2.2vw, 30px);
+  font-weight: 620;
+  letter-spacing: -.055em;
+  line-height: 1.12;
+}
+.public-home .feature-number { color: var(--apple-accent); }
+.public-home .editorial-panel,
+.public-home .trust-list article,
+.public-home .review-themes article {
+  border-color: var(--apple-line);
+  border-radius: 22px;
+  background: rgba(255,255,255,.62);
+  box-shadow: 0 12px 40px rgba(26, 49, 39, .045);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+}
+.public-home .ui-button--secondary,
+.public-home .ui-button--ghost {
+  border-radius: 999px;
+}
+.public-home a:not(.ui-button):hover { color: var(--apple-accent); }
+
+.sonic-atlas-launch, .redteam-launch {
+  border-radius: 999px !important;
+  -webkit-backdrop-filter: blur(18px) saturate(150%);
+  backdrop-filter: blur(18px) saturate(150%);
+  box-shadow: 0 12px 36px rgba(10, 25, 20, .16) !important;
+  transition: transform .22s ease, box-shadow .22s ease !important;
+}
+.sonic-atlas-launch:hover, .redteam-launch:hover {
+  transform: translateY(-3px) !important;
+  box-shadow: 0 16px 42px rgba(10, 25, 20, .2) !important;
+}
+
+@media (max-width: 980px) {
+  .public-home .public-hero {
+    min-height: 0;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 54px;
+    padding-top: 82px;
+    padding-bottom: 90px;
+  }
+  .public-home .hero-copy { max-width: 780px; }
+  .public-home .public-hero h1 { max-width: 12ch; font-size: clamp(3.6rem, 9vw, 6rem) !important; }
+  .public-home .hero-object { width: min(100%, 680px); margin-inline: auto; }
+}
+@media (max-width: 760px) {
+  .public-home .home-section { padding-top: 86px; padding-bottom: 86px; }
+  .public-home .feature-grid { grid-template-columns: minmax(0, 1fr); }
+  .public-home .feature-item { min-height: 0; padding: 26px; border-right: 1px solid var(--apple-line); }
+  .public-home .feature-item h3 { margin-top: 38px; }
+}
+@media (max-width: 520px) {
+  .site-header__inner { min-height: 68px; }
+  .public-home .public-hero, .public-home .home-section { padding-inline: 21px; }
+  .public-home .public-hero { gap: 42px; padding-top: 64px; padding-bottom: 70px; }
+  .public-home .public-hero h1 { max-width: 10ch; font-size: clamp(3.35rem, 15vw, 4.6rem) !important; line-height: .98 !important; }
+  .public-home .hero-subhead, .public-home .public-hero h1 + p { margin-top: 22px; font-size: 16px; line-height: 1.68; }
+  .public-home .hero-actions { align-items: stretch; }
+  .public-home .hero-actions .ui-button { width: 100%; }
+  .public-home .hero-object { border-radius: 22px; }
+  .public-home .instrument-readout { padding: 22px 18px; }
+  .public-home .instrument-caption { margin-bottom: 28px; }
+  .public-home .home-section h2, .public-home .section-title__heading { font-size: clamp(2.4rem, 11vw, 3.5rem); }
+  .sonic-atlas-launch, .redteam-launch { right: 12px !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: .01ms !important;
+  }
+}
