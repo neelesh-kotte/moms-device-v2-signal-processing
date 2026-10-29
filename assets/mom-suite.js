@@ -26,7 +26,6 @@
     $$('.mode-switch button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.mode===mode)));
     $('#profileTitle').textContent=modes[mode].title;
     $('#profileDesc').textContent=modes[mode].desc;
-    $('#runModeLabel').textContent=mode==='breath'?'Respiratory profile':mode==='sleep'?'Sleep-audio profile':mode==='heart'?'Heart-sound profile':'Abdominal-acoustic profile';
     if(state.file)processFile(state.file); else $('#reportMethod').textContent=modes[state.mode].method;
   }
   $$('.mode-switch button').forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.mode)));
@@ -79,7 +78,7 @@
     return segments.sort((a,b)=>b.end-b.start).slice(0,8).sort((a,b)=>a.start-b.start);
   }
   async function processFile(file){
-    state.file=file;state.fileName=file.name;$('#fileName').textContent=file.name;$('#reportError').textContent='';
+    state.file=file;state.fileName=file.name;$('#reportError').textContent='';
     if(file.size>80*1024*1024){$('#reportError').textContent='Please choose a file smaller than 80 MB.';return}
     if(!/\.(wav|mp3|m4a|aac|ogg|webm|flac)$/i.test(file.name)){ $('#reportError').textContent='Choose an audio file (WAV is recommended).';return}
     $('#reportEmpty').classList.add('hidden');$('#reportLive').classList.remove('active');$('#reportLoading').classList.remove('hidden');$('#statusMessage').textContent='Decoding audio locally in this browser…';
