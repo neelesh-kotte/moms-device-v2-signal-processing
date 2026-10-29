@@ -779,7 +779,7 @@ var MOM;
                         E('div', { className: 'premium-signal-card__footer' },
                             E('div', null, E('span', { className: 'premium-mini-icon' }, E(Icon, { name: 'scan-line', size: 16 })), E('span', null, E('strong', null, 'Quality before interpretation'), E('small', null, 'Inspect the signal. Keep the limits visible.'))),
                             E('span', { className: 'premium-signal-card__arrow', 'aria-hidden': 'true' }, E(Icon, { name: 'arrow-up-right', size: 18 }))),
-                        E('figcaption', { id: 'premium-signal-caption', className: 'premium-signal-card__caption' }, 'Concept visualization only · No patient or diagnostic data shown'))),
+                        E('figcaption', { id: 'premium-signal-caption', className: 'premium-signal-card__caption' }, 'Concept visualization only · No patient or diagnostic data shown')))),
                 E('section', { className: 'premium-proof-strip', 'aria-label': 'Project at a glance' },
                     E('div', { className: 'premium-proof-strip__intro' }, 'BUILT TO BE INSPECTED', E('span', null, 'Engineering, signal processing, and reproducible research.')),
                     E('div', { className: 'premium-proof-stat' }, E('strong', null, '32+'), E('span', null, 'controlled engineering experiments')),
