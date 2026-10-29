@@ -59,7 +59,8 @@ python pulsecheck.py \
 
 The reference and test WAVs must have the same sample rate, duration, and pulse timing, with a pre-pulse baseline. The files should be captured from the same repeatable bench setup.
 
-## Literature grounding
+## Literature grounding and novelty boundary
 
-- Shortcut learning in medical AI can exploit acquisition artifacts and harm generalization. See the 2024 npj Digital Medicine study: https://www.nature.com/articles/s41746-024-01118-4
-- This project’s own hardware notes already document testing gain, clipping, movement, environmental noise, placement, mounting pressure, and acoustic contact. PulseCheck turns those engineering concerns into a repeatable challenge-response experiment.
+- Active self-diagnostics and pulse-based coupling checks already exist in acoustic-emission and piezoelectric sensing; this project must not claim to have invented active sensor self-testing. See the [ASTM acoustic-emission system performance guide](https://www.iteh.us/catalog/standards/astm/8bb4c49f-8a24-47f7-bd05-5110ef186eae/astm-e2374-16-2021), [research on piezoelectric active-sensor diagnostics](https://laro.lanl.gov/esploro/outputs/journalArticle/Piezoelectric-Active-Sensor-Self-Diagnostics-Using-Electrical/9916364297703761), and the [open-access pitch-catch study](https://pmc.ncbi.nlm.nih.gov/articles/PMC10457745/).
+- Shortcut learning in medical AI can exploit acquisition artifacts and harm generalization. See the 2024 [npj Digital Medicine study](https://www.nature.com/articles/s41746-024-01118-4).
+- The possible MOM-specific contribution is an affordable, repeatable challenge-response workflow tailored to this abdominal-acoustic prototype and evaluated against its existing passive quality checks. Whether that is useful or novel enough must be established by literature review and controlled experiments; it is not assumed.
