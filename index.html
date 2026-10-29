@@ -24,6 +24,12 @@
       </main>
     </div>
 
+    <a class="sonic-atlas-launch" href="sonic-atlas.html" aria-label="Open Sonic Atlas interactive abdominal-acoustic signal explorer">◉ <span>Explore Sonic Atlas</span> ↗</a>
+    <style>
+      .sonic-atlas-launch{position:fixed;right:22px;bottom:22px;z-index:2147483000;display:inline-flex;align-items:center;gap:9px;padding:13px 17px;border:1px solid #7df3ce;background:#0d211d;color:#b7ffe9;border-radius:999px;box-shadow:0 8px 32px #0004;font:700 13px/1.2 system-ui,sans-serif;text-decoration:none;letter-spacing:.01em;transition:transform .18s,box-shadow .18s}
+      .sonic-atlas-launch:hover{transform:translateY(-2px);box-shadow:0 12px 38px #0006}
+      @media(max-width:520px){.sonic-atlas-launch{right:12px;bottom:12px;padding:12px 14px}.sonic-atlas-launch span{display:inline}}
+    </style>
     <script defer src="https://cdn.jsdelivr.net/npm/react@18.3.1/umd/react.production.min.js" crossorigin></script>
     <script defer src="https://cdn.jsdelivr.net/npm/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin></script>
     <script defer src="https://www.gstatic.com/firebasejs/12.19.0/firebase-app-compat.js"></script>
