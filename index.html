@@ -3,9 +3,9 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#F4F1E8">
+    <meta name="theme-color" content="#F7F8F7">
     <meta name="color-scheme" content="light">
-    <meta name="mom-build" content="warm-minimal-v3-native-20260907">
+    <meta name="mom-build" content="apple-editorial-v1-20261028">
     <meta name="description" content="MOM SenseLoop is a low-cost abdominal-acoustic research prototype with interactive waveform analysis and a counterfactual stress lab that tests how recording changes affect its signal features.">
     <meta property="og:title" content="MOM SenseLoop V3">
     <meta property="og:description" content="Explore abdominal-acoustic recordings, inspect their frequency landscape, and stress-test signal features under controlled recording changes. Research software, not a diagnostic tool.">
@@ -16,6 +16,7 @@
     <link rel="stylesheet" href="assets/base.css?v=audit-20260907">
     <link rel="stylesheet" href="assets/scientific.css?v=audit-20260907-4">
     <link rel="stylesheet" href="assets/visual-polish.css?v=20260924-1">
+    <link rel="stylesheet" href="assets/apple-landing.css?v=20261028-1">
   </head>
   <body>
     <div id="root">
@@ -27,9 +28,11 @@
     <a class="sonic-atlas-launch" href="sonic-atlas.html" aria-label="Open Sonic Atlas interactive abdominal-acoustic signal explorer and counterfactual stress lab">◉ <span>Explore Sonic Atlas</span> ↗</a>
     <a class="redteam-launch" href="red-team-bench.html" aria-label="Open MOM Red-Team Bench classifier evaluation lab">⌁ <span>Red-Team Bench</span> ↗</a>
     <style>
-      .sonic-atlas-launch{position:fixed;right:22px;bottom:22px;z-index:2147483000;display:inline-flex;align-items:center;gap:9px;padding:13px 17px;border:1px solid #7df3ce;background:#0d211d;color:#b7ffe9;border-radius:999px;box-shadow:0 8px 32px #0004;font:700 13px/1.2 system-ui,sans-serif;text-decoration:none;letter-spacing:.01em;transition:transform .18s,box-shadow .18s}
+      .sonic-atlas-launch{position:fixed;right:22px;bottom:22px;z-index:2147483000;display:inline-flex;align-items:center;gap:9px;padding:13px 17px;border:1px solid #7df3ce;background:rgba(13,33,29,.92);color:#b7ffe9;border-radius:999px;box-shadow:0 8px 32px #0004;font:700 13px/1.2 system-ui,sans-serif;text-decoration:none;letter-spacing:.01em;transition:transform .18s,box-shadow .18s}
       .sonic-atlas-launch:hover{transform:translateY(-2px);box-shadow:0 12px 38px #0006}
-      .redteam-launch{position:fixed;right:22px;bottom:78px;z-index:2147483000;display:inline-flex;align-items:center;gap:9px;padding:13px 17px;border:1px solid #8bbdff;background:#101b2b;color:#c7ddff;border-radius:999px;box-shadow:0 8px 32px #0004;font:700 13px/1.2 system-ui,sans-serif;text-decoration:none;letter-spacing:.01em;transition:transform .18s,box-shadow .18s}\n      .redteam-launch:hover{transform:translateY(-2px);box-shadow:0 12px 38px #0006}\n      @media(max-width:520px){.sonic-atlas-launch{right:12px;bottom:12px;padding:12px 14px}.sonic-atlas-launch span{display:inline}.redteam-launch{right:12px;bottom:68px;padding:12px 14px}}
+      .redteam-launch{position:fixed;right:22px;bottom:78px;z-index:2147483000;display:inline-flex;align-items:center;gap:9px;padding:13px 17px;border:1px solid #8bbdff;background:rgba(16,27,43,.92);color:#c7ddff;border-radius:999px;box-shadow:0 8px 32px #0004;font:700 13px/1.2 system-ui,sans-serif;text-decoration:none;letter-spacing:.01em;transition:transform .18s,box-shadow .18s}
+      .redteam-launch:hover{transform:translateY(-2px);box-shadow:0 12px 38px #0006}
+      @media(max-width:520px){.sonic-atlas-launch{right:12px;bottom:12px;padding:12px 14px}.sonic-atlas-launch span{display:inline}.redteam-launch{right:12px;bottom:68px;padding:12px 14px}}
     </style>
     <script defer src="https://cdn.jsdelivr.net/npm/react@18.3.1/umd/react.production.min.js" crossorigin></script>
     <script defer src="https://cdn.jsdelivr.net/npm/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin></script>
