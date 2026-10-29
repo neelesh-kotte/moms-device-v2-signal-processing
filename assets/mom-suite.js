@@ -118,6 +118,6 @@
   const observer=new ResizeObserver(()=>{if(state.report&&state.frames.length)drawWave(state.frames)});
   if(canvas)observer.observe(canvas);
   window.MOMResearchSuite={setMode,analyzeFile:processFile,getReport:()=>state.report};
-  $('.mode-link').forEach(button=>button.addEventListener('click',()=>{setMode(button.dataset.openMode);$('#audio-lab').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});$('#audioFile').focus({preventScroll:true})}));
+  $$('.mode-link').forEach(button=>button.addEventListener('click',()=>{setMode(button.dataset.openMode);$('#audio-lab').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});$('#audioFile').focus({preventScroll:true})}));
   $('#reportMethod').textContent=modes[state.mode].method;
 })();
