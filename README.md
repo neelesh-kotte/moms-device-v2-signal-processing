@@ -110,6 +110,16 @@ moms-device-v2-signal-processing/
     └── expected_external_summary.json
 ```
 
+## Interactive Sonic Atlas
+
+Open the browser-based [MOM Sonic Atlas](sonic-atlas.html) to explore a WAV recording through a waveform, frequency spectrogram, descriptive acoustic fingerprint, and exploratory high-amplitude segment timeline. The homepage also links to the explorer.
+
+- Processing runs locally in the browser; this page does not send the selected audio to a server.
+- The built-in demo is explicitly simulated and is not real abdominal audio.
+- The fingerprint describes the recording's signal properties. Candidate segments are not verified bowel-sound events.
+- This visualization is a research tool, not a diagnostic or clinical interpretation system.
+
+
 ## Running the analysis
 
 ```bash
