@@ -114,9 +114,11 @@ def compare_recordings(
 
     ref_rms = _rms(pulse_ref)
     test_rms = _rms(pulse_test)
-    ratio = test_rms / ref_rms if ref_rms > 0 else math.inf
+    if ref_rms <= 1e-12:
+        raise ValueError("Reference pulse has negligible energy; capture a valid reference.")
+    ratio = test_rms / ref_rms
     baseline_rms = _rms(base_test)
-    snr_db = 20 * math.log10(test_rms / max(baseline_rms, 1e-12))
+    snr_db = 20 * math.log10(max(test_rms, 1e-12) / max(baseline_rms, 1e-12))
     correlation = _corr(pulse_ref, pulse_test)
     clipping = _clipping_fraction(test)
 
