@@ -820,7 +820,7 @@ var MOM;
                             E('h3', null, 'The signal-processing study'),
                             E('p', null, 'A fixed spectral feature is examined on two public, de-identified bowel-sound datasets to understand its behavior under the stated analysis protocol.'),
                             E('ul', null, E('li', null, '500 ms non-overlapping analysis windows'), E('li', null, 'Recording-level comparisons, not just window counts'), E('li', null, 'Limitations and uncertainty documented')),
-                            E('p', { className: 'premium-track-card__caveat' }, E(Icon, { name: 'info', size: 15 }), 'These public recordings were not captured with the MOM hardware.'))),
+                            E('p', { className: 'premium-track-card__caveat' }, E(Icon, { name: 'info', size: 15 }), 'These public recordings were not captured with the MOM hardware.')))),
                 E('section', { id: 'evidence', className: 'premium-evidence' },
                     E('div', { className: 'premium-evidence__inner' },
                         E('div', { className: 'premium-evidence__copy' },
