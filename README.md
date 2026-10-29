@@ -78,6 +78,24 @@ An additional within-subject rank analysis was added after the primary result an
 
 The exploratory result does not replace the primary result.
 
+## MOM PulseCheck: “silence is not proof”
+
+A proposed active acoustic-path integrity check: apply a repeatable calibration pulse to a bench-mounted coupler and compare the recorded response with a known-good reference. It reports pulse-shape correlation, amplitude ratio, pulse-to-baseline SNR, and clipping, then asks for a retest if the configured engineering checks fail.
+
+See `MOM_PULSECHECK.md` and `pulsecheck.py`. The current prototype has no calibrated actuator, so this is an offline bench-analysis engine—not an on-device capability yet. Thresholds are provisional and must be learned and tested on repeated, held-out bench sessions. It does not diagnose a person or prove that a bowel-sound recording is medically meaningful.
+
+## SOUNDTRUTH: counterfactual acoustic shortcut audit
+
+SOUNDTRUTH tests whether an existing frozen acoustic model changes its prediction when the same labeled recording is exposed to realistic, label-preserving recording nuisances. It reports paired prediction flips, clean-versus-perturbed accuracy changes, and per-recording results. See `SOUNDTRUTH.md` for the proposed protocol and `counterfactual_acoustic_audit.py` for the analysis utility.
+
+This targets a specific failure mode: a model may learn recording conditions rather than generalizable acoustic evidence. The utility analyzes predictions exported from real experiments; it does not create perturbations, train a model, or claim clinical validation. No result should be claimed until the model is actually tested on held-out paired examples.
+
+## Risk-aware acoustic AI audit
+
+The optional `risk_aware_audit.py` utility evaluates predictions from an existing model with confidence and signal-quality abstention gates. It reports coverage alongside error metrics and breaks results down by recording, helping expose cases hidden by one aggregate score. The accompanying `RISK_AWARE_ACOUSTIC_AUDIT.md` documents the protocol, limitations, and example commands; unit tests are in `tests/test_risk_aware_audit.py`.
+
+This is a research-evaluation extension, not a trained model, diagnosis, or medical validation. Thresholds must be selected on validation data and reported with coverage. Public-dataset results do not establish performance on MOM hardware.
+
 ## Engineering evidence
 
 The repository separates engineering evidence from the public-data study. It includes hardware iteration notes, controlled testing records, two independent operator reproductions, external engineering review notes, and the executable external-validation package.
