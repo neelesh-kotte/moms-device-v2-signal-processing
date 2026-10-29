@@ -243,7 +243,7 @@ def run(manifest: Path, out_dir: Path, seed: int = 20261028) -> dict:
     with csv_path.open("w", newline="", encoding="utf-8") as f:
         fields = ["model", "condition", "n_clips", "accuracy", "balanced_accuracy",
                   "event_sensitivity_recall", "non_event_specificity", "precision", "f1",
-                  "auroc", "brier_score", "false_negatives", "false_positives",
+                  "auroc", "brier_score", "false_negatives", "false_positives", "true_positives", "true_negatives",
                   "prediction_flip_rate_vs_baseline", "mean_absolute_probability_shift"]
         writer = csv.DictWriter(f, fieldnames=fields)
         writer.writeheader()
