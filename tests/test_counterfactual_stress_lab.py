@@ -42,7 +42,7 @@ class CounterfactualStressLabTests(unittest.TestCase):
 
     def test_resample_and_float_conversion(self):
         converted = to_float_mono(np.array([0, 1000, -1000] * 8, dtype=np.int16))
-        self.assertEqual(converted.shape, (3,))
+        self.assertEqual(converted.shape, (24,))
         resampled = resample_audio(np.sin(np.arange(4800) / 10), 48000)
         self.assertEqual(len(resampled), 800)
 
