@@ -745,7 +745,7 @@ var MOM;
                 mobileOpen && E('nav', { className: 'premium-mobile-menu', 'aria-label': 'Mobile navigation' },
                     navItems.map(navLink),
                     E('a', { href: 'https://github.com/neelesh-kotte/moms-device-v2-signal-processing', onClick: () => setMobileOpen(false) }, 'Open source repository'),
-                    E('button', { onClick: () => { setMobileOpen(false); onPrivate(); } }, 'Open dashboard'))),
+                    E('button', { onClick: () => { setMobileOpen(false); onPrivate(); } }, 'Open dashboard')))),
             E('main', { id: 'main-content', className: 'premium-home' },
                 E('section', { className: 'premium-hero', 'aria-labelledby': 'premium-hero-title' },
                     E('div', { className: 'premium-hero__copy' },
