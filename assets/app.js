@@ -330,6 +330,7 @@ var MOM;
                 React.createElement("button", { onClick: () => pushRoute('home'), className: "rounded-xl text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mint" },
                     React.createElement(Logo, null)),
                 React.createElement("nav", { className: "site-header__nav", "aria-label": "Public navigation" },
+                    React.createElement(Button, { variant: "ghost", onClick: () => scrollPublicSection('research-tools') }, "Research tools"),
                     React.createElement(Button, { variant: "ghost", onClick: () => pushRoute('learn') }, "Learn"),
                     React.createElement(Button, { variant: "ghost", onClick: () => scrollPublicSection('how-it-works') }, "How it works"),
                     React.createElement(Button, { variant: "ghost", onClick: () => scrollPublicSection('proof') }, "Evidence & limitations"),
@@ -343,6 +344,7 @@ var MOM;
                     React.createElement(Icon, { name: mobile ? 'x' : 'menu' }))),
             mobile && React.createElement("nav", { className: "border-t border-line bg-panel px-4 py-3 md:hidden", "aria-label": "Mobile public navigation" },
                 React.createElement("div", { className: "grid gap-2" },
+                    React.createElement(Button, { variant: "ghost", onClick: () => { setMobile(false); scrollPublicSection('research-tools'); } }, "Research tools"),
                     React.createElement(Button, { variant: "ghost", onClick: () => { setMobile(false); pushRoute('learn'); } }, "Learn"),
                     React.createElement(Button, { variant: "ghost", onClick: () => { setMobile(false); scrollPublicSection('how-it-works'); } }, "How it works"),
                     React.createElement(Button, { variant: "ghost", onClick: () => { setMobile(false); scrollPublicSection('proof'); } }, "Evidence & limitations"),
@@ -644,23 +646,75 @@ var MOM;
             React.createElement(Footer, null));
     }
 
+    function ResearchTools() {
+        const tools = [
+            {
+                number: "01",
+                label: "Explore recordings",
+                title: "Sonic Atlas",
+                description: "Open a WAV file, inspect its waveform and spectrogram, then see how the acoustic feature changes under six controlled recording stress probes.",
+                detail: "Browser-based · WAV · JSON and CSV exports",
+                href: "sonic-atlas.html",
+                action: "Open Sonic Atlas",
+                tone: "mint"
+            },
+            {
+                number: "02",
+                label: "Challenge a model",
+                title: "Red-Team Bench",
+                description: "Evaluate labeled audio clips with recording-level holdouts. Compare models, inspect false positives and false negatives, and find conditions where results are weakest.",
+                detail: "Labeled CSV required · Research evaluation",
+                href: "red-team-bench.html",
+                action: "Open Red-Team Bench",
+                tone: "blue"
+            },
+            {
+                number: "03",
+                label: "Reproduce the work",
+                title: "Methods & source",
+                description: "Read the protocols and inspect the Python implementation behind the stress lab and classifier benchmark. The methods are open to review.",
+                detail: "Open methods · Python source · Limitations",
+                href: "https://github.com/neelesh-kotte/moms-device-v2-signal-processing",
+                action: "View research repository",
+                tone: "sand"
+            }
+        ];
+        return React.createElement("section", { id: "research-tools", className: "home-section research-tools-section", "aria-labelledby": "research-tools-heading" },
+            React.createElement("div", { className: "section-intro research-tools-intro" },
+                React.createElement("p", { className: "eyebrow" }, "TRY THE RESEARCH TOOLS"),
+                React.createElement("h2", { id: "research-tools-heading" }, "Curious? Start exploring."),
+                React.createElement("p", null, "You do not need a technical background to begin. Choose a tool, see what it does, and follow the methods if you want to go deeper.")),
+            React.createElement("div", { className: "research-tools-grid" }, tools.map(tool =>
+                React.createElement("article", { key: tool.number, className: "research-tool-card research-tool-card--" + tool.tone },
+                    React.createElement("div", { className: "research-tool-card__top" },
+                        React.createElement("span", { className: "research-tool-card__number" }, tool.number),
+                        React.createElement("span", { className: "research-tool-card__label" }, tool.label)),
+                    React.createElement("h3", null, tool.title),
+                    React.createElement("p", { className: "research-tool-card__description" }, tool.description),
+                    React.createElement("p", { className: "research-tool-card__detail" }, tool.detail),
+                    React.createElement("a", { href: tool.href, className: "research-tool-card__link" }, tool.action, React.createElement("span", { "aria-hidden": "true" }, " ↗"))))),
+            React.createElement("p", { className: "research-tools-note" },
+                React.createElement("strong", null, "Important: "),
+                "these are research tools, not medical tests. A working tool is not proof of a scientific or clinical finding. Real results require suitable data and experiments."));
+    }
+
     function PublicHome({ onPrivate }) {
         return React.createElement(React.Fragment, null,
             React.createElement(PublicNav, { onPrivate: onPrivate }),
             React.createElement("main", { id: "main-content", className: "public-home" },
                 React.createElement("section", { className: "public-hero" },
                     React.createElement("div", { className: "hero-copy" },
-                        React.createElement("p", { className: "hero-overline" }, "MOM SENSELOOP V3 · LOW-COST RESEARCH PROTOTYPE"),
-                        React.createElement("h1", null, "Turn abdominal sound into visible data."),
-                        React.createElement("p", { className: "hero-subhead" }, "MOM SenseLoop is a low-cost research prototype that records quiet abdominal sounds through a stethoscope-mounted microphone. It checks signal quality before showing patterns, keeps private profiles separate, and never presents a diagnosis."),
+                        React.createElement("p", { className: "hero-overline" }, "MOM SENSELOOP · OPEN RESEARCH PROJECT"),
+                        React.createElement("h1", null, "A small sound. A bigger research question."),
+                        React.createElement("p", { className: "hero-subhead" }, "MOM is a low-cost research prototype for exploring abdominal acoustics: how recordings are captured, how signal quality is checked, and how algorithms behave when recordings change."),
                         React.createElement("div", { className: "hero-actions" },
-                            React.createElement(Button, { variant: "primary", onClick: () => pushRoute('guest') }, "Explore the safe demo", React.createElement(Icon, { name: "arrow-right" })),
-                            React.createElement(Button, { variant: "ghost", onClick: () => pushRoute('learn') }, "Start from zero"),
-                            React.createElement(Button, { variant: "ghost", onClick: () => scrollPublicSection('how-it-works') }, "See how it works")),
+                            React.createElement(Button, { variant: "primary", onClick: () => scrollPublicSection('research-tools') }, "Explore the research tools", React.createElement(Icon, { name: "arrow-right" })),
+                            React.createElement(Button, { variant: "ghost", onClick: () => pushRoute('learn') }, "What is MOM?")),
                         React.createElement("p", { className: "hero-boundary" },
-                            React.createElement("strong", null, "Exploratory only."),
-                            " Not a medical device, hunger meter, mind reader, or food-ordering system.")),
+                            React.createElement("strong", null, "Research prototype only. "),
+                            "MOM is not a medical device and does not diagnose conditions or measure hunger.")),
                     React.createElement(HeroVisual, null)),
+                React.createElement(ResearchTools, null),
                 React.createElement(LearningPath, null),
                 React.createElement(FeatureGrid, null),
                 React.createElement(ReviewProof, null),
