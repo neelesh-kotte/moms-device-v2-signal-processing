@@ -805,7 +805,7 @@ var MOM;
                     ].map(([n,title,copy],i)=>E('article',{key:n,className:'premium-step'},
                         E('div',{className:'premium-step__top'},E('span',null,n),E('span',{className:'premium-step__rule'})),
                         E('h3',null,title),E('p',null,copy),
-                        i===0?E(Icon,{name:'mic-2',size:20}):i===1?E(Icon,{name:'activity',size:20}):E(Icon,{name:'git-compare',size:20})))),
+                        i===0?E(Icon,{name:'mic-2',size:20}):i===1?E(Icon,{name:'activity',size:20}):E(Icon,{name:'git-compare',size:20}))))),
                 E('section', { className: 'premium-section premium-two-tracks', 'aria-labelledby': 'premium-tracks-title' },
                     E('div', { className: 'premium-section__heading' }, E('div', null, E('p', { className: 'premium-eyebrow' }, 'TWO DISTINCT LINES OF WORK'), E('h2', { id: 'premium-tracks-title' }, 'Keep the hardware and the data honest.')), E('p', null, 'The prototype and the public-data study answer different questions. They are intentionally not presented as the same experiment.')),
                     E('div', { className: 'premium-track-grid' },
