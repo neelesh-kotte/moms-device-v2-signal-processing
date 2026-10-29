@@ -650,33 +650,49 @@ var MOM;
         const tools = [
             {
                 number: "01",
-                label: "Explore recordings",
+                label: "See the sound",
                 title: "Sonic Atlas",
-                description: "Open a WAV file, inspect its waveform and spectrogram, then see how the acoustic feature changes under six controlled recording stress probes.",
-                detail: "Browser-based · WAV · JSON and CSV exports",
+                description: "Open an audio recording and explore its waveform, spectrogram, and acoustic fingerprint in an interactive browser-based viewer.",
+                detail: "WAV recording · Visual exploration",
                 href: "sonic-atlas.html",
-                action: "Open Sonic Atlas",
+                action: "Explore Sonic Atlas",
                 tone: "mint"
             },
             {
                 number: "02",
-                label: "Challenge a model",
-                title: "Red-Team Bench",
-                description: "Evaluate labeled audio clips with recording-level holdouts. Compare models, inspect false positives and false negatives, and find conditions where results are weakest.",
-                detail: "Labeled CSV required · Research evaluation",
-                href: "red-team-bench.html",
-                action: "Open Red-Team Bench",
+                label: "Test recording changes",
+                title: "Counterfactual Stress Lab",
+                description: "Run six controlled probes—including gain changes, background noise, a time shift, and clipping—to measure how the acoustic feature moves.",
+                detail: "Stress probes · JSON and CSV reports",
+                href: "sonic-atlas.html",
+                action: "Open the stress lab",
                 tone: "blue"
             },
             {
                 number: "03",
-                label: "Reproduce the work",
-                title: "Methods & source",
-                description: "Read the protocols and inspect the Python implementation behind the stress lab and classifier benchmark. The methods are open to review.",
-                detail: "Open methods · Python source · Limitations",
-                href: "https://github.com/neelesh-kotte/moms-device-v2-signal-processing",
-                action: "View research repository",
-                tone: "sand"
+                label: "Challenge a classifier",
+                title: "Red-Team Bench",
+                description: "Evaluate labeled audio clips using recording-level holdouts. Compare logistic regression and random forest, inspect false positives and negatives, and find weak test conditions.",
+                detail: "Labeled CSV required · Report viewer",
+                href: "red-team-bench.html",
+                action: "Open Red-Team Bench",
+                tone: "mint"
+            },
+            {
+                number: "04",
+                label: "Inspect the method",
+                title: "Research methods & code",
+                description: "Read how each experiment works, what the reports mean, and what the software cannot prove. Inspect the Python implementation instead of taking the interface on trust.",
+                detail: "Open methods · Reproducible source",
+                href: "COUNTERFACTUAL_STRESS_LAB.md",
+                action: "Read the stress-lab method",
+                tone: "sand",
+                resources: [
+                    ["Red-Team Bench protocol", "MOM_REDTEAM_BENCH.md"],
+                    ["Stress-test Python source", "counterfactual_stress_lab.py"],
+                    ["Classifier benchmark source", "mom_redteam_bench.py"],
+                    ["Full repository", "https://github.com/neelesh-kotte/moms-device-v2-signal-processing"]
+                ]
             }
         ];
         return React.createElement("section", { id: "research-tools", className: "home-section research-tools-section", "aria-labelledby": "research-tools-heading" },
@@ -692,10 +708,12 @@ var MOM;
                     React.createElement("h3", null, tool.title),
                     React.createElement("p", { className: "research-tool-card__description" }, tool.description),
                     React.createElement("p", { className: "research-tool-card__detail" }, tool.detail),
-                    React.createElement("a", { href: tool.href, className: "research-tool-card__link" }, tool.action, React.createElement("span", { "aria-hidden": "true" }, " ↗"))))),
+                    React.createElement("a", { href: tool.href, className: "research-tool-card__link" }, tool.action, React.createElement("span", { "aria-hidden": "true" }, " ↗")),
+                    tool.resources && React.createElement("div", { className: "research-tool-card__resources", "aria-label": "Related research files" },
+                        tool.resources.map(([label, href]) => React.createElement("a", { key: href, href: href, className: "research-tool-card__resource" }, label)))))),
             React.createElement("p", { className: "research-tools-note" },
-                React.createElement("strong", null, "Important: "),
-                "these are research tools, not medical tests. A working tool is not proof of a scientific or clinical finding. Real results require suitable data and experiments."));
+                React.createElement("strong", null, "Research boundary: "),
+                "these tools help inspect recordings and audit software behavior; they are not medical tests. A working tool is not proof of a scientific or clinical finding. Real results require suitable labeled data and experiments."));
     }
 
     function PublicHome({ onPrivate }) {
