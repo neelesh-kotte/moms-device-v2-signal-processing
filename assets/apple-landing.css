@@ -199,7 +199,7 @@ a { text-underline-offset: 3px; }
 .public-home .research-tools-intro { margin-bottom: 30px; }
 .public-home .research-tools-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 16px;
 }
 .public-home .research-tool-card {
@@ -239,6 +239,9 @@ a { text-underline-offset: 3px; }
   text-decoration: none;
 }
 .public-home .research-tool-card__link:hover { text-decoration: underline; }
+.public-home .research-tool-card__resources { display: grid; gap: 8px; margin-top: 17px; padding-top: 15px; border-top: 1px solid rgba(36, 62, 45, .12); }
+.public-home .research-tool-card__resource { width: fit-content; color: #596b60; font-size: 11px; font-weight: 650; text-decoration: none; }
+.public-home .research-tool-card__resource:hover { color: var(--mom-green-dark); text-decoration: underline; }
 .public-home .research-tools-note {
   max-width: 850px;
   margin: 22px 0 0;
