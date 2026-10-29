@@ -684,13 +684,13 @@ var MOM;
                 title: "Research methods & code",
                 description: "Read how each experiment works, what the reports mean, and what the software cannot prove. Inspect the Python implementation instead of taking the interface on trust.",
                 detail: "Open methods · Reproducible source",
-                href: "COUNTERFACTUAL_STRESS_LAB.md",
+                href: "https://github.com/neelesh-kotte/moms-device-v2-signal-processing/blob/main/COUNTERFACTUAL_STRESS_LAB.md",
                 action: "Read the stress-lab method",
                 tone: "sand",
                 resources: [
-                    ["Red-Team Bench protocol", "MOM_REDTEAM_BENCH.md"],
-                    ["Stress-test Python source", "counterfactual_stress_lab.py"],
-                    ["Classifier benchmark source", "mom_redteam_bench.py"],
+                    ["Red-Team Bench protocol", "https://github.com/neelesh-kotte/moms-device-v2-signal-processing/blob/main/MOM_REDTEAM_BENCH.md"],
+                    ["Stress-test Python source", "https://github.com/neelesh-kotte/moms-device-v2-signal-processing/blob/main/counterfactual_stress_lab.py"],
+                    ["Classifier benchmark source", "https://github.com/neelesh-kotte/moms-device-v2-signal-processing/blob/main/mom_redteam_bench.py"],
                     ["Full repository", "https://github.com/neelesh-kotte/moms-device-v2-signal-processing"]
                 ]
             }
