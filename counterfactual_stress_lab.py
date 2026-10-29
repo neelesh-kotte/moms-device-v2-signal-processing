@@ -113,16 +113,16 @@ def make_conditions(x: np.ndarray, sample_rate: int) -> list[tuple[str, str, np.
 def summarize(name: str, description: str, x: np.ndarray, base_feature: float | None) -> dict:
     values = np.asarray(feature_per_window(x), dtype=float)
     finite = values[np.isfinite(values)]
-    feature = float(np.median(finite)) if len(finite) else float("nan")
-    delta = feature - base_feature if base_feature is not None and np.isfinite(feature) else float("nan")
-    rel = abs(delta) / max(abs(base_feature), 1e-12) if base_feature is not None and np.isfinite(feature) else float("nan")
+    feature = float(np.median(finite)) if len(finite) else None
+    delta = feature - base_feature if base_feature is not None and feature is not None else None
+    rel = abs(delta) / max(abs(base_feature), 1e-12) if delta is not None and base_feature is not None else None
     return {
         "condition": name,
         "description": description,
         "complete_windows": int(len(values)),
         "median_band_power_ratio": feature,
-        "absolute_change_from_baseline": float(delta),
-        "relative_change_percent": float(100 * rel),
+        "absolute_change_from_baseline": float(delta) if delta is not None else None,
+        "relative_change_percent": float(100 * rel) if rel is not None else None,
         "rms_amplitude": rms(x),
         "clipped_sample_fraction": float(np.mean(np.abs(x) >= 0.999)),
     }
