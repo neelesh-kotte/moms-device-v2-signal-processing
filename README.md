@@ -78,6 +78,12 @@ An additional within-subject rank analysis was added after the primary result an
 
 The exploratory result does not replace the primary result.
 
+## Risk-aware acoustic AI audit
+
+The optional `risk_aware_audit.py` utility evaluates predictions from an existing model with confidence and signal-quality abstention gates. It reports coverage alongside error metrics and breaks results down by recording, helping expose cases hidden by one aggregate score. The accompanying `RISK_AWARE_ACOUSTIC_AUDIT.md` documents the protocol, limitations, and example commands; unit tests are in `tests/test_risk_aware_audit.py`.
+
+This is a research-evaluation extension, not a trained model, diagnosis, or medical validation. Thresholds must be selected on validation data and reported with coverage. Public-dataset results do not establish performance on MOM hardware.
+
 ## Engineering evidence
 
 The repository separates engineering evidence from the public-data study. It includes hardware iteration notes, controlled testing records, two independent operator reproductions, external engineering review notes, and the executable external-validation package.
