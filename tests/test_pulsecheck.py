@@ -26,6 +26,7 @@ class PulseCheckTests(unittest.TestCase):
         result = compare_recordings(self.reference, test, self.fs, 0.4, 0.6)
         self.assertEqual(result["status"], "RETEST_AND_INSPECT")
         self.assertFalse(result["checks"]["pulse_above_baseline_noise"])
+        self.assertTrue(np.isfinite(result["metrics"]["test_pulse_snr_db"]))
 
     def test_amplitude_out_of_range_triggers_retest(self):
         test = self.test.copy()
