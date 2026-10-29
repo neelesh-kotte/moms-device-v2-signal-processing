@@ -795,7 +795,7 @@ var MOM;
                         E('h3', null, tool.title),
                         E('p', { className: 'premium-tool-card__copy' }, tool.copy),
                         E('div', { className: 'premium-tool-card__meta' }, E(Icon, { name: 'check-circle-2', size: 14 }), tool.meta),
-                        E('a', { href: tool.href, className: 'premium-tool-card__link' }, tool.action, E(Icon, { name: 'arrow-up-right', size: 17 }))))),
+                        E('a', { href: tool.href, className: 'premium-tool-card__link' }, tool.action, E(Icon, { name: 'arrow-up-right', size: 17 })))))),
                 E('section', { id: 'approach', className: 'premium-section premium-approach', 'aria-labelledby': 'premium-approach-title' },
                     E('div', { className: 'premium-approach__intro' }, E('p', { className: 'premium-eyebrow' }, 'THE IDEA, SIMPLY'), E('h2', { id: 'premium-approach-title' }, 'Listen. Check. Then ask better questions.'), E('p', null, 'Abdominal acoustics means studying sounds captured from outside the abdomen. The first job is to understand the recording—not jump to a conclusion.')),
                     E('div', { className: 'premium-steps' }, [
