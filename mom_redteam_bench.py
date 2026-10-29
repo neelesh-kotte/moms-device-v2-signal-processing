@@ -36,15 +36,14 @@ FEATURE_NAMES = [
 
 def load_audio(path: Path) -> np.ndarray:
     rate, data = wavfile.read(path)
-    if data.ndim == 2:
-        data = data.astype(np.float64).mean(axis=1)
-    elif data.ndim == 1:
-        if np.issubdtype(data.dtype, np.integer):
-            info = np.iinfo(data.dtype)
-            data = data.astype(np.float64) / max(abs(info.min), abs(info.max))
-        else:
-            data = data.astype(np.float64)
+    if np.issubdtype(data.dtype, np.integer):
+        info = np.iinfo(data.dtype)
+        data = data.astype(np.float64) / max(abs(info.min), abs(info.max))
     else:
+        data = data.astype(np.float64)
+    if data.ndim == 2:
+        data = data.mean(axis=1)
+    elif data.ndim != 1:
         raise ValueError(f"{path}: expected mono or stereo WAV")
     if len(data) < 16 or not np.all(np.isfinite(data)):
         raise ValueError(f"{path}: audio is empty, too short, or non-finite")
@@ -239,6 +238,7 @@ def run(manifest: Path, out_dir: Path, seed: int = 20261028) -> dict:
         report["models"][model_name] = model_result
     json_path = out_dir / "redteam_report.json"
     csv_path = out_dir / "redteam_summary.csv"
+    report["output_files"] = [str(json_path), str(csv_path)]
     json_path.write_text(json.dumps(report, indent=2, allow_nan=False), encoding="utf-8")
     with csv_path.open("w", newline="", encoding="utf-8") as f:
         fields = ["model", "condition", "n_clips", "accuracy", "balanced_accuracy",
@@ -250,7 +250,6 @@ def run(manifest: Path, out_dir: Path, seed: int = 20261028) -> dict:
         for model_name, result in report["models"].items():
             for condition, values in result["conditions"].items():
                 writer.writerow({"model": model_name, "condition": condition, **values})
-    report["output_files"] = [str(json_path), str(csv_path)]
     return report
 
 
